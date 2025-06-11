@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Switch Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .language-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 25px;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 5px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        [dir="rtl"] {
+            text-align: right;
+        }
+
+        [dir="rtl"] .language-toggle {
+            left: 20px;
+            right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
+        <button class="lang-btn" onclick="switchLanguage('ar')">العربية</button>
+    </div>
+
+    <h1 data-en="Welcome to Voice Donation" data-ar="مرحباً بكم في التبرع بالصوت">Welcome to Voice Donation</h1>
+
+    <p data-en="This is a test of the language switching functionality." data-ar="هذا اختبار لوظيفة تبديل اللغة.">
+        This is a test of the language switching functionality.
+    </p>
+
+    <button data-en="Click Me" data-ar="اضغط هنا">Click Me</button>
+
+    <script>
+        function switchLanguage(lang) {
+            console.log('Switching language to:', lang);
+
+            // Update document direction
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = lang;
+
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+
+            // Set active button
+            if (lang === 'ar') {
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+            } else {
+                document.querySelectorAll('.lang-btn')[0].classList.add('active');
+            }
+
+            // Update all translatable elements
+            document.querySelectorAll('[data-en][data-ar]').forEach(function(element) {
+                const text = lang === 'ar' ? element.getAttribute('data-ar') : element.getAttribute('data-en');
+                element.textContent = text;
+            });
+
+            console.log('Language switch complete');
+        }
+
+        console.log('Script loaded successfully');
+    </script>
+</body>
+</html>
