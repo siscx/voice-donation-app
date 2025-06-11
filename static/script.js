@@ -7,8 +7,10 @@ let recordingInterval;
 let minRecordingTime = 30000;
 let maxRecordingTime = 40000;
 
-// API Configuration
-const API_BASE_URL = window.location.origin + '/api';
+// API Configuration - Smart environment detection
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000/api'  // Local development
+    : window.location.origin + '/api'; // Production
 
 // Picture URLs
 const pictureUrls = [
