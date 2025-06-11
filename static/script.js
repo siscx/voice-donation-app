@@ -104,6 +104,8 @@ const translations = {
         processingTitle: "Analyzing Your Voice",
         processingSubtitle: "Processing Audio Features",
         processingDescription: "Our AI is extracting over 60 vocal biomarkers from your recording. This analysis helps researchers identify subtle voice patterns that could indicate early signs of health conditions.",
+        processingStatus: "Processing your voice donation...",
+        processingWait: "This usually takes 2-4 minutes. Please keep this page open.",
         feature1: "✓ Pitch patterns",
         feature2: "✓ Voice quality",
         feature3: "✓ Speech rhythm",
@@ -185,6 +187,8 @@ const translations = {
         processingTitle: "تحليل صوتك",
         processingSubtitle: "معالجة الميزات الصوتية",
         processingDescription: "يقوم الذكاء الاصطناعي بتحليل أكثر من 60 مؤشر صوتي من تسجيلك. يساعد هذا التحليل الباحثين في تحديد الأنماط الصوتية الدقيقة التي قد تشير إلى علامات مبكرة للحالات الصحية.",
+        processingStatus: "جاري معالجة تبرعك الصوتي...",
+        processingWait: "يستغرق هذا عادة 2-4 دقائق. يرجى إبقاء هذه الصفحة مفتوحة.",
         feature1: "✓ أنماط الطبقة الصوتية",
         feature2: "✓ جودة الصوت",
         feature3: "✓ إيقاع الكلام",
@@ -547,12 +551,191 @@ async function submitDonation() {
 
         formData.append('audio', audioBlob, 'voice_donation.webm');
 
+async function submitDonation() {
+    try {
+        // Prepare form data
+        const formData = new FormData();
+
+        // Add audio file - ensure we have audio data
+        if (!audioChunks || audioChunks.length === 0) {
+            alert('No audio recorded. Please record your voice first.');
+            return;
+        }
+
+        console.log('Audio chunks:', audioChunks.length, 'Total size:', audioChunks.reduce((total, chunk) => total + chunk.size, 0));
+
+        // Create blob with proper MIME type
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+        console.log('Audio blob size:', audioBlob.size);
+
+        if (audioBlob.size === 0) {
+            alert('Audio recording is empty. Please try recording again.');
+            return;
+        }
+
+        formData.append('audio', audioBlob, 'voice_donation.webm');
+
         // Add questionnaire data
         const chronicConditions = Array.from(document.querySelectorAll('input[name="chronicConditions"]:checked')).map(cb => cb.value);
         const questionnaireData = {
             donation_language: document.getElementById('donationLanguage').value,
             age_group: document.getElementById('ageGroup').value,
             chronic_conditions: chronicConditions,
+            respiratory_severity: document.getElementById('respiratorySeverity').value || null,
+            voice_problems: document.getElementById('voiceProblems').value,
+            other_condition: document.getElementById('otherCondition').value || null,
+            other_voice_problem: document.getElementById('otherVoiceProblem').value || null
+        };
+
+        formData.append('questionnaire', JSON.stringify(questionnaireData));
+
+        // Show processing screen
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        document.getElementById('processingStep').classList.add('active');
+
+        // Submit to API
+        const response = await fetch(`${API_BASE_URL}/voice-donation`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.status === 'processing') {
+            // Store recording ID and start polling
+            const recordingId = result.recording_id;
+
+            // Update processing display with waiting message
+            updateProcessingDisplay(recordingId, 'processing');
+
+            // Start polling for completion
+            pollDonationStatus(recordingId);
+        } else {
+            throw new Error(result.message || 'Unknown error occurred');
+        }
+
+    } catch (error) {
+        console.error('Submission error:', error);
+        alert('There was an error submitting your donation. Please try again.');
+        // Go back to recording step
+        document.getElementById('processingStep').classList.remove('active');
+        document.getElementById(`step${currentStep}`).classList.add('active');
+    }
+}_conditions: chronicConditions,
+            respiratory_severity: document.getElementById('respiratorySeverity').value || null,
+            voice_problems: document.getElementById('voiceProblems').value,
+            other_condition: document.getElementById('otherCondition').value || null,
+            other_voice_problem: document.getElementById('otherVoiceProblem').value || null
+        };
+
+        formData.append('questionnaire', JSON.stringify(questionnaireData));
+
+        // Show processing screen
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        document.getElementById('processingStep').classList.add('active');
+
+        // Submit to API
+        const response = await fetch(`${API_BASE_URL}/voice-donation`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.status === 'processing') {
+            // Store recording ID and start polling
+            const recordingId = result.recording_id;
+
+            // Update processing display with waiting message
+            updateProcessingDisplay(recordingId, 'processing');
+
+            // Start polling for completion
+            pollDonationStatus(recordingId);
+        } else {
+            throw new Error(result.message || 'Unknown error occurred');
+        }
+
+    } catch (error) {
+        console.error('Submission error:', error);
+        alert('There was an error submitting your donation. Please try again.');
+        // Go back to recording step
+        document.getElementById('processingStep').classList.remove('active');
+        document.getElementById(`step${currentStep}`).classList.add('active');
+    }
+}
+
+function updateProcessingDisplay(recordingId, status) {
+    const currentLang = document.documentElement.lang || 'en';
+
+    // Update processing status text
+    const statusElement = document.querySelector('.processing-title');
+    const waitElement = document.querySelector('.processing-subtitle');
+
+    if (status === 'processing') {
+        statusElement.textContent = translations[currentLang]['processingStatus'];
+        waitElement.textContent = translations[currentLang]['processingWait'];
+    } else if (status === 'completed') {
+        statusElement.textContent = translations[currentLang]['processingSubtitle'];
+        waitElement.textContent = translations[currentLang]['processingDescription'];
+    }
+}
+
+async function pollDonationStatus(recordingId) {
+    const maxAttempts = 60; // Poll for up to 5 minutes (60 * 5 seconds)
+    let attempts = 0;
+
+    const poll = async () => {
+        try {
+            attempts++;
+            console.log(`Polling attempt ${attempts} for ${recordingId}`);
+
+            const response = await fetch(`${API_BASE_URL}/donation-status/${recordingId}`);
+
+            if (!response.ok) {
+                throw new Error(`Status check failed: ${response.status}`);
+            }
+
+            const statusData = await response.json();
+            console.log('Status check result:', statusData);
+
+            if (statusData.status === 'completed') {
+                // Processing complete - show success
+                document.getElementById('donationId').textContent = `Donation ID: ${recordingId}`;
+                document.getElementById('processingStep').classList.remove('active');
+                document.getElementById('step5').classList.add('active');
+                return;
+            } else if (statusData.status === 'failed') {
+                // Processing failed
+                throw new Error(`Processing failed: ${statusData.error_message || 'Unknown processing error'}`);
+            } else if (statusData.status === 'processing') {
+                // Still processing - continue polling
+                if (attempts < maxAttempts) {
+                    setTimeout(poll, 5000); // Poll every 5 seconds
+                } else {
+                    throw new Error('Processing is taking longer than expected. Please check back later or contact support.');
+                }
+            }
+
+        } catch (error) {
+            console.error('Status polling error:', error);
+            alert(`Error checking processing status: ${error.message}`);
+            // Go back to recording step
+            document.getElementById('processingStep').classList.remove('active');
+            document.getElementById(`step${currentStep}`).classList.add('active');
+        }
+    };
+
+    // Start polling after 2 seconds
+    setTimeout(poll, 2000);
+}_conditions: chronicConditions,
             respiratory_severity: document.getElementById('respiratorySeverity').value || null,
             voice_problems: document.getElementById('voiceProblems').value,
             other_condition: document.getElementById('otherCondition').value || null,

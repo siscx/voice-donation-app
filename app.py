@@ -1,12 +1,13 @@
-#app.py
+# app.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-import traceback  # Added for debugging
+import traceback
+import threading
+import uuid
+from datetime import datetime
 from dotenv import load_dotenv
 from flask import send_from_directory
-
-
 
 # Load environment variables
 load_dotenv()
@@ -17,13 +18,16 @@ CORS(app)  # Enable CORS for frontend integration
 # Basic configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+
 @app.route('/')
 def home():
     return send_from_directory('static', 'index.html')
 
+
 @app.route('/static/<path:filename>')
 def static_files(filename):
     return send_from_directory('static', filename)
+
 
 # Health check endpoint
 @app.route('/health', methods=['GET'])
@@ -105,7 +109,53 @@ def upload_audio():
         }), 500
 
 
-# Complete voice donation endpoint (audio + questionnaire)
+def process_audio_background(recording_id, audio_data, filename, questionnaire_result, request_info):
+    """Background function to process audio features"""
+    try:
+        print(f"Starting background processing for {recording_id}")
+
+        # Extract features from audio
+        from utils.feature_extraction import extract_all_features
+
+        # Process audio and extract features
+        features_result = extract_all_features(audio_data, filename, request_info)
+
+        if not features_result.get('summary', {}).get('processing_successful', False):
+            # Update database with failed status
+            from utils.database import update_voice_donation_status
+            update_voice_donation_status(recording_id, 'failed', error=features_result.get('processing_error'))
+            print(f"Audio processing failed for {recording_id}: {features_result.get('processing_error')}")
+            return
+
+        # Save complete record to database
+        from utils.database import save_voice_donation_features
+        db_result = save_voice_donation_features(
+            recording_id=recording_id,
+            audio_features=features_result,
+            questionnaire_data=questionnaire_result['data'],
+            metadata=features_result['metadata']
+        )
+
+        if db_result['success']:
+            print(f"Successfully completed processing for {recording_id}")
+        else:
+            print(f"Database save failed for {recording_id}: {db_result['error']}")
+            # Update status to failed
+            from utils.database import update_voice_donation_status
+            update_voice_donation_status(recording_id, 'failed', error=db_result['error'])
+
+    except Exception as e:
+        print(f"Background processing error for {recording_id}: {e}")
+        print(traceback.format_exc())
+        # Update database with failed status
+        try:
+            from utils.database import update_voice_donation_status
+            update_voice_donation_status(recording_id, 'failed', error=str(e))
+        except:
+            pass  # Avoid infinite error loops
+
+
+# Complete voice donation endpoint (audio + questionnaire) - ASYNC VERSION
 @app.route('/api/voice-donation', methods=['POST'])
 def voice_donation():
     try:
@@ -158,8 +208,17 @@ def voice_donation():
                 'details': questionnaire_result['errors']
             }), 400
 
-        # Extract features from audio
-        from utils.feature_extraction import extract_all_features
+        # Generate unique recording ID
+        recording_id = str(uuid.uuid4())
+        print(f"Generated recording_id: {recording_id}")
+
+        # Read audio data
+        audio_data = file.read()
+        if len(audio_data) == 0:
+            return jsonify({'error': 'Empty audio file'}), 400
+
+        # Create initial database record with "processing" status
+        from utils.database import save_initial_voice_donation
 
         # Prepare request info for metadata
         request_info = {
@@ -168,45 +227,40 @@ def voice_donation():
             'method': request.method
         }
 
-        # Process audio and extract features
-        print("Processing audio...")
-        audio_data = file.read()
-        features_result = extract_all_features(audio_data, file.filename, request_info)
-
-        if not features_result.get('summary', {}).get('processing_successful', False):
-            print(f"Audio processing failed: {features_result.get('processing_error', 'Unknown error')}")
-            return jsonify({
-                'error': 'Audio processing failed',
-                'details': features_result.get('processing_error', 'Unknown error')
-            }), 500
-
-        # Save complete record to database
-        from utils.database import save_voice_donation
-        recording_id = features_result['metadata']['recording_id']
-
-        print(f"Saving to database with recording_id: {recording_id}")
-        db_result = save_voice_donation(
+        # Save initial record
+        initial_result = save_initial_voice_donation(
             recording_id=recording_id,
-            audio_features=features_result,
             questionnaire_data=questionnaire_result['data'],
-            metadata=features_result['metadata']
+            audio_filename=file.filename,
+            audio_size=len(audio_data),
+            request_info=request_info
         )
 
-        if db_result['success']:
-            print("SUCCESS: Voice donation completed")
+        if not initial_result['success']:
+            print(f"Failed to save initial record: {initial_result['error']}")
             return jsonify({
-                'success': True,
-                'recording_id': recording_id,
-                'message': 'Voice donation completed successfully',
-                'features_extracted': features_result['summary']['total_features_extracted'],
-                'audio_quality': features_result['quality_metrics']['signal_quality']
-            }), 200
-        else:
-            print(f"Database save failed: {db_result['error']}")
-            return jsonify({
-                'error': 'Failed to save data',
-                'details': db_result['error']
+                'error': 'Failed to save initial data',
+                'details': initial_result['error']
             }), 500
+
+        # Start background processing thread
+        processing_thread = threading.Thread(
+            target=process_audio_background,
+            args=(recording_id, audio_data, file.filename, questionnaire_result, request_info),
+            daemon=True
+        )
+        processing_thread.start()
+
+        print("SUCCESS: Voice donation submitted, processing started in background")
+
+        # Return success immediately
+        return jsonify({
+            'success': True,
+            'recording_id': recording_id,
+            'message': 'Voice donation submitted successfully',
+            'status': 'processing',
+            'processing_info': 'Audio features are being extracted in the background. This usually takes 2-4 minutes.'
+        }), 200
 
     except Exception as e:
         print(f"VOICE DONATION ERROR: {e}")
@@ -215,6 +269,39 @@ def voice_donation():
         return jsonify({
             'error': str(e),
             'message': 'Failed to process voice donation'
+        }), 500
+
+
+# New endpoint to check donation processing status
+@app.route('/api/donation-status/<recording_id>', methods=['GET'])
+def check_donation_status(recording_id):
+    try:
+        from utils.database import get_voice_donation_status
+
+        result = get_voice_donation_status(recording_id)
+
+        if not result['success']:
+            return jsonify({
+                'error': 'Recording not found',
+                'recording_id': recording_id
+            }), 404
+
+        status_data = result['data']
+
+        return jsonify({
+            'recording_id': recording_id,
+            'status': status_data['status'],
+            'created_at': status_data.get('created_at'),
+            'completed_at': status_data.get('completed_at'),
+            'error_message': status_data.get('error_message'),
+            'features_extracted': status_data.get('features_extracted', 0)
+        }), 200
+
+    except Exception as e:
+        print(f"STATUS CHECK ERROR: {e}")
+        return jsonify({
+            'error': str(e),
+            'message': 'Failed to check donation status'
         }), 500
 
 
