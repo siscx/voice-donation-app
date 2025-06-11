@@ -4,6 +4,9 @@ from flask_cors import CORS
 import os
 import traceback  # Added for debugging
 from dotenv import load_dotenv
+from flask import send_from_directory
+
+
 
 # Load environment variables
 load_dotenv()
@@ -14,6 +17,13 @@ CORS(app)  # Enable CORS for frontend integration
 # Basic configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+@app.route('/')
+def home():
+    return send_from_directory('static', 'index.html')
+
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
 
 # Health check endpoint
 @app.route('/health', methods=['GET'])
