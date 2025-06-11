@@ -4,36 +4,21 @@ let mediaRecorder;
 let audioChunks = [];
 let recordingStartTime;
 let recordingInterval;
-let minRecordingTime = 30000; // 30 seconds
-let maxRecordingTime = 40000; // 40 seconds
+let minRecordingTime = 30000;
+let maxRecordingTime = 40000;
 
 // API Configuration
-const API_BASE_URL = window.location.origin + '/api'; //'http://127.0.0.1:5000/api';
+const API_BASE_URL = window.location.origin + '/api';
 
-// Better engaging pictures for description task
+// Picture URLs
 const pictureUrls = [
-    // Family cooking together - lots to describe
     'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=350&fit=crop&crop=center',
-
-    // People playing basketball - action scene
     'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500&h=350&fit=crop&crop=center',
-
-    // Children playing in a park - dynamic scene
     'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=350&fit=crop&crop=center',
-
-    // Friends having a picnic - social interaction
     'https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=500&h=350&fit=crop&crop=center',
-
-    // People working in a garden - detailed activity
     'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=500&h=350&fit=crop&crop=center',
-
-    // Musicians playing instruments - engaging scene
     'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=350&fit=crop&crop=center',
-
-    // People exercising in a gym - action scene
     'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=350&fit=crop&crop=center',
-
-    // Family at the beach - vacation scene with details
     'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500&h=350&fit=crop&crop=center'
 ];
 
@@ -116,11 +101,7 @@ const translations = {
         successTitle: "Thank You!",
         successSubtitle: "Your voice sample has been successfully submitted and will contribute to life-changing voice analytics research.",
         successDescription: "Your anonymous donation contributes to developing AI that can detect health conditions years before symptoms appear, bringing proactive healthcare within reach for everyone.",
-        privacyNote: "Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing.",
-        impactTitle: "Your Impact",
-        impactStat1: "Voice donated today",
-        impactStat2: "Features analyzed",
-        impactStat3: "Potential lives helped"
+        privacyNote: "Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing."
     },
     ar: {
         heroTitle: "تبرع بصوتك من أجل الصحة",
@@ -199,17 +180,15 @@ const translations = {
         successTitle: "شكراً لك!",
         successSubtitle: "تم إرسال عينة صوتك بنجاح وستساهم في أبحاث التحليل الصوتي المغيرة للحياة.",
         successDescription: "يساهم تبرعك المجهول في تطوير ذكاء اصطناعي يمكنه اكتشاف الحالات الصحية قبل سنوات من ظهور الأعراض، مما يجعل الرعاية الصحية الاستباقية في متناول الجميع.",
-        privacyNote: "يتم تخزين بياناتك بأمان واستخدامها بشكل مجهول للبحوث الصحية. لطلب إزالة تبرعك، يرجى مراسلة privacy@munsait.com وتضمين معرف التبرع أعلاه لمعالجة أسرع.",
-        impactTitle: "تأثيرك",
-        impactStat1: "صوت تم التبرع به اليوم",
-        impactStat2: "ميزة تم تحليلها",
-        impactStat3: "أرواح يمكن إنقاذها"
+        privacyNote: "يتم تخزين بياناتك بأمان واستخدامها بشكل مجهول للبحوث الصحية. لطلب إزالة تبرعك، يرجى مراسلة privacy@munsait.com وتضمين معرف التبرع أعلاه لمعالجة أسرع."
     }
 };
 
 // Create particles
 function createParticles() {
     const particlesContainer = document.getElementById('particles');
+    if (!particlesContainer) return;
+
     for (let i = 0; i < 50; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
@@ -223,6 +202,8 @@ function createParticles() {
 
 // Step navigation
 function nextStep() {
+    console.log('nextStep called, currentStep:', currentStep);
+
     // Validate questionnaire on step 2
     if (currentStep === 2 && !validateQuestionnaire()) {
         return;
@@ -253,23 +234,56 @@ function nextStep() {
 
 function loadRandomPicture() {
     const randomIndex = Math.floor(Math.random() * pictureUrls.length);
-    document.getElementById('randomPicture').src = pictureUrls[randomIndex];
+    const imgElement = document.getElementById('randomPicture');
+    if (imgElement) {
+        imgElement.src = pictureUrls[randomIndex];
+    }
+}
+
+// Language switching
+function switchLanguage(lang) {
+    console.log('switchLanguage called with:', lang);
+
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+
+    // Toggle active class
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    const langBtn = document.getElementById(`lang-${lang}`);
+    if (langBtn) {
+        langBtn.classList.add('active');
+    }
+
+    // Translate all elements with data-translate
+    document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        const translation = translations[lang][key];
+        if (translation) {
+            el.textContent = translation;
+        }
+    });
 }
 
 // Form validation
 function validateQuestionnaire() {
-    const language = document.getElementById('donationLanguage').value;
-    const ageGroup = document.getElementById('ageGroup').value;
+    const language = document.getElementById('donationLanguage');
+    const ageGroup = document.getElementById('ageGroup');
     const chronicConditions = Array.from(document.querySelectorAll('input[name="chronicConditions"]:checked')).map(cb => cb.value);
-    const voiceProblems = document.getElementById('voiceProblems').value;
+    const voiceProblems = document.getElementById('voiceProblems');
 
-    if (!language || !ageGroup || chronicConditions.length === 0 || !voiceProblems) {
+    if (!language || !ageGroup || !voiceProblems) {
+        console.log('Missing form elements');
+        return false;
+    }
+
+    if (!language.value || !ageGroup.value || chronicConditions.length === 0 || !voiceProblems.value) {
+        console.log('Missing form values');
         return false;
     }
 
     // Check conditional fields
     const otherConditionRequired = chronicConditions.includes('other') && !document.getElementById('otherCondition').value.trim();
-    const otherVoiceProblemRequired = voiceProblems === 'other' && !document.getElementById('otherVoiceProblem').value.trim();
+    const otherVoiceProblemRequired = voiceProblems.value === 'other' && !document.getElementById('otherVoiceProblem').value.trim();
     const respiratorySeverityRequired = chronicConditions.includes('respiratory') && !document.getElementById('respiratorySeverity').value;
 
     if (otherConditionRequired || otherVoiceProblemRequired || respiratorySeverityRequired) {
@@ -307,11 +321,10 @@ function handleChronicConditionChange() {
         if (noneCheckbox) noneCheckbox.checked = false;
     }
 
-    // Show/hide conditional fields based on current selections
+    // Show/hide conditional fields
     const otherGroup = document.getElementById('otherConditionGroup');
     const respiratoryGroup = document.getElementById('respiratorySeverityGroup');
 
-    // Show "Other condition" text field ONLY if "other" is selected
     if (checkedConditions.includes('other')) {
         if (otherGroup) otherGroup.classList.remove('hidden');
     } else {
@@ -322,7 +335,6 @@ function handleChronicConditionChange() {
         }
     }
 
-    // Show "Respiratory severity" dropdown ONLY if "respiratory" is selected
     if (checkedConditions.includes('respiratory')) {
         if (respiratoryGroup) respiratoryGroup.classList.remove('hidden');
     } else {
@@ -333,7 +345,7 @@ function handleChronicConditionChange() {
         }
     }
 
-    // Update checkbox visual styling
+    // Update checkbox styling
     document.querySelectorAll('.checkbox-card').forEach(item => {
         const checkbox = item.querySelector('input[type="checkbox"]');
         if (checkbox && checkbox.checked) {
@@ -350,7 +362,6 @@ function handleVoiceProblemsChange() {
     const voiceProblems = document.getElementById('voiceProblems').value;
     const otherVoiceGroup = document.getElementById('otherVoiceProblemGroup');
 
-    // Show "Other voice problem" text field ONLY if "other" is selected
     if (voiceProblems === 'other') {
         if (otherVoiceGroup) otherVoiceGroup.classList.remove('hidden');
     } else {
@@ -364,29 +375,9 @@ function handleVoiceProblemsChange() {
     updateContinueButton();
 }
 
-// Language switching
-function switchLanguage(lang) {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-
-    // Toggle active class
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`lang-${lang}`).classList.add('active');
-
-    // Translate all elements with data-translate
-    document.querySelectorAll('[data-translate]').forEach(el => {
-        const key = el.getAttribute('data-translate');
-        const translation = translations[lang][key];
-        if (translation) {
-            el.textContent = translation;
-        }
-    });
-}
-
-// Recording functions
-async function toggleRecording() {
+function toggleRecording() {
     if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-        await startRecording();
+        startRecording();
     } else {
         const elapsed = Date.now() - recordingStartTime;
         if (elapsed >= minRecordingTime) {
@@ -403,19 +394,19 @@ async function startRecording() {
         console.log('Requesting microphone access...');
         const stream = await navigator.mediaDevices.getUserMedia({
             audio: {
-                sampleRate: 44100,  // High quality sample rate
-                echoCancellation: false,  // Preserve natural voice characteristics
-                noiseSuppression: false,  // Don't alter voice features
-                autoGainControl: false    // Maintain original amplitude
+                sampleRate: 44100,
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
             }
         });
         console.log('Microphone access granted');
 
         // Prefer uncompressed formats for medical analysis
         const mimeTypes = [
-            'audio/wav',              // Best for medical analysis
-            'audio/webm;codecs=pcm',  // Uncompressed WebM
-            'audio/webm;codecs=opus', // Fallback
+            'audio/wav',
+            'audio/webm;codecs=pcm',
+            'audio/webm;codecs=opus',
             'audio/webm',
             'audio/mp4',
             ''
@@ -436,7 +427,7 @@ async function startRecording() {
 
         mediaRecorder = new MediaRecorder(stream, {
             mimeType: mimeType,
-            audioBitsPerSecond: 256000  // High bitrate for quality
+            audioBitsPerSecond: 256000
         });
         audioChunks = [];
 
@@ -463,12 +454,14 @@ async function startRecording() {
             const audioUrl = URL.createObjectURL(audioBlob);
 
             const audioPlayer = document.getElementById('audioPlayer');
-            audioPlayer.src = audioUrl;
-            document.getElementById('audioPlayback').classList.remove('hidden');
+            if (audioPlayer) {
+                audioPlayer.src = audioUrl;
+                document.getElementById('audioPlayback').classList.remove('hidden');
+            }
         };
 
         // Start recording with smaller timeslice for better data flow
-        mediaRecorder.start(500);  // Request data every 500ms
+        mediaRecorder.start(500);
         recordingStartTime = Date.now();
 
         // Update UI
@@ -503,8 +496,10 @@ function updateTimer() {
     const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
     const minutes = Math.floor(elapsed / 60);
     const seconds = elapsed % 60;
-    document.getElementById('recordingTimer').textContent =
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const timerElement = document.getElementById('recordingTimer');
+    if (timerElement) {
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
 
     // Enable stop button after 30 seconds
     if (elapsed >= 30) {
@@ -529,30 +524,8 @@ function updateRecordingStatusText(translationKey) {
 
 async function submitDonation() {
     try {
-        // Prepare form data
-        const formData = new FormData();
+        console.log('=== STARTING SUBMISSION ===');
 
-        // Add audio file - ensure we have audio data
-        if (!audioChunks || audioChunks.length === 0) {
-            alert('No audio recorded. Please record your voice first.');
-            return;
-        }
-
-        console.log('Audio chunks:', audioChunks.length, 'Total size:', audioChunks.reduce((total, chunk) => total + chunk.size, 0));
-
-        // Create blob with proper MIME type
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
-        console.log('Audio blob size:', audioBlob.size);
-
-        if (audioBlob.size === 0) {
-            alert('Audio recording is empty. Please try recording again.');
-            return;
-        }
-
-        formData.append('audio', audioBlob, 'voice_donation.webm');
-
-async function submitDonation() {
-    try {
         // Prepare form data
         const formData = new FormData();
 
@@ -587,23 +560,39 @@ async function submitDonation() {
             other_voice_problem: document.getElementById('otherVoiceProblem').value || null
         };
 
+        console.log('Questionnaire data:', questionnaireData);
         formData.append('questionnaire', JSON.stringify(questionnaireData));
 
         // Show processing screen
         document.getElementById(`step${currentStep}`).classList.remove('active');
         document.getElementById('processingStep').classList.add('active');
 
-        // Submit to API
-        const response = await fetch(`${API_BASE_URL}/voice-donation`, {
+        // Submit to API (try real async endpoint)
+        const submitUrl = `${API_BASE_URL}/voice-donation`;
+        console.log('Submitting to:', submitUrl);
+
+        const response = await fetch(submitUrl, {
             method: 'POST',
             body: formData
         });
 
+        console.log('Response status:', response.status);
+
+        const responseText = await response.text();
+        console.log('Raw response:', responseText);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP ${response.status}: ${responseText}`);
         }
 
-        const result = await response.json();
+        let result;
+        try {
+            result = JSON.parse(responseText);
+        } catch (e) {
+            throw new Error(`Invalid JSON response: ${responseText}`);
+        }
+
+        console.log('Parsed result:', result);
 
         if (result.success && result.status === 'processing') {
             // Store recording ID and start polling
@@ -614,58 +603,22 @@ async function submitDonation() {
 
             // Start polling for completion
             pollDonationStatus(recordingId);
+        } else if (result.success) {
+            // Old-style synchronous response - show success immediately
+            document.getElementById('donationId').textContent = `Donation ID: ${result.recording_id}`;
+            document.getElementById('processingStep').classList.remove('active');
+            document.getElementById('step5').classList.add('active');
         } else {
-            throw new Error(result.message || 'Unknown error occurred');
+            throw new Error(result.message || result.error || 'Unknown error occurred');
         }
 
     } catch (error) {
-        console.error('Submission error:', error);
-        alert('There was an error submitting your donation. Please try again.');
-        // Go back to recording step
-        document.getElementById('processingStep').classList.remove('active');
-        document.getElementById(`step${currentStep}`).classList.add('active');
-    }
-}_conditions: chronicConditions,
-            respiratory_severity: document.getElementById('respiratorySeverity').value || null,
-            voice_problems: document.getElementById('voiceProblems').value,
-            other_condition: document.getElementById('otherCondition').value || null,
-            other_voice_problem: document.getElementById('otherVoiceProblem').value || null
-        };
+        console.error('=== SUBMISSION ERROR ===');
+        console.error('Error details:', error);
+        console.error('Error stack:', error.stack);
 
-        formData.append('questionnaire', JSON.stringify(questionnaireData));
+        alert(`There was an error submitting your donation: ${error.message}`);
 
-        // Show processing screen
-        document.getElementById(`step${currentStep}`).classList.remove('active');
-        document.getElementById('processingStep').classList.add('active');
-
-        // Submit to API
-        const response = await fetch(`${API_BASE_URL}/voice-donation`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.success && result.status === 'processing') {
-            // Store recording ID and start polling
-            const recordingId = result.recording_id;
-
-            // Update processing display with waiting message
-            updateProcessingDisplay(recordingId, 'processing');
-
-            // Start polling for completion
-            pollDonationStatus(recordingId);
-        } else {
-            throw new Error(result.message || 'Unknown error occurred');
-        }
-
-    } catch (error) {
-        console.error('Submission error:', error);
-        alert('There was an error submitting your donation. Please try again.');
         // Go back to recording step
         document.getElementById('processingStep').classList.remove('active');
         document.getElementById(`step${currentStep}`).classList.add('active');
@@ -679,12 +632,14 @@ function updateProcessingDisplay(recordingId, status) {
     const statusElement = document.querySelector('.processing-title');
     const waitElement = document.querySelector('.processing-subtitle');
 
-    if (status === 'processing') {
-        statusElement.textContent = translations[currentLang]['processingStatus'];
-        waitElement.textContent = translations[currentLang]['processingWait'];
-    } else if (status === 'completed') {
-        statusElement.textContent = translations[currentLang]['processingSubtitle'];
-        waitElement.textContent = translations[currentLang]['processingDescription'];
+    if (statusElement && waitElement) {
+        if (status === 'processing') {
+            statusElement.textContent = translations[currentLang]['processingStatus'];
+            waitElement.textContent = translations[currentLang]['processingWait'];
+        } else if (status === 'completed') {
+            statusElement.textContent = translations[currentLang]['processingSubtitle'];
+            waitElement.textContent = translations[currentLang]['processingDescription'];
+        }
     }
 }
 
@@ -739,7 +694,7 @@ async function pollDonationStatus(recordingId) {
 
 // Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded, initializing...');
+    console.log('DOM loaded, initializing...');
     createParticles();
 
     // Form event listeners
@@ -757,74 +712,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Voice problems dropdown with conditional field
-    const voiceProblemsSelect = document.getElementById('voiceProblems');
-    if (voiceProblemsSelect) {
-        voiceProblemsSelect.addEventListener('change', handleVoiceProblemsChange);
-    }
-
-    updateContinueButton();
-    console.log('Initialization complete');
-});_conditions: chronicConditions,
-            respiratory_severity: document.getElementById('respiratorySeverity').value || null,
-            voice_problems: document.getElementById('voiceProblems').value,
-            other_condition: document.getElementById('otherCondition').value || null,
-            other_voice_problem: document.getElementById('otherVoiceProblem').value || null
-        };
-
-        formData.append('questionnaire', JSON.stringify(questionnaireData));
-
-        // Show processing screen
-        document.getElementById(`step${currentStep}`).classList.remove('active');
-        document.getElementById('processingStep').classList.add('active');
-
-        // Submit to API
-        const response = await fetch(`${API_BASE_URL}/voice-donation`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        // Show success
-        document.getElementById('donationId').textContent = `Donation ID: ${result.recording_id}`;
-        document.getElementById('processingStep').classList.remove('active');
-        document.getElementById(`step5`).classList.add('active');
-
-    } catch (error) {
-        console.error('Submission error:', error);
-        alert('There was an error submitting your donation. Please try again.');
-        // Go back to recording step
-        document.getElementById('processingStep').classList.remove('active');
-        document.getElementById(`step${currentStep}`).classList.add('active');
-    }
-}
-
-// Initialize everything when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded, initializing...');
-    createParticles();
-
-    // Form event listeners
-    const chronicConditionCheckboxes = document.querySelectorAll('input[name="chronicConditions"]');
-    chronicConditionCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', handleChronicConditionChange);
-    });
-
-    const formInputs = ['donationLanguage', 'ageGroup', 'voiceProblems', 'otherCondition', 'otherVoiceProblem', 'respiratorySeverity'];
-    formInputs.forEach(inputId => {
-        const element = document.getElementById(inputId);
-        if (element) {
-            element.addEventListener('change', updateContinueButton);
-            element.addEventListener('input', updateContinueButton);
-        }
-    });
-
-    // Voice problems dropdown with conditional field
     const voiceProblemsSelect = document.getElementById('voiceProblems');
     if (voiceProblemsSelect) {
         voiceProblemsSelect.addEventListener('change', handleVoiceProblemsChange);
