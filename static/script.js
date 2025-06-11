@@ -735,7 +735,37 @@ async function pollDonationStatus(recordingId) {
 
     // Start polling after 2 seconds
     setTimeout(poll, 2000);
-}_conditions: chronicConditions,
+}
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded, initializing...');
+    createParticles();
+
+    // Form event listeners
+    const chronicConditionCheckboxes = document.querySelectorAll('input[name="chronicConditions"]');
+    chronicConditionCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', handleChronicConditionChange);
+    });
+
+    const formInputs = ['donationLanguage', 'ageGroup', 'voiceProblems', 'otherCondition', 'otherVoiceProblem', 'respiratorySeverity'];
+    formInputs.forEach(inputId => {
+        const element = document.getElementById(inputId);
+        if (element) {
+            element.addEventListener('change', updateContinueButton);
+            element.addEventListener('input', updateContinueButton);
+        }
+    });
+
+    // Voice problems dropdown with conditional field
+    const voiceProblemsSelect = document.getElementById('voiceProblems');
+    if (voiceProblemsSelect) {
+        voiceProblemsSelect.addEventListener('change', handleVoiceProblemsChange);
+    }
+
+    updateContinueButton();
+    console.log('Initialization complete');
+});_conditions: chronicConditions,
             respiratory_severity: document.getElementById('respiratorySeverity').value || null,
             voice_problems: document.getElementById('voiceProblems').value,
             other_condition: document.getElementById('otherCondition').value || null,
