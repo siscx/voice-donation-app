@@ -8,7 +8,7 @@ let minRecordingTime = 30000; // 30 seconds
 let maxRecordingTime = 40000; // 40 seconds
 
 // API Configuration
-const API_BASE_URL = '/api'; //'http://127.0.0.1:5000/api';
+const API_BASE_URL = window.location.origin + '/api'; //'http://127.0.0.1:5000/api';
 
 // Better engaging pictures for description task
 const pictureUrls = [
