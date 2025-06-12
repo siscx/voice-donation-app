@@ -29,7 +29,7 @@ const translations = {
     en: {
         heroTitle: "Donate Your Voice For Health",
         heroSubtitle: "Help us unlock the potential of voice for early health detection. Your donation helps train AI to identify signs of chronic conditions in just 30 seconds of speech—building proactive healthcare for everyone.",
-        trustBadge1: "HIPAA Secure",
+        trustBadge1: "Health Forward",
         trustBadge2: "Anonymous",
         trustBadge3: "AI-Powered",
         step1Icon: "🚀",
@@ -108,7 +108,7 @@ const translations = {
     ar: {
         heroTitle: "تبرع بصوتك من أجل الصحة",
         heroSubtitle: "ساعدنا في إطلاق إمكانات الصوت للكشف المبكر عن الصحة. يساعد تبرعك في تدريب الذكاء الاصطناعي على تحديد علامات الحالات المزمنة في 30 ثانية فقط من الكلام—لبناء رعاية صحية استباقية للجميع.",
-        trustBadge1: "آمن وفق HIPAA",
+        trustBadge1: "للصحة المستقبلية",
         trustBadge2: "مجهول الهوية",
         trustBadge3: "مدعوم بالذكاء الاصطناعي",
         step1Icon: "🚀",
