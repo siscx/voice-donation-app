@@ -27,6 +27,32 @@ const pictureUrls = [
 // Translation object
 const translations = {
     en: {
+        recordingInstructions: "Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.",
+        testimonial1: '"When I found out that a 40-second voice recording could help researchers detect diseases earlier, I didn\'t hesitate. It felt empowering to know that something so easy for me could be so meaningful for someone else. I donated my voice for science, and I\'d do it again in a heartbeat."',
+        testimonial1Author: "- Jamal, 65 years old, UAE",
+        testimonial2: '"It\'s incredible to think my voice could help someone track their health better. I love knowing I\'m part of a project that could change how we fight chronic illness in our region."',
+        testimonial2Author: "- Salma, 43 years old, Morocco",
+        testimonial3: '"Your voice holds more health information than you imagine. With just a few seconds of audio, we can begin to detect patterns linked to chronic diseases. But for our research to be accurate and inclusive, we need thousands of voices—different ages, accents, and health backgrounds."',
+        testimonial3Author: "- Dr Leila, Neurologist",
+        testimonial4: '"Most of the medical AI tools today are trained on data from outside our region. But voice, like language and accent, varies across populations. By donating your voice, you\'re helping us build healthcare solutions that truly reflect and serve our communities."',
+        testimonial4Author: "- Dr Ahmed, Pulmonologist",
+        tabHome: "Home",
+        tabAbout: "About Us",
+        tabScience: "The Science",
+        aboutTitle: "Who We Are",
+        aboutContent: "We're a team of clinicians, scientists, and technologists on a mission to make healthcare more accessible and proactive. With deep experience in Voice, health, and AI, we're building tools that can detect subtle changes in your voice to support early screening and remote monitoring. We believe your voice holds powerful clues about your health—and that with the right safeguards, it can help transform care for millions.",
+        aboutContent2: "This app is part of that vision. Every voice shared brings us closer to safer, smarter, and more inclusive health solutions.",
+        scienceTitle: "The Science Behind Voice Biomarkers",
+        scienceIntro: "Your voice is more than just sound—it reflects how your body and brain are doing.",
+        scienceResearch: "Research from institutions like Mayo Clinic, MIT, and the NIH has shown that subtle changes in voice—such as pitch, rhythm, pauses, and breathiness—can reveal early signs of health changes. This field, known as voice biomarker research, is growing quickly and showing real promise.",
+        scienceConditions: "Studies have linked voice patterns to a wide range of health conditions, including:",
+        conditionRespiratory2: "• Respiratory issues",
+        conditionCognitive: "• Cognitive decline",
+        conditionNeurological2: "• Neurological disorders",
+        conditionCardiovascular2: "• Cardiovascular diseases",
+        conditionMental: "• Mental health challenges",
+        scienceAI: "By combining voice data with AI, researchers are developing tools that can help detect and monitor health conditions—non-invasively, passively, and at scale.",
+        scienceMission: "Your voice donation supports this mission. With just a few seconds of speech, you're helping build the science needed to make healthcare more proactive, accessible, and personalized—for everyone.",
         heroTitle: "Donate Your Voice For Health",
         heroSubtitle: "Help us unlock the potential of voice for early health detection. Your donation helps train AI to identify signs of chronic conditions in just 30 seconds of speech—building proactive healthcare for everyone.",
         trustBadge1: "Health Forward",
@@ -106,6 +132,32 @@ const translations = {
         privacyNote: "Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing."
     },
     ar: {
+        recordingInstructions: "يرجى التحدث على بُعد حوالي 20 سم (8 بوصات) من ميكروفون جهازك، في بيئة هادئة إن أمكن.",
+        testimonial1: '"عندما اكتشفت أن تسجيل صوتي لمدة 40 ثانية يمكن أن يساعد الباحثين في اكتشاف الأمراض مبكراً، لم أتردد. شعرت بالتمكين عندما علمت أن شيئاً سهلاً بالنسبة لي يمكن أن يكون مفيداً جداً لشخص آخر. تبرعت بصوتي للعلم، وسأفعل ذلك مرة أخرى دون تردد."',
+        testimonial1Author: "- جمال، 65 عاماً، الإمارات",
+        testimonial2: '"من المذهل أن أفكر في أن صوتي يمكن أن يساعد شخصاً ما في تتبع صحته بشكل أفضل. أحب معرفة أنني جزء من مشروع يمكن أن يغير كيفية مكافحتنا للأمراض المزمنة في منطقتنا."',
+        testimonial2Author: "- سلمى، 43 عاماً، المغرب",
+        testimonial3: '"صوتك يحمل معلومات صحية أكثر مما تتخيل. مع بضع ثوانٍ فقط من الصوت، يمكننا البدء في اكتشاف الأنماط المرتبطة بالأمراض المزمنة. لكن لكي يكون بحثنا دقيقاً وشاملاً، نحتاج إلى آلاف الأصوات—أعمار ولهجات وخلفيات صحية مختلفة."',
+        testimonial3Author: "- د. ليلى، طبيبة أعصاب",
+        testimonial4: '"معظم أدوات الذكاء الاصطناعي الطبية اليوم مدربة على بيانات من خارج منطقتنا. لكن الصوت، مثل اللغة واللهجة، يختلف عبر السكان. من خلال التبرع بصوتك، أنت تساعدنا في بناء حلول رعاية صحية تعكس وتخدم مجتمعاتنا حقاً."',
+        testimonial4Author: "- د. أحمد، طبيب رئة",
+        tabHome: "الرئيسية",
+        tabAbout: "من نحن",
+        tabScience: "العلم",
+        aboutTitle: "من نحن",
+        aboutContent: "نحن فريق من الأطباء والعلماء والتقنيين في مهمة لجعل الرعاية الصحية أكثر إتاحة واستباقية. مع خبرة عميقة في الصوت والصحة والذكاء الاصطناعي، نحن نبني أدوات يمكنها اكتشاف التغييرات الدقيقة في صوتك لدعم الفحص المبكر والمراقبة عن بُعد. نحن نؤمن أن صوتك يحمل أدلة قوية حول صحتك—وأنه مع الضمانات المناسبة، يمكن أن يساعد في تحويل الرعاية لملايين الأشخاص.",
+        aboutContent2: "هذا التطبيق جزء من تلك الرؤية. كل صوت يتم مشاركته يقربنا من حلول صحية أكثر أماناً وذكاءً وشمولاً.",
+        scienceTitle: "العلم وراء المؤشرات الحيوية الصوتية",
+        scienceIntro: "صوتك أكثر من مجرد صوت—إنه يعكس كيف يعمل جسمك ودماغك.",
+        scienceResearch: "أظهرت الأبحاث من مؤسسات مثل مايو كلينك وإم آي تي والمعاهد الوطنية للصحة أن التغييرات الدقيقة في الصوت—مثل النبرة والإيقاع والتوقفات وضيق التنفس—يمكن أن تكشف عن علامات مبكرة للتغييرات الصحية. هذا المجال، المعروف باسم بحث المؤشرات الحيوية الصوتية، ينمو بسرعة ويظهر وعداً حقيقياً.",
+        scienceConditions: "ربطت الدراسات بين أنماط الصوت ومجموعة واسعة من الحالات الصحية، بما في ذلك:",
+        conditionRespiratory2: "• مشاكل تنفسية",
+        conditionCognitive: "• تراجع إدراكي",
+        conditionNeurological2: "• اضطرابات عصبية",
+        conditionCardiovascular2: "• أمراض القلب والأوعية الدموية",
+        conditionMental: "• تحديات الصحة النفسية",
+        scienceAI: "من خلال الجمع بين بيانات الصوت والذكاء الاصطناعي، يطور الباحثون أدوات يمكنها المساعدة في اكتشاف ومراقبة الحالات الصحية—بطريقة غير جراحية وسلبية وعلى نطاق واسع.",
+        scienceMission: "تبرعك بالصوت يدعم هذه المهمة. مع بضع ثوانٍ فقط من الكلام، أنت تساعد في بناء العلم المطلوب لجعل الرعاية الصحية أكثر استباقية وإتاحة وتخصيصاً—للجميع.",
         heroTitle: "تبرع بصوتك من أجل الصحة",
         heroSubtitle: "ساعدنا في إطلاق إمكانات الصوت للكشف المبكر عن الصحة. يساعد تبرعك في تدريب الذكاء الاصطناعي على تحديد علامات الحالات المزمنة في 30 ثانية فقط من الكلام—لبناء رعاية صحية استباقية للجميع.",
         trustBadge1: "للصحة المستقبلية",
@@ -228,7 +280,12 @@ function nextStep() {
 
     // Load random picture when entering recording step
     if (currentStep === 3) {
-        loadRandomPicture();
+    loadRandomPicture();
+    }
+
+    // Stop testimonials when leaving step 1
+    if (currentStep === 2) {
+        stopTestimonialRotation();
     }
 
     document.getElementById(`step${currentStep}`).classList.add('active');
@@ -264,6 +321,67 @@ function switchLanguage(lang) {
             el.textContent = translation;
         }
     });
+}
+
+// Tab switching functionality
+function switchTab(tabName) {
+    console.log('Switching to tab:', tabName);
+
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Show selected tab content
+    const targetTab = document.getElementById(`tab-${tabName}`);
+    if (targetTab) {
+        targetTab.classList.add('active');
+    }
+
+    // Add active class to clicked button
+    event.target.classList.add('active');
+
+    // Reset to step 1 when going back to home tab
+    if (tabName === 'home') {
+        currentStep = 1;
+        document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+        document.getElementById('step1').classList.add('active');
+    }
+}
+
+// Testimonials rotation
+let currentTestimonial = 0;
+const totalTestimonials = 4;
+let testimonialInterval;
+
+function rotateTestimonials() {
+    const currentSlide = document.getElementById(`testimonial-${currentTestimonial}`);
+    if (currentSlide) {
+        currentSlide.classList.remove('active');
+    }
+
+    currentTestimonial = (currentTestimonial + 1) % totalTestimonials;
+
+    const nextSlide = document.getElementById(`testimonial-${currentTestimonial}`);
+    if (nextSlide) {
+        nextSlide.classList.add('active');
+    }
+}
+
+function startTestimonialRotation() {
+    // Start rotation every 10 seconds
+    testimonialInterval = setInterval(rotateTestimonials, 10000);
+}
+
+function stopTestimonialRotation() {
+    if (testimonialInterval) {
+        clearInterval(testimonialInterval);
+    }
 }
 
 // Form validation
@@ -721,4 +839,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateContinueButton();
     console.log('Initialization complete');
+
+    // Start testimonials rotation on step 1
+    startTestimonialRotation();
 });

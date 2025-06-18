@@ -13,271 +13,357 @@
         <button class="lang-btn" onclick="switchLanguage('ar')" id="lang-ar">AR</button>
     </div>
 
+    <!-- Main Navigation Tabs -->
+    <div class="main-tabs">
+        <button class="tab-btn active" onclick="switchTab('home')" data-translate="tabHome">Home</button>
+        <button class="tab-btn" onclick="switchTab('about')" data-translate="tabAbout">About Us</button>
+        <button class="tab-btn" onclick="switchTab('science')" data-translate="tabScience">The Science</button>
+    </div>
+
     <!-- Animated background particles -->
     <div class="bg-particles" id="particles"></div>
 
-    <div class="container">
-        <!-- Hero Section -->
-        <div class="hero">
-            <div class="hero-content">
-                <div class="logo-modern">🎤</div>
-                <h1 class="hero-title" data-translate="heroTitle">Donate Your Voice For Health</h1>
-                <p class="hero-subtitle" data-translate="heroSubtitle">
-                    Help us unlock the potential of voice for early health detection. Your donation helps train AI to identify signs of chronic conditions in just 30 seconds of speech—building proactive healthcare for everyone.
-                </p>
-                <div class="trust-badges">
-                    <div class="trust-badge">
-                        <span>✓</span>
-                        <span data-translate="trustBadge1">Health Forward</span>
-                    </div>
-                    <div class="trust-badge">
-                        <span>🛡️</span>
-                        <span data-translate="trustBadge2">Anonymous</span>
-                    </div>
-                    <div class="trust-badge">
-                        <span>🔬</span>
-                        <span data-translate="trustBadge3">AI-Powered</span>
+    <!-- Home Tab Content (existing donation flow) -->
+    <div class="tab-content active" id="tab-home">
+        <div class="container">
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="hero-content">
+                    <div class="logo-modern">🎤</div>
+                    <h1 class="hero-title" data-translate="heroTitle">Donate Your Voice For Health</h1>
+                    <p class="hero-subtitle" data-translate="heroSubtitle">
+                        Help us unlock the potential of voice for early health detection. Your donation helps train AI to identify signs of chronic conditions in just 30 seconds of speech—building proactive healthcare for everyone.
+                    </p>
+                    <div class="trust-badges">
+                        <div class="trust-badge">
+                            <span>✓</span>
+                            <span data-translate="trustBadge1">Health Forward</span>
+                        </div>
+                        <div class="trust-badge">
+                            <span>🛡️</span>
+                            <span data-translate="trustBadge2">Anonymous</span>
+                        </div>
+                        <div class="trust-badge">
+                            <span>🔬</span>
+                            <span data-translate="trustBadge3">AI-Powered</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Step 1: Welcome -->
-        <div class="step active" id="step1">
-            <div class="glass-card">
-                <div class="step-header">
-                    <div class="step-icon" data-translate="step1Icon">🚀</div>
-                    <div>
-                        <h2 class="step-title" data-translate="step1Title">Your Voice, Our Future</h2>
+            <!-- Step 1: Welcome -->
+            <div class="step active" id="step1">
+                <div class="glass-card">
+                    <div class="step-header">
+                        <div class="step-icon" data-translate="step1Icon">🚀</div>
+                        <div>
+                            <h2 class="step-title" data-translate="step1Title">Your Voice, Our Future</h2>
+                        </div>
                     </div>
-                </div>
-                <p style="font-size: 1.15rem; line-height: 1.7; color: var(--gray-600); margin-bottom: 40px;" data-translate="step1Text">
-                    Every voice carries hidden health insights. Your unique vocal patterns hold clues that could transform how we detect and prevent illness. Help us build the foundation for accessible healthcare worldwide.
-                </p>
+                    <p style="font-size: 1.15rem; line-height: 1.7; color: var(--gray-600); margin-bottom: 40px;" data-translate="step1Text">
+                        Every voice carries hidden health insights. Your unique vocal patterns hold clues that could transform how we detect and prevent illness. Help us build the foundation for accessible healthcare worldwide.
+                    </p>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" data-translate="stat1Number">60+</div>
-                        <div class="stat-label" data-translate="stat1Label">Voice features analyzed</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" data-translate="stat2Number">30s</div>
-                        <div class="stat-label" data-translate="stat2Label">Time to contribute</div>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary btn-wide" onclick="nextStep()">
-                    <span data-translate="step1Button">Begin Your Contribution</span>
-                    <span>→</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Step 2: Health Questionnaire -->
-        <div class="step" id="step2">
-            <div class="glass-card">
-                <div class="step-header">
-                    <div class="step-icon" data-translate="step2Icon">💬</div>
-                    <div>
-                        <h2 class="step-title" data-translate="step2Title">Health Questionnaire</h2>
-                        <p style="color: var(--gray-600); margin-top: 8px;" data-translate="step2Subtitle">Anonymous data helps train our AI models</p>
-                    </div>
-                </div>
-
-                <form id="questionnaireForm" class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="donationLanguage" data-translate="donationLanguageLabel">Recording Language</label>
-                        <select class="form-select" id="donationLanguage" name="donationLanguage" required>
-                            <option value="" data-translate="donationLanguageSelect">Select the language for your voice recording</option>
-                            <option value="english" data-translate="donationLanguageEnglish">English</option>
-                            <option value="arabic" data-translate="donationLanguageArabic">Arabic</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="ageGroup" data-translate="ageLabel">Age Range</label>
-                        <select class="form-select" id="ageGroup" name="ageGroup" required>
-                            <option value="" data-translate="ageSelect">Select your age range</option>
-                            <option value="18-25" data-translate="age1825">18-25 years</option>
-                            <option value="26-35" data-translate="age2635">26-35 years</option>
-                            <option value="36-45" data-translate="age3645">36-45 years</option>
-                            <option value="46-55" data-translate="age4655">46-55 years</option>
-                            <option value="56-65" data-translate="age5665">56-65 years</option>
-                            <option value="66-75" data-translate="age6675">66-75 years</option>
-                            <option value="76+" data-translate="age76plus">76+ years</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" data-translate="conditionsLabel">Health Conditions (Select all that apply)</label>
-                        <div class="checkbox-grid" id="chronicConditionCheckboxes">
-                            <div class="checkbox-card">
-                                <div class="checkbox-content">
-                                    <input type="checkbox" id="condition_none" name="chronicConditions" value="none" class="checkbox-input">
-                                    <label for="condition_none" class="checkbox-label" data-translate="conditionNone">None</label>
-                                </div>
-                            </div>
-                            <div class="checkbox-card">
-                                <div class="checkbox-content">
-                                    <input type="checkbox" id="condition_respiratory" name="chronicConditions" value="respiratory" class="checkbox-input">
-                                    <label for="condition_respiratory" class="checkbox-label" data-translate="conditionRespiratory">Respiratory (Asthma, COPD)</label>
-                                </div>
-                            </div>
-                            <div class="checkbox-card">
-                                <div class="checkbox-content">
-                                    <input type="checkbox" id="condition_neurological" name="chronicConditions" value="neurological" class="checkbox-input">
-                                    <label for="condition_neurological" class="checkbox-label" data-translate="conditionNeurological">Neurological (Parkinson's, MS)</label>
-                                </div>
-                            </div>
-                            <div class="checkbox-card">
-                                <div class="checkbox-content">
-                                    <input type="checkbox" id="condition_cardiovascular" name="chronicConditions" value="cardiovascular" class="checkbox-input">
-                                    <label for="condition_cardiovascular" class="checkbox-label" data-translate="conditionCardiovascular">Cardiovascular (Heart disease)</label>
-                                </div>
-                            </div>
-                            <div class="checkbox-card">
-                                <div class="checkbox-content">
-                                    <input type="checkbox" id="condition_other" name="chronicConditions" value="other" class="checkbox-input">
-                                    <label for="condition_other" class="checkbox-label" data-translate="conditionOther">Other chronic condition</label>
-                                </div>
-                            </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" data-translate="stat1Number">60+</div>
+                            <div class="stat-label" data-translate="stat1Label">Voice features analyzed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" data-translate="stat2Number">30s</div>
+                            <div class="stat-label" data-translate="stat2Label">Time to contribute</div>
                         </div>
                     </div>
 
-                    <div class="form-group hidden" id="otherConditionGroup">
-                        <label class="form-label" for="otherCondition" data-translate="otherConditionLabel">Please specify your chronic condition</label>
-                        <input type="text" class="form-input" id="otherCondition" name="otherCondition" data-translate="otherConditionPlaceholder" placeholder="Describe your condition">
-                    </div>
-
-                    <div class="form-group hidden" id="respiratorySeverityGroup">
-                        <label class="form-label" for="respiratorySeverity" data-translate="respiratorySeverityLabel">Please select the severity of your respiratory condition</label>
-                        <select class="form-select" id="respiratorySeverity" name="respiratorySeverity">
-                            <option value="" data-translate="severitySelect">Select severity</option>
-                            <option value="mild" data-translate="severityMild">Mild</option>
-                            <option value="medium" data-translate="severityMedium">Medium</option>
-                            <option value="severe" data-translate="severitySevere">Severe</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="voiceProblems" data-translate="voiceProblemsLabel">Voice Problems</label>
-                        <select class="form-select" id="voiceProblems" name="voiceProblems" required>
-                            <option value="" data-translate="voiceProblemsSelect">Select voice problems (if any)</option>
-                            <option value="none" data-translate="voiceProblemNone">None</option>
-                            <option value="vocal_nodules" data-translate="voiceProblemNodules">Vocal nodules</option>
-                            <option value="vocal_polyps" data-translate="voiceProblemPolyps">Vocal polyps</option>
-                            <option value="vocal_paralysis" data-translate="voiceProblemParalysis">Vocal cord paralysis</option>
-                            <option value="chronic_laryngitis" data-translate="voiceProblemLaryngitis">Chronic laryngitis</option>
-                            <option value="other" data-translate="voiceProblemOther">Other voice problem</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group hidden" id="otherVoiceProblemGroup">
-                        <label class="form-label" for="otherVoiceProblem" data-translate="otherVoiceProblemLabel">Please specify your voice problem</label>
-                        <input type="text" class="form-input" id="otherVoiceProblem" name="otherVoiceProblem" data-translate="otherVoiceProblemPlaceholder" placeholder="Describe your voice problem">
-                    </div>
-                </form>
-
-                <button class="btn btn-primary btn-wide" id="continueButton" onclick="nextStep()" disabled>
-                    <span data-translate="continueButton">Continue to Voice Recording</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Step 3: Voice Recording -->
-        <div class="step" id="step3">
-            <div class="glass-card">
-                <div class="step-header">
-                    <div class="step-icon">🎙️</div>
-                    <div>
-                        <h2 class="step-title" data-translate="step3Title">Voice Recording</h2>
-                    </div>
-                </div>
-                <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="step3Subtitle">
-                    Please describe what you see in the image below. Speak naturally for at least 30 seconds.
-                </p>
-
-                <div class="picture-showcase">
-                    <img id="randomPicture" class="picture-display" src="" alt="Describe this image">
-                    <div class="picture-instruction" data-translate="recordingInstruction">
-                        Describe what you see in this image - the people, activities, setting, and any details you notice.
-                    </div>
-                </div>
-
-                <div class="recording-section">
-                    <button class="record-button" id="recordButton" onclick="toggleRecording()">
-                        <span id="recordIcon">🎤</span>
+                    <button class="btn btn-primary btn-wide" onclick="nextStep()">
+                        <span data-translate="step1Button">Begin Your Contribution</span>
+                        <span>→</span>
                     </button>
-                    <div class="recording-status" id="recordingStatus" data-translate="recordingStatusStart">Click to start recording</div>
-                    <div class="recording-timer" id="recordingTimer">00:00</div>
-                    <div id="audioPlayback" class="hidden" style="margin-top: 20px;">
-                        <audio controls id="audioPlayer" style="width: 100%; margin-bottom: 20px;"></audio>
-                        <button class="btn btn-primary btn-wide" onclick="nextStep()">
-                            <span data-translate="submitButton">Submit Your Donation</span>
+
+                    <!-- Testimonials Banner -->
+                    <div class="testimonials-banner">
+                        <div class="testimonial-slide active" id="testimonial-0">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text" data-translate="testimonial1">"When I found out that a 40-second voice recording could help researchers detect diseases earlier, I didn't hesitate. It felt empowering to know that something so easy for me could be so meaningful for someone else. I donated my voice for science, and I'd do it again in a heartbeat."</p>
+                                <div class="testimonial-author" data-translate="testimonial1Author">- Jamal, 65 years old, UAE</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide" id="testimonial-1">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text" data-translate="testimonial2">"It's incredible to think my voice could help someone track their health better. I love knowing I'm part of a project that could change how we fight chronic illness in our region."</p>
+                                <div class="testimonial-author" data-translate="testimonial2Author">- Salma, 43 years old, Morocco</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide" id="testimonial-2">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text" data-translate="testimonial3">"Your voice holds more health information than you imagine. With just a few seconds of audio, we can begin to detect patterns linked to chronic diseases. But for our research to be accurate and inclusive, we need thousands of voices—different ages, accents, and health backgrounds."</p>
+                                <div class="testimonial-author" data-translate="testimonial3Author">- Dr Leila, Neurologist</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide" id="testimonial-3">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text" data-translate="testimonial4">"Most of the medical AI tools today are trained on data from outside our region. But voice, like language and accent, varies across populations. By donating your voice, you're helping us build healthcare solutions that truly reflect and serve our communities."</p>
+                                <div class="testimonial-author" data-translate="testimonial4Author">- Dr Ahmed, Pulmonologist</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Health Questionnaire -->
+            <div class="step" id="step2">
+                <div class="glass-card">
+                    <div class="step-header">
+                        <div class="step-icon" data-translate="step2Icon">💬</div>
+                        <div>
+                            <h2 class="step-title" data-translate="step2Title">Health Questionnaire</h2>
+                            <p style="color: var(--gray-600); margin-top: 8px;" data-translate="step2Subtitle">Anonymous data helps train our AI models</p>
+                        </div>
+                    </div>
+
+                    <form id="questionnaireForm" class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="donationLanguage" data-translate="donationLanguageLabel">Recording Language</label>
+                            <select class="form-select" id="donationLanguage" name="donationLanguage" required>
+                                <option value="" data-translate="donationLanguageSelect">Select the language for your voice recording</option>
+                                <option value="english" data-translate="donationLanguageEnglish">English</option>
+                                <option value="arabic" data-translate="donationLanguageArabic">Arabic</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="ageGroup" data-translate="ageLabel">Age Range</label>
+                            <select class="form-select" id="ageGroup" name="ageGroup" required>
+                                <option value="" data-translate="ageSelect">Select your age range</option>
+                                <option value="18-25" data-translate="age1825">18-25 years</option>
+                                <option value="26-35" data-translate="age2635">26-35 years</option>
+                                <option value="36-45" data-translate="age3645">36-45 years</option>
+                                <option value="46-55" data-translate="age4655">46-55 years</option>
+                                <option value="56-65" data-translate="age5665">56-65 years</option>
+                                <option value="66-75" data-translate="age6675">66-75 years</option>
+                                <option value="76+" data-translate="age76plus">76+ years</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-translate="conditionsLabel">Health Conditions (Select all that apply)</label>
+                            <div class="checkbox-grid" id="chronicConditionCheckboxes">
+                                <div class="checkbox-card">
+                                    <div class="checkbox-content">
+                                        <input type="checkbox" id="condition_none" name="chronicConditions" value="none" class="checkbox-input">
+                                        <label for="condition_none" class="checkbox-label" data-translate="conditionNone">None</label>
+                                    </div>
+                                </div>
+                                <div class="checkbox-card">
+                                    <div class="checkbox-content">
+                                        <input type="checkbox" id="condition_respiratory" name="chronicConditions" value="respiratory" class="checkbox-input">
+                                        <label for="condition_respiratory" class="checkbox-label" data-translate="conditionRespiratory">Respiratory (Asthma, COPD)</label>
+                                    </div>
+                                </div>
+                                <div class="checkbox-card">
+                                    <div class="checkbox-content">
+                                        <input type="checkbox" id="condition_neurological" name="chronicConditions" value="neurological" class="checkbox-input">
+                                        <label for="condition_neurological" class="checkbox-label" data-translate="conditionNeurological">Neurological (Parkinson's, MS)</label>
+                                    </div>
+                                </div>
+                                <div class="checkbox-card">
+                                    <div class="checkbox-content">
+                                        <input type="checkbox" id="condition_cardiovascular" name="chronicConditions" value="cardiovascular" class="checkbox-input">
+                                        <label for="condition_cardiovascular" class="checkbox-label" data-translate="conditionCardiovascular">Cardiovascular (Heart disease)</label>
+                                    </div>
+                                </div>
+                                <div class="checkbox-card">
+                                    <div class="checkbox-content">
+                                        <input type="checkbox" id="condition_other" name="chronicConditions" value="other" class="checkbox-input">
+                                        <label for="condition_other" class="checkbox-label" data-translate="conditionOther">Other chronic condition</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group hidden" id="otherConditionGroup">
+                            <label class="form-label" for="otherCondition" data-translate="otherConditionLabel">Please specify your chronic condition</label>
+                            <input type="text" class="form-input" id="otherCondition" name="otherCondition" data-translate="otherConditionPlaceholder" placeholder="Describe your condition">
+                        </div>
+
+                        <div class="form-group hidden" id="respiratorySeverityGroup">
+                            <label class="form-label" for="respiratorySeverity" data-translate="respiratorySeverityLabel">Please select the severity of your respiratory condition</label>
+                            <select class="form-select" id="respiratorySeverity" name="respiratorySeverity">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="voiceProblems" data-translate="voiceProblemsLabel">Voice Problems</label>
+                            <select class="form-select" id="voiceProblems" name="voiceProblems" required>
+                                <option value="" data-translate="voiceProblemsSelect">Select voice problems (if any)</option>
+                                <option value="none" data-translate="voiceProblemNone">None</option>
+                                <option value="vocal_nodules" data-translate="voiceProblemNodules">Vocal nodules</option>
+                                <option value="vocal_polyps" data-translate="voiceProblemPolyps">Vocal polyps</option>
+                                <option value="vocal_paralysis" data-translate="voiceProblemParalysis">Vocal cord paralysis</option>
+                                <option value="chronic_laryngitis" data-translate="voiceProblemLaryngitis">Chronic laryngitis</option>
+                                <option value="other" data-translate="voiceProblemOther">Other voice problem</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group hidden" id="otherVoiceProblemGroup">
+                            <label class="form-label" for="otherVoiceProblem" data-translate="otherVoiceProblemLabel">Please specify your voice problem</label>
+                            <input type="text" class="form-input" id="otherVoiceProblem" name="otherVoiceProblem" data-translate="otherVoiceProblemPlaceholder" placeholder="Describe your voice problem">
+                        </div>
+                    </form>
+
+                    <button class="btn btn-primary btn-wide" id="continueButton" onclick="nextStep()" disabled>
+                        <span data-translate="continueButton">Continue to Voice Recording</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Voice Recording -->
+            <div class="step" id="step3">
+                <div class="glass-card">
+                    <div class="step-header">
+                        <div class="step-icon">🎙️</div>
+                        <div>
+                            <h2 class="step-title" data-translate="step3Title">Voice Recording</h2>
+                        </div>
+                    </div>
+                    <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="step3Subtitle">
+                        Please describe what you see in the image below. Speak naturally for at least 30 seconds.
+                    </p>
+
+                    <div class="picture-showcase">
+                        <img id="randomPicture" class="picture-display" src="" alt="Describe this image">
+                        <div class="picture-instruction" data-translate="recordingInstruction">
+                            Describe what you see in this image - the people, activities, setting, and any details you notice.
+                        </div>
+                    </div>
+
+                    <!-- Recording Instructions -->
+                    <div class="recording-instructions">
+                        <div class="instruction-icon">💡</div>
+                        <p class="instruction-text" data-translate="recordingInstructions">Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.</p>
+                    </div>
+
+                    <div class="recording-section">
+                        <button class="record-button" id="recordButton" onclick="toggleRecording()">
+                            <span id="recordIcon">🎤</span>
                         </button>
-                        <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 12px; line-height: 1.4;" data-translate="consentText">
-                            By submitting, you grant consent for anonymous use of your voice recording in health research, with data stored securely indefinitely for ongoing scientific analysis.
+                        <div class="recording-status" id="recordingStatus" data-translate="recordingStatusStart">Click to start recording</div>
+                        <div class="recording-timer" id="recordingTimer">00:00</div>
+                        <div id="audioPlayback" class="hidden" style="margin-top: 20px;">
+                            <audio controls id="audioPlayer" style="width: 100%; margin-bottom: 20px;"></audio>
+                            <button class="btn btn-primary btn-wide" onclick="nextStep()">
+                                <span data-translate="submitButton">Submit Your Donation</span>
+                            </button>
+                            <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 12px; line-height: 1.4;" data-translate="consentText">
+                                By submitting, you grant consent for anonymous use of your voice recording in health research, with data stored securely indefinitely for ongoing scientific analysis.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Processing -->
+            <div class="step" id="processingStep">
+                <div class="glass-card">
+                    <div class="step-header">
+                        <div class="step-icon">🧠</div>
+                        <h2 class="step-title" data-translate="processingTitle">Analyzing Your Voice</h2>
+                    </div>
+                    <div class="processing-section">
+                        <div class="processing-spinner">
+                            <div class="spinner-ring"></div>
+                        </div>
+                        <div class="processing-text">
+                            <div class="processing-title" data-translate="processingSubtitle">Processing Audio Features</div>
+                            <div class="processing-subtitle" data-translate="processingDescription">
+                                Our AI is extracting over 60 vocal biomarkers from your recording.
+                                This analysis helps researchers identify subtle voice patterns
+                                that could indicate early signs of health conditions.
+                            </div>
+                        </div>
+
+                        <div class="feature-grid">
+                            <div class="feature-item" data-translate="feature1">✓ Pitch patterns</div>
+                            <div class="feature-item" data-translate="feature2">✓ Voice quality</div>
+                            <div class="feature-item" data-translate="feature3">✓ Speech rhythm</div>
+                            <div class="feature-item" data-translate="feature4">✓ Spectral features</div>
+                            <div class="feature-item" data-translate="feature5">✓ Intensity measures</div>
+                            <div class="feature-item" data-translate="feature6">✓ Formant frequencies</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Thank You -->
+            <div class="step" id="step5">
+                <div class="success-section">
+                    <div class="success-content">
+                        <div class="success-icon" data-translate="successIcon">🎉</div>
+                        <h2 class="success-title" data-translate="successTitle">Thank You!</h2>
+                        <p class="success-subtitle" data-translate="successSubtitle">
+                            Your voice sample has been successfully submitted and will contribute to life-changing voice analytics research.
+                        </p>
+                        <div class="donation-id" id="donationId">
+                            Donation ID: Loading...
+                        </div>
+                        <p style="font-size: 1rem; opacity: 0.9;" data-translate="successDescription">
+                            Your anonymous donation contributes to developing AI that can detect health conditions years before symptoms appear, bringing proactive healthcare within reach for everyone.
                         </p>
                     </div>
                 </div>
+
+                <!-- Privacy note outside the green block -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="font-size: 0.75rem; color: var(--gray-500); line-height: 1.4; max-width: 600px; margin: 0 auto;" data-translate="privacyNote">
+                        Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing.
+                    </p>
+                </div>
             </div>
         </div>
+     </div>
 
-        <!-- Step 4: Processing -->
-        <div class="step" id="processingStep">
+
+    <div class="tab-content" id="tab-about">
+        <div class="container">
             <div class="glass-card">
                 <div class="step-header">
-                    <div class="step-icon">🧠</div>
-                    <h2 class="step-title" data-translate="processingTitle">Analyzing Your Voice</h2>
+                    <div class="step-icon">👥</div>
+                    <h2 class="step-title" data-translate="aboutTitle">Who We Are</h2>
                 </div>
-                <div class="processing-section">
-                    <div class="processing-spinner">
-                        <div class="spinner-ring"></div>
-                    </div>
-                    <div class="processing-text">
-                        <div class="processing-title" data-translate="processingSubtitle">Processing Audio Features</div>
-                        <div class="processing-subtitle" data-translate="processingDescription">
-                            Our AI is extracting over 60 vocal biomarkers from your recording.
-                            This analysis helps researchers identify subtle voice patterns
-                            that could indicate early signs of health conditions.
-                        </div>
-                    </div>
-
-                    <div class="feature-grid">
-                        <div class="feature-item" data-translate="feature1">✓ Pitch patterns</div>
-                        <div class="feature-item" data-translate="feature2">✓ Voice quality</div>
-                        <div class="feature-item" data-translate="feature3">✓ Speech rhythm</div>
-                        <div class="feature-item" data-translate="feature4">✓ Spectral features</div>
-                        <div class="feature-item" data-translate="feature5">✓ Intensity measures</div>
-                        <div class="feature-item" data-translate="feature6">✓ Formant frequencies</div>
-                    </div>
+                <div class="content-section">
+                    <p data-translate="aboutContent">We're a team of clinicians, scientists, and technologists on a mission to make healthcare more accessible and proactive. With deep experience in Voice, health, and AI, we're building tools that can detect subtle changes in your voice to support early screening and remote monitoring. We believe your voice holds powerful clues about your health—and that with the right safeguards, it can help transform care for millions.</p>
+                    <p data-translate="aboutContent2">This app is part of that vision. Every voice shared brings us closer to safer, smarter, and more inclusive health solutions.</p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Step 5: Thank You -->
-        <div class="step" id="step5">
-            <div class="success-section">
-                <div class="success-content">
-                    <div class="success-icon" data-translate="successIcon">🎉</div>
-                    <h2 class="success-title" data-translate="successTitle">Thank You!</h2>
-                    <p class="success-subtitle" data-translate="successSubtitle">
-                        Your voice sample has been successfully submitted and will contribute to life-changing voice analytics research.
-                    </p>
-                    <div class="donation-id" id="donationId">
-                        Donation ID: Loading...
-                    </div>
-                    <p style="font-size: 1rem; opacity: 0.9;" data-translate="successDescription">
-                        Your anonymous donation contributes to developing AI that can detect health conditions years before symptoms appear, bringing proactive healthcare within reach for everyone.
-                    </p>
+    <!-- The Science Tab Content -->
+    <div class="tab-content" id="tab-science">
+        <div class="container">
+            <div class="glass-card">
+                <div class="step-header">
+                    <div class="step-icon">🔬</div>
+                    <h2 class="step-title" data-translate="scienceTitle">The Science Behind Voice Biomarkers</h2>
                 </div>
-            </div>
-
-            <!-- Privacy note outside the green block -->
-            <div style="text-align: center; margin-top: 20px;">
-                <p style="font-size: 0.75rem; color: var(--gray-500); line-height: 1.4; max-width: 600px; margin: 0 auto;" data-translate="privacyNote">
-                    Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing.
-                </p>
+                <div class="content-section">
+                    <p data-translate="scienceIntro">Your voice is more than just sound—it reflects how your body and brain are doing.</p>
+                    <p data-translate="scienceResearch">Research from institutions like Mayo Clinic, MIT, and the NIH has shown that subtle changes in voice—such as pitch, rhythm, pauses, and breathiness—can reveal early signs of health changes. This field, known as voice biomarker research, is growing quickly and showing real promise.</p>
+                    <p data-translate="scienceConditions">Studies have linked voice patterns to a wide range of health conditions, including:</p>
+                    <ul class="conditions-list">
+                        <li data-translate="conditionRespiratory2">• Respiratory issues</li>
+                        <li data-translate="conditionCognitive">• Cognitive decline</li>
+                        <li data-translate="conditionNeurological2">• Neurological disorders</li>
+                        <li data-translate="conditionCardiovascular2">• Cardiovascular diseases</li>
+                        <li data-translate="conditionMental">• Mental health challenges</li>
+                    </ul>
+                    <p data-translate="scienceAI">By combining voice data with AI, researchers are developing tools that can help detect and monitor health conditions—non-invasively, passively, and at scale.</p>
+                    <p data-translate="scienceMission">Your voice donation supports this mission. With just a few seconds of speech, you're helping build the science needed to make healthcare more proactive, accessible, and personalized—for everyone.</p>
+                </div>
             </div>
         </div>
     </div>
