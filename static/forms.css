@@ -107,3 +107,187 @@
     font-weight: 500;
     color: var(--gray-700);
 }
+
+/* Enhanced Medical Conditions - Collapsible Categories */
+.form-helper {
+    font-size: 0.9rem;
+    color: var(--gray-500);
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+.condition-category {
+    margin-bottom: 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+}
+
+/* Remove special styling for none option */
+.none-option {
+    border: 1px solid var(--gray-200);
+    background: white;
+}
+
+.category-header {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--gray-50), white);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+}
+
+.category-header:hover {
+    background: linear-gradient(135deg, var(--gray-100), var(--gray-50));
+}
+
+.category-title {
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 1rem;
+}
+
+.category-arrow {
+    font-size: 1.2rem;
+    color: var(--primary);
+    transition: transform 0.3s ease;
+}
+
+.category-header.expanded .category-arrow {
+    transform: rotate(180deg);
+}
+
+.category-content {
+    padding: 0;
+    max-height: 1000px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-content.collapsed {
+    max-height: 0;
+    padding: 0;
+}
+
+/* More compact condition items */
+.condition-item {
+    padding: 8px 20px;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.condition-item:last-child {
+    border-bottom: none;
+    padding-bottom: 16px;
+}
+
+.condition-item:first-child {
+    padding-top: 16px;
+}
+
+.condition-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* More compact checkbox cards */
+.condition-row .checkbox-card {
+    flex: 1;
+    min-width: 200px;
+    margin: 0;
+    padding: 12px 16px;
+    background: var(--gray-25);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+}
+
+/* Match severity select styling to the compact condition boxes */
+.severity-select {
+    min-width: 180px;
+    padding: 12px 16px;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: white;
+    font-family: inherit;
+    color: var(--gray-700);
+}
+
+.severity-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    transform: translateY(-1px);
+}
+
+.severity-select.visible {
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Compact checkbox styling within conditions */
+.condition-row .checkbox-content {
+    gap: 8px;
+}
+
+.condition-row .checkbox-input {
+    width: 18px;
+    height: 18px;
+}
+
+.condition-row .checkbox-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+/* Responsive design for condition rows */
+@media (max-width: 768px) {
+    .condition-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .condition-row .checkbox-card {
+        min-width: auto;
+    }
+
+    .severity-select {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .category-header {
+        padding: 14px 16px;
+    }
+
+    .condition-item {
+        padding: 8px 16px;
+    }
+
+    .condition-item:first-child {
+        padding-top: 14px;
+    }
+
+    .condition-item:last-child {
+        padding-bottom: 14px;
+    }
+}

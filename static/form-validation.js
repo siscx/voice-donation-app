@@ -4,26 +4,52 @@
 function validateQuestionnaire() {
     const language = document.getElementById('donationLanguage');
     const ageGroup = document.getElementById('ageGroup');
-    const chronicConditions = Array.from(document.querySelectorAll('input[name="chronicConditions"]:checked')).map(cb => cb.value);
-    const voiceProblems = document.getElementById('voiceProblems');
 
-    if (!language || !ageGroup || !voiceProblems) {
+    // Get health conditions (new enhanced system)
+    const healthConditions = Array.from(document.querySelectorAll('input[name="healthConditions"]:checked')).map(cb => cb.value);
+
+    if (!language || !ageGroup) {
         console.log('Missing form elements');
         return false;
     }
 
-    if (!language.value || !ageGroup.value || chronicConditions.length === 0 || !voiceProblems.value) {
+    if (!language.value || !ageGroup.value || healthConditions.length === 0) {
         console.log('Missing form values');
         return false;
     }
 
-    // Check conditional fields
-    const otherConditionRequired = chronicConditions.includes('other') && !document.getElementById('otherCondition').value.trim();
-    const otherVoiceProblemRequired = voiceProblems.value === 'other' && !document.getElementById('otherVoiceProblem').value.trim();
-    const respiratorySeverityRequired = chronicConditions.includes('respiratory') && !document.getElementById('respiratorySeverity').value;
+    // Special "other" conditions that need text specification instead of severity
+    const otherConditions = ['respiratory_other', 'mood_other', 'voice_other'];
 
-    if (otherConditionRequired || otherVoiceProblemRequired || respiratorySeverityRequired) {
-        return false;
+    // Check that selected conditions have severity specified (except "none", "other_general", and category "other" conditions)
+    for (const condition of healthConditions) {
+        if (condition !== 'none' && condition !== 'other_general' && !otherConditions.includes(condition)) {
+            const severitySelect = document.getElementById(`severity_${condition}`);
+            if (severitySelect && !severitySelect.value) {
+                console.log(`Missing severity for ${condition}`);
+                return false;
+            }
+        }
+    }
+
+    // Check if "other" conditions in categories have text specification
+    for (const condition of healthConditions) {
+        if (otherConditions.includes(condition)) {
+            const specifyInput = document.getElementById(`specify_${condition}`);
+            if (!specifyInput || !specifyInput.value.trim()) {
+                console.log(`Missing specification for ${condition}`);
+                return false;
+            }
+        }
+    }
+
+    // Check if other_general is selected and text is provided
+    if (healthConditions.includes('other_general')) {
+        const otherGeneralInput = document.getElementById('otherGeneralCondition');
+        if (!otherGeneralInput || !otherGeneralInput.value.trim()) {
+            console.log('Missing text for other_general condition');
+            return false;
+        }
     }
 
     return true;
@@ -40,86 +66,159 @@ function updateContinueButton() {
     }
 }
 
-function handleChronicConditionChange() {
-    const checkedConditions = Array.from(document.querySelectorAll('input[name="chronicConditions"]:checked')).map(cb => cb.value);
+// Enhanced Medical Conditions Functions
+function toggleCategory(categoryId) {
+    const content = document.getElementById(`category-${categoryId}`);
+    const header = content.previousElementSibling;
 
-    // Handle "None" exclusivity
-    if (checkedConditions.includes('none') && checkedConditions.length > 1) {
-        document.querySelectorAll('input[name="chronicConditions"]').forEach(cb => {
-            if (cb.value !== 'none') cb.checked = false;
-        });
-        // Recalculate after changes
-        const newCheckedConditions = Array.from(document.querySelectorAll('input[name="chronicConditions"]:checked')).map(cb => cb.value);
-        checkedConditions.length = 0;
-        checkedConditions.push(...newCheckedConditions);
-    } else if (checkedConditions.length > 0 && !checkedConditions.includes('none')) {
-        const noneCheckbox = document.getElementById('condition_none');
-        if (noneCheckbox) noneCheckbox.checked = false;
-    }
-
-    // Show/hide conditional fields
-    const otherGroup = document.getElementById('otherConditionGroup');
-    const respiratoryGroup = document.getElementById('respiratorySeverityGroup');
-
-    if (checkedConditions.includes('other')) {
-        if (otherGroup) otherGroup.classList.remove('hidden');
+    if (content.classList.contains('collapsed')) {
+        content.classList.remove('collapsed');
+        header.classList.add('expanded');
     } else {
-        if (otherGroup) {
-            otherGroup.classList.add('hidden');
-            const otherInput = document.getElementById('otherCondition');
-            if (otherInput) otherInput.value = '';
+        content.classList.add('collapsed');
+        header.classList.remove('expanded');
+    }
+}
+
+function handleConditionCheckboxChange(event) {
+    const checkbox = event.target;
+    const conditionValue = checkbox.value;
+    const severitySelect = document.getElementById(`severity_${conditionValue}`);
+
+    // Special handling for "other" conditions that need text specification
+    const otherConditions = ['respiratory_other', 'mood_other', 'voice_other'];
+    const isOtherCondition = otherConditions.includes(conditionValue);
+    const specifyInput = isOtherCondition ? document.getElementById(`specify_${conditionValue}`) : null;
+
+    if (checkbox.checked) {
+        // Show severity dropdown OR text input for "other" conditions
+        if (isOtherCondition && specifyInput) {
+            specifyInput.classList.remove('hidden');
+            // Map condition values to translation keys explicitly
+            const placeholderKeys = {
+                'respiratory_other': 'specifyRespiratoryOtherPlaceholder',
+                'mood_other': 'specifyMoodOtherPlaceholder',
+                'voice_other': 'specifyVoiceOtherPlaceholder'
+            };
+            updatePlaceholderText(specifyInput, placeholderKeys[conditionValue]);
+        } else if (severitySelect) {
+            severitySelect.classList.remove('hidden');
+            severitySelect.classList.add('visible');
         }
-    }
 
-    if (checkedConditions.includes('respiratory')) {
-        if (respiratoryGroup) respiratoryGroup.classList.remove('hidden');
+        // Handle "other_general" condition to show text field
+        if (conditionValue === 'other_general') {
+            const otherGeneralGroup = document.getElementById('otherGeneralConditionGroup');
+            if (otherGeneralGroup) {
+                otherGeneralGroup.classList.remove('hidden');
+                const otherGeneralInput = document.getElementById('otherGeneralCondition');
+                if (otherGeneralInput) {
+                    updatePlaceholderText(otherGeneralInput, 'otherGeneralConditionPlaceholder');
+                }
+            }
+        }
+
+        // If "none" is selected, uncheck all other conditions
+        if (conditionValue === 'none') {
+            const allConditions = document.querySelectorAll('input[name="healthConditions"]:not([value="none"])');
+            allConditions.forEach(cb => {
+                cb.checked = false;
+                const severityDropdown = document.getElementById(`severity_${cb.value}`);
+                const specifyField = document.getElementById(`specify_${cb.value}`);
+
+                if (severityDropdown) {
+                    severityDropdown.classList.add('hidden');
+                    severityDropdown.value = '';
+                }
+                if (specifyField) {
+                    specifyField.classList.add('hidden');
+                    specifyField.value = '';
+                }
+            });
+            // Also hide the other general condition text field
+            const otherGeneralGroup = document.getElementById('otherGeneralConditionGroup');
+            if (otherGeneralGroup) {
+                otherGeneralGroup.classList.add('hidden');
+                const otherInput = document.getElementById('otherGeneralCondition');
+                if (otherInput) otherInput.value = '';
+            }
+        } else {
+            // If any other condition is selected, uncheck "none"
+            const noneCheckbox = document.getElementById('condition_none');
+            if (noneCheckbox) {
+                noneCheckbox.checked = false;
+            }
+        }
     } else {
-        if (respiratoryGroup) {
-            respiratoryGroup.classList.add('hidden');
-            const severitySelect = document.getElementById('respiratorySeverity');
-            if (severitySelect) severitySelect.value = '';
+        // Hide severity dropdown/text input and clear value
+        if (isOtherCondition && specifyInput) {
+            specifyInput.classList.add('hidden');
+            specifyInput.value = '';
+        } else if (severitySelect) {
+            severitySelect.classList.add('hidden');
+            severitySelect.classList.remove('visible');
+            severitySelect.value = '';
+        }
+
+        // Handle unchecking "other_general" condition
+        if (conditionValue === 'other_general') {
+            const otherGeneralGroup = document.getElementById('otherGeneralConditionGroup');
+            if (otherGeneralGroup) {
+                otherGeneralGroup.classList.add('hidden');
+                const otherInput = document.getElementById('otherGeneralCondition');
+                if (otherInput) otherInput.value = '';
+            }
         }
     }
 
     // Update checkbox styling
-    document.querySelectorAll('.checkbox-card').forEach(item => {
-        const checkbox = item.querySelector('input[type="checkbox"]');
-        if (checkbox && checkbox.checked) {
-            item.classList.add('selected');
+    updateCheckboxStyling();
+    updateContinueButton();
+}
+
+function updateCheckboxStyling() {
+    document.querySelectorAll('.condition-checkbox').forEach(checkbox => {
+        const card = checkbox.closest('.checkbox-card');
+        if (checkbox.checked) {
+            card.classList.add('selected');
         } else {
-            item.classList.remove('selected');
+            card.classList.remove('selected');
         }
     });
-
-    updateContinueButton();
 }
 
-function handleVoiceProblemsChange() {
-    const voiceProblems = document.getElementById('voiceProblems').value;
-    const otherVoiceGroup = document.getElementById('otherVoiceProblemGroup');
+function updatePlaceholderText(element, translationKey) {
+    const currentLang = document.documentElement.lang || 'en';
+    const translation = translations[currentLang][translationKey];
 
-    if (voiceProblems === 'other') {
-        if (otherVoiceGroup) otherVoiceGroup.classList.remove('hidden');
-    } else {
-        if (otherVoiceGroup) {
-            otherVoiceGroup.classList.add('hidden');
-            const otherInput = document.getElementById('otherVoiceProblem');
-            if (otherInput) otherInput.value = '';
-        }
+    console.log('updatePlaceholderText:', {
+        element: element.id,
+        translationKey: translationKey,
+        currentLang: currentLang,
+        translation: translation
+    });
+
+    if (translation) {
+        element.placeholder = translation;
     }
-
-    updateContinueButton();
 }
 
-// Initialize form validation
+// Initialize form validation - SINGLE DEFINITION
 function initializeFormValidation() {
-    // Form event listeners
-    const chronicConditionCheckboxes = document.querySelectorAll('input[name="chronicConditions"]');
-    chronicConditionCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', handleChronicConditionChange);
+    // Enhanced medical conditions listeners
+    const healthConditionCheckboxes = document.querySelectorAll('input[name="healthConditions"]');
+    healthConditionCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', handleConditionCheckboxChange);
     });
 
-    const formInputs = ['donationLanguage', 'ageGroup', 'voiceProblems', 'otherCondition', 'otherVoiceProblem', 'respiratorySeverity'];
+    // Enhanced validation for severity selects
+    const severitySelects = document.querySelectorAll('.severity-select');
+    severitySelects.forEach(select => {
+        select.addEventListener('change', updateContinueButton);
+    });
+
+    // Form inputs including the new condition text fields
+    const formInputs = ['donationLanguage', 'ageGroup', 'otherGeneralCondition', 'specify_respiratory_other', 'specify_mood_other', 'specify_voice_other'];
     formInputs.forEach(inputId => {
         const element = document.getElementById(inputId);
         if (element) {
@@ -127,11 +226,6 @@ function initializeFormValidation() {
             element.addEventListener('input', updateContinueButton);
         }
     });
-
-    const voiceProblemsSelect = document.getElementById('voiceProblems');
-    if (voiceProblemsSelect) {
-        voiceProblemsSelect.addEventListener('change', handleVoiceProblemsChange);
-    }
 
     updateContinueButton();
 }

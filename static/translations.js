@@ -80,6 +80,20 @@ const translations = {
         successSubtitle: "Your voice sample has been successfully submitted and will contribute to life-changing voice analytics research.",
         successDescription: "Your anonymous donation contributes to developing AI that can detect health conditions years before symptoms appear, bringing proactive healthcare within reach for everyone.",
         privacyNote: "Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing.",
+        conditionsHelper: "Select all conditions that apply to you and indicate their severity",
+        severityUnknown: "I do not know",
+        categoryNeurological: "Neurological Conditions",
+        categoryRespiratory: "Respiratory Conditions",
+        conditionAlzheimers: "Alzheimer's",
+        conditionDementia: "Dementia",
+        conditionMCI: "Mild Cognitive Impairment",
+        conditionALS: "ALS",
+        conditionHuntingtons: "Huntington's disease",
+        conditionParkinsons: "Parkinson's disease",
+        conditionAsthma: "Asthma",
+        conditionChronicCough: "Chronic cough",
+        conditionCOPD: "COPD",
+        conditionRespiratoryOther: "Other respiratory condition",
 
         // Tab navigation
         tabHome: "Home",
@@ -108,7 +122,53 @@ const translations = {
         testimonial3: '"Your voice holds more health information than you imagine. With just a few seconds of audio, we can begin to detect patterns linked to chronic diseases. But for our research to be accurate and inclusive, we need thousands of voices—different ages, accents, and health backgrounds."',
         testimonial3Author: "- Dr Leila, Neurologist",
         testimonial4: '"Most of the medical AI tools today are trained on data from outside our region. But voice, like language and accent, varies across populations. By donating your voice, you\'re helping us build healthcare solutions that truly reflect and serve our communities."',
-        testimonial4Author: "- Dr Ahmed, Pulmonologist"
+        testimonial4Author: "- Dr Ahmed, Pulmonologist",
+
+        // Enhanced medical conditions - categories
+        categoryMood: "Mood and Psychiatric Conditions",
+        categoryMetabolic: "Metabolic/Endocrine Conditions",
+        categoryVoice: "Voice Problems",
+
+        // Neurological conditions
+        conditionMCI: "Mild Cognitive Impairment",
+        conditionALS: "ALS",
+        conditionHuntingtons: "Huntington's disease",
+        conditionParkinsons: "Parkinson's disease",
+
+        // Mood/Psychiatric conditions
+        conditionDepression: "Depression disorder",
+        conditionAnxiety: "Anxiety disorder",
+        conditionSubstanceUse: "Alcohol or substance use disorder",
+        conditionBipolar: "Bipolar disorder",
+        conditionAutism: "Autism spectrum disorder",
+        conditionADHD: "ADHD",
+        conditionMoodOther: "Other mood/psychiatric condition",
+
+        // Metabolic/Endocrine conditions
+        conditionDiabetes1: "Diabetes type 1",
+        conditionDiabetes2: "Diabetes type 2",
+        conditionPrediabetes: "Prediabetes",
+        conditionThyroid: "Thyroid Disorder",
+        conditionObesity: "Obesity",
+
+        // Voice problems
+        conditionVocalFoldParalysis: "Unilateral vocal fold paralysis",
+        conditionMuscleTensionDysphonia: "Muscle Tension Dysphonia",
+        conditionSpasmodicDysphonia: "Spasmodic Dysphonia/laryngeal tremor",
+        conditionVocalLesions: "Lesions (vocal polyp, nodules etc)",
+        conditionLaryngitis: "Laryngitis",
+        conditionLaryngealCancer: "Laryngeal cancer",
+        conditionVoiceOther: "Other voice problem",
+
+        // Other conditions
+        conditionOtherGeneral: "Other condition (please specify)",
+        otherGeneralConditionLabel: "Please specify your condition",
+        otherGeneralConditionPlaceholder: "Describe your condition",
+
+        // Specify placeholders for "other" conditions
+        specifyRespiratoryOtherPlaceholder: "Please specify your respiratory condition",
+        specifyMoodOtherPlaceholder: "Please specify your mood/psychiatric condition",
+        specifyVoiceOtherPlaceholder: "Please specify your voice problem"
     },
 
     ar: {
@@ -190,6 +250,20 @@ const translations = {
         successSubtitle: "تم إرسال عينة صوتك بنجاح وستساهم في أبحاث التحليل الصوتي المغيرة للحياة.",
         successDescription: "يساهم تبرعك المجهول في تطوير ذكاء اصطناعي يمكنه اكتشاف الحالات الصحية قبل سنوات من ظهور الأعراض، مما يجعل الرعاية الصحية الاستباقية في متناول الجميع.",
         privacyNote: "يتم تخزين بياناتك بأمان واستخدامها بشكل مجهول للبحوث الصحية. لطلب إزالة تبرعك، يرجى مراسلة privacy@munsait.com وتضمين معرف التبرع أعلاه لمعالجة أسرع.",
+        conditionsHelper: "اختر كل الحالات التي تنطبق عليك وحدد شدتها",
+        severityUnknown: "لا أعرف",
+        categoryNeurological: "الحالات العصبية",
+        categoryRespiratory: "الحالات التنفسية",
+        conditionAlzheimers: "الزهايمر",
+        conditionDementia: "الخرف",
+        conditionMCI: "ضعف إدراكي خفيف",
+        conditionALS: "التصلب الجانبي الضموري",
+        conditionHuntingtons: "مرض هنتنغتون",
+        conditionParkinsons: "مرض باركنسون",
+        conditionAsthma: "الربو",
+        conditionChronicCough: "السعال المزمن",
+        conditionCOPD: "مرض الانسداد الرئوي المزمن",
+        conditionRespiratoryOther: "حالة تنفسية أخرى",
 
         // Tab navigation
         tabHome: "الرئيسية",
@@ -218,7 +292,53 @@ const translations = {
         testimonial3: '"صوتك يحمل معلومات صحية أكثر مما تتخيل. مع بضع ثوانٍ فقط من الصوت، يمكننا البدء في اكتشاف الأنماط المرتبطة بالأمراض المزمنة. لكن لكي يكون بحثنا دقيقاً وشاملاً، نحتاج إلى آلاف الأصوات—أعمار ولهجات وخلفيات صحية مختلفة."',
         testimonial3Author: "- د. ليلى، طبيبة أعصاب",
         testimonial4: '"معظم أدوات الذكاء الاصطناعي الطبية اليوم مدربة على بيانات من خارج منطقتنا. لكن الصوت، مثل اللغة واللهجة، يختلف عبر السكان. من خلال التبرع بصوتك، أنت تساعدنا في بناء حلول رعاية صحية تعكس وتخدم مجتمعاتنا حقاً."',
-        testimonial4Author: "- د. أحمد، طبيب رئة"
+        testimonial4Author: "- د. أحمد، طبيب رئة",
+
+        // Enhanced medical conditions - categories
+        categoryMood: "حالات المزاج والطب النفسي",
+        categoryMetabolic: "حالات التمثيل الغذائي/الغدد الصماء",
+        categoryVoice: "مشاكل الصوت",
+
+        // Neurological conditions
+        conditionMCI: "ضعف إدراكي خفيف",
+        conditionALS: "التصلب الجانبي الضموري",
+        conditionHuntingtons: "مرض هنتنغتون",
+        conditionParkinsons: "مرض باركنسون",
+
+        // Mood/Psychiatric conditions
+        conditionDepression: "اضطراب الاكتئاب",
+        conditionAnxiety: "اضطراب القلق",
+        conditionSubstanceUse: "اضطراب تعاطي الكحول أو المواد",
+        conditionBipolar: "اضطراب ثنائي القطب",
+        conditionAutism: "اضطراب طيف التوحد",
+        conditionADHD: "اضطراب نقص الانتباه وفرط النشاط",
+        conditionMoodOther: "حالة مزاج/نفسية أخرى",
+
+        // Metabolic/Endocrine conditions
+        conditionDiabetes1: "السكري من النوع الأول",
+        conditionDiabetes2: "السكري من النوع الثاني",
+        conditionPrediabetes: "مقدمات السكري",
+        conditionThyroid: "اضطراب الغدة الدرقية",
+        conditionObesity: "السمنة",
+
+        // Voice problems
+        conditionVocalFoldParalysis: "شلل الحبل الصوتي الأحادي",
+        conditionMuscleTensionDysphonia: "خلل النطق بتوتر العضلات",
+        conditionSpasmodicDysphonia: "خلل النطق التشنجي/رعشة الحنجرة",
+        conditionVocalLesions: "آفات (لحمية صوتية، عقد إلخ)",
+        conditionLaryngitis: "التهاب الحنجرة",
+        conditionLaryngealCancer: "سرطان الحنجرة",
+        conditionVoiceOther: "مشكلة صوتية أخرى",
+
+        // Other conditions
+        conditionOtherGeneral: "حالة أخرى (يرجى التحديد)",
+        otherGeneralConditionLabel: "يرجى تحديد حالتك",
+        otherGeneralConditionPlaceholder: "اوصف حالتك",
+
+        // Specify placeholders for "other" conditions
+        specifyRespiratoryOtherPlaceholder: "يرجى تحديد حالتك التنفسية",
+        specifyMoodOtherPlaceholder: "يرجى تحديد حالتك النفسية/المزاجية",
+        specifyVoiceOtherPlaceholder: "يرجى تحديد مشكلتك الصوتية"
     }
 };
 

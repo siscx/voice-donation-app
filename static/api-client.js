@@ -5,6 +5,62 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:5000/api'  // Local development
     : window.location.origin + '/api'; // Production
 
+// ENHANCED: New function to collect questionnaire data for enhanced medical conditions
+function collectEnhancedQuestionnaireData() {
+    // Get basic fields
+    const donationLanguage = document.getElementById('donationLanguage').value;
+    const ageGroup = document.getElementById('ageGroup').value;
+
+    // Get selected health conditions (NEW ENHANCED SYSTEM)
+    const healthConditions = Array.from(document.querySelectorAll('input[name="healthConditions"]:checked'))
+        .map(cb => cb.value);
+
+    console.log('Selected health conditions:', healthConditions);
+
+    // Collect severity data for each selected condition
+    const conditionSeverities = {};
+    healthConditions.forEach(condition => {
+        const severitySelect = document.getElementById(`severity_${condition}`);
+        if (severitySelect && severitySelect.value) {
+            conditionSeverities[condition] = severitySelect.value;
+        }
+    });
+
+    console.log('Condition severities:', conditionSeverities);
+
+    // Collect specification data for "other" conditions
+    const conditionSpecifications = {};
+
+    // Check for each "other" condition specification
+    const specificationFields = [
+        'specify_respiratory_other',
+        'specify_mood_other',
+        'specify_voice_other',
+        'otherGeneralCondition'
+    ];
+
+    specificationFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && field.value.trim()) {
+            conditionSpecifications[fieldId] = field.value.trim();
+        }
+    });
+
+    console.log('Condition specifications:', conditionSpecifications);
+
+    // Structure the data according to new schema
+    const questionnaireData = {
+        donation_language: donationLanguage,
+        age_group: ageGroup,
+        health_conditions: healthConditions,
+        condition_severities: conditionSeverities,
+        condition_specifications: conditionSpecifications
+    };
+
+    console.log('Final enhanced questionnaire data:', questionnaireData);
+    return questionnaireData;
+}
+
 async function submitDonation() {
     try {
         console.log('=== STARTING SUBMISSION ===');
@@ -31,19 +87,9 @@ async function submitDonation() {
 
         formData.append('audio', audioBlob, 'voice_donation.webm');
 
-        // Add questionnaire data
-        const chronicConditions = Array.from(document.querySelectorAll('input[name="chronicConditions"]:checked')).map(cb => cb.value);
-        const questionnaireData = {
-            donation_language: document.getElementById('donationLanguage').value,
-            age_group: document.getElementById('ageGroup').value,
-            chronic_conditions: chronicConditions,
-            respiratory_severity: document.getElementById('respiratorySeverity').value || null,
-            voice_problems: document.getElementById('voiceProblems').value,
-            other_condition: document.getElementById('otherCondition').value || null,
-            other_voice_problem: document.getElementById('otherVoiceProblem').value || null
-        };
-
-        console.log('Questionnaire data:', questionnaireData);
+        // ENHANCED: Add questionnaire data using new collection method
+        const questionnaireData = collectEnhancedQuestionnaireData();
+        console.log('Enhanced questionnaire data:', questionnaireData);
         formData.append('questionnaire', JSON.stringify(questionnaireData));
 
         // Show processing screen

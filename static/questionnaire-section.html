@@ -33,73 +33,562 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label" data-translate="conditionsLabel">Health Conditions (Select all that apply)</label>
-            <div class="checkbox-grid" id="chronicConditionCheckboxes">
-                <div class="checkbox-card">
+            <label class="form-label" data-translate="conditionsLabel">Health Conditions</label>
+            <p class="form-helper" data-translate="conditionsHelper">Select all conditions that apply to you and indicate their severity</p>
+
+            <!-- None Option -->
+            <div class="condition-category">
+                <div class="checkbox-card none-option">
                     <div class="checkbox-content">
-                        <input type="checkbox" id="condition_none" name="chronicConditions" value="none" class="checkbox-input">
-                        <label for="condition_none" class="checkbox-label" data-translate="conditionNone">None</label>
-                    </div>
-                </div>
-                <div class="checkbox-card">
-                    <div class="checkbox-content">
-                        <input type="checkbox" id="condition_respiratory" name="chronicConditions" value="respiratory" class="checkbox-input">
-                        <label for="condition_respiratory" class="checkbox-label" data-translate="conditionRespiratory">Respiratory (Asthma, COPD)</label>
-                    </div>
-                </div>
-                <div class="checkbox-card">
-                    <div class="checkbox-content">
-                        <input type="checkbox" id="condition_neurological" name="chronicConditions" value="neurological" class="checkbox-input">
-                        <label for="condition_neurological" class="checkbox-label" data-translate="conditionNeurological">Neurological (Parkinson's, MS)</label>
-                    </div>
-                </div>
-                <div class="checkbox-card">
-                    <div class="checkbox-content">
-                        <input type="checkbox" id="condition_cardiovascular" name="chronicConditions" value="cardiovascular" class="checkbox-input">
-                        <label for="condition_cardiovascular" class="checkbox-label" data-translate="conditionCardiovascular">Cardiovascular (Heart disease)</label>
-                    </div>
-                </div>
-                <div class="checkbox-card">
-                    <div class="checkbox-content">
-                        <input type="checkbox" id="condition_other" name="chronicConditions" value="other" class="checkbox-input">
-                        <label for="condition_other" class="checkbox-label" data-translate="conditionOther">Other chronic condition</label>
+                        <input type="checkbox" id="condition_none" name="healthConditions" value="none" class="checkbox-input">
+                        <label for="condition_none" class="checkbox-label" data-translate="conditionNone">None - I have no diagnosed health conditions</label>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="form-group hidden" id="otherConditionGroup">
-            <label class="form-label" for="otherCondition" data-translate="otherConditionLabel">Please specify your chronic condition</label>
-            <input type="text" class="form-input" id="otherCondition" name="otherCondition" data-translate="otherConditionPlaceholder" placeholder="Describe your condition">
-        </div>
+            <!-- Neurological Conditions -->
+            <div class="condition-category">
+                <div class="category-header" onclick="toggleCategory('neurological')">
+                    <span class="category-title" data-translate="categoryNeurological">Neurological Conditions</span>
+                    <span class="category-arrow">▼</span>
+                </div>
+                <div class="category-content collapsed" id="category-neurological">
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="neuro_alzheimers" name="healthConditions" value="alzheimers" class="checkbox-input condition-checkbox">
+                                    <label for="neuro_alzheimers" class="checkbox-label" data-translate="conditionAlzheimers">Alzheimer's</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_alzheimers" name="severity_alzheimers">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="neuro_dementia" name="healthConditions" value="dementia" class="checkbox-input condition-checkbox">
+                                    <label for="neuro_dementia" class="checkbox-label" data-translate="conditionDementia">Dementia</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_dementia" name="severity_dementia">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="neuro_mci" name="healthConditions" value="mci" class="checkbox-input condition-checkbox">
+                                    <label for="neuro_mci" class="checkbox-label" data-translate="conditionMCI">Mild Cognitive Impairment</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_mci" name="severity_mci">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="neuro_als" name="healthConditions" value="als" class="checkbox-input condition-checkbox">
+                                    <label for="neuro_als" class="checkbox-label" data-translate="conditionALS">ALS</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_als" name="severity_als">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="neuro_huntingtons" name="healthConditions" value="huntingtons" class="checkbox-input condition-checkbox">
+                                    <label for="neuro_huntingtons" class="checkbox-label" data-translate="conditionHuntingtons">Huntington's disease</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_huntingtons" name="severity_huntingtons">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="neuro_parkinsons" name="healthConditions" value="parkinsons" class="checkbox-input condition-checkbox">
+                                    <label for="neuro_parkinsons" class="checkbox-label" data-translate="conditionParkinsons">Parkinson's disease</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_parkinsons" name="severity_parkinsons">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="form-group hidden" id="respiratorySeverityGroup">
-            <label class="form-label" for="respiratorySeverity" data-translate="respiratorySeverityLabel">Please select the severity of your respiratory condition</label>
-            <select class="form-select" id="respiratorySeverity" name="respiratorySeverity">
-                <option value="" data-translate="severitySelect">Select severity</option>
-                <option value="mild" data-translate="severityMild">Mild</option>
-                <option value="medium" data-translate="severityMedium">Medium</option>
-                <option value="severe" data-translate="severitySevere">Severe</option>
-            </select>
-        </div>
+            <!-- Respiratory Conditions -->
+            <div class="condition-category">
+                <div class="category-header" onclick="toggleCategory('respiratory')">
+                    <span class="category-title" data-translate="categoryRespiratory">Respiratory Conditions</span>
+                    <span class="category-arrow">▼</span>
+                </div>
+                <div class="category-content collapsed" id="category-respiratory">
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="resp_asthma" name="healthConditions" value="asthma" class="checkbox-input condition-checkbox">
+                                    <label for="resp_asthma" class="checkbox-label" data-translate="conditionAsthma">Asthma</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_asthma" name="severity_asthma">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="resp_cough" name="healthConditions" value="chronic_cough" class="checkbox-input condition-checkbox">
+                                    <label for="resp_cough" class="checkbox-label" data-translate="conditionChronicCough">Chronic cough</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_chronic_cough" name="severity_chronic_cough">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="resp_copd" name="healthConditions" value="copd" class="checkbox-input condition-checkbox">
+                                    <label for="resp_copd" class="checkbox-label" data-translate="conditionCOPD">COPD</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_copd" name="severity_copd">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="resp_other" name="healthConditions" value="respiratory_other" class="checkbox-input condition-checkbox">
+                                    <label for="resp_other" class="checkbox-label" data-translate="conditionRespiratoryOther">Other respiratory condition</label>
+                                </div>
+                            </div>
+                            <input type="text" class="form-input hidden" id="specify_respiratory_other" name="specify_respiratory_other" data-translate="specifyRespiratoryOtherPlaceholder" placeholder="Please specify your respiratory condition">
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label class="form-label" for="voiceProblems" data-translate="voiceProblemsLabel">Voice Problems</label>
-            <select class="form-select" id="voiceProblems" name="voiceProblems" required>
-                <option value="" data-translate="voiceProblemsSelect">Select voice problems (if any)</option>
-                <option value="none" data-translate="voiceProblemNone">None</option>
-                <option value="vocal_nodules" data-translate="voiceProblemNodules">Vocal nodules</option>
-                <option value="vocal_polyps" data-translate="voiceProblemPolyps">Vocal polyps</option>
-                <option value="vocal_paralysis" data-translate="voiceProblemParalysis">Vocal cord paralysis</option>
-                <option value="chronic_laryngitis" data-translate="voiceProblemLaryngitis">Chronic laryngitis</option>
-                <option value="other" data-translate="voiceProblemOther">Other voice problem</option>
-            </select>
-        </div>
+            <!-- Mood and Psychiatric Conditions -->
+            <div class="condition-category">
+                <div class="category-header" onclick="toggleCategory('mood')">
+                    <span class="category-title" data-translate="categoryMood">Mood and Psychiatric Conditions</span>
+                    <span class="category-arrow">▼</span>
+                </div>
+                <div class="category-content collapsed" id="category-mood">
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="mood_depression" name="healthConditions" value="depression" class="checkbox-input condition-checkbox">
+                                    <label for="mood_depression" class="checkbox-label" data-translate="conditionDepression">Depression disorder</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_depression" name="severity_depression">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="mood_anxiety" name="healthConditions" value="anxiety" class="checkbox-input condition-checkbox">
+                                    <label for="mood_anxiety" class="checkbox-label" data-translate="conditionAnxiety">Anxiety disorder</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_anxiety" name="severity_anxiety">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="mood_substance" name="healthConditions" value="substance_use" class="checkbox-input condition-checkbox">
+                                    <label for="mood_substance" class="checkbox-label" data-translate="conditionSubstanceUse">Alcohol or substance use disorder</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_substance_use" name="severity_substance_use">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="mood_bipolar" name="healthConditions" value="bipolar" class="checkbox-input condition-checkbox">
+                                    <label for="mood_bipolar" class="checkbox-label" data-translate="conditionBipolar">Bipolar disorder</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_bipolar" name="severity_bipolar">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="mood_autism" name="healthConditions" value="autism" class="checkbox-input condition-checkbox">
+                                    <label for="mood_autism" class="checkbox-label" data-translate="conditionAutism">Autism spectrum disorder</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_autism" name="severity_autism">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="mood_adhd" name="healthConditions" value="adhd" class="checkbox-input condition-checkbox">
+                                    <label for="mood_adhd" class="checkbox-label" data-translate="conditionADHD">ADHD</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_adhd" name="severity_adhd">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="mood_other" name="healthConditions" value="mood_other" class="checkbox-input condition-checkbox">
+                                    <label for="mood_other" class="checkbox-label" data-translate="conditionMoodOther">Other mood/psychiatric condition</label>
+                                </div>
+                            </div>
+                            <input type="text" class="form-input hidden" id="specify_mood_other" name="specify_mood_other" data-translate="specifyMoodOtherPlaceholder" placeholder="Please specify your mood/psychiatric condition">
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="form-group hidden" id="otherVoiceProblemGroup">
-            <label class="form-label" for="otherVoiceProblem" data-translate="otherVoiceProblemLabel">Please specify your voice problem</label>
-            <input type="text" class="form-input" id="otherVoiceProblem" name="otherVoiceProblem" data-translate="otherVoiceProblemPlaceholder" placeholder="Describe your voice problem">
-        </div>
+            <!-- Metabolic/Endocrine Conditions -->
+            <div class="condition-category">
+                <div class="category-header" onclick="toggleCategory('metabolic')">
+                    <span class="category-title" data-translate="categoryMetabolic">Metabolic/Endocrine Conditions</span>
+                    <span class="category-arrow">▼</span>
+                </div>
+                <div class="category-content collapsed" id="category-metabolic">
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="meta_diabetes1" name="healthConditions" value="diabetes_type1" class="checkbox-input condition-checkbox">
+                                    <label for="meta_diabetes1" class="checkbox-label" data-translate="conditionDiabetes1">Diabetes type 1</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_diabetes_type1" name="severity_diabetes_type1">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="meta_diabetes2" name="healthConditions" value="diabetes_type2" class="checkbox-input condition-checkbox">
+                                    <label for="meta_diabetes2" class="checkbox-label" data-translate="conditionDiabetes2">Diabetes type 2</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_diabetes_type2" name="severity_diabetes_type2">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="meta_prediabetes" name="healthConditions" value="prediabetes" class="checkbox-input condition-checkbox">
+                                    <label for="meta_prediabetes" class="checkbox-label" data-translate="conditionPrediabetes">Prediabetes</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_prediabetes" name="severity_prediabetes">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="meta_thyroid" name="healthConditions" value="thyroid" class="checkbox-input condition-checkbox">
+                                    <label for="meta_thyroid" class="checkbox-label" data-translate="conditionThyroid">Thyroid Disorder</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_thyroid" name="severity_thyroid">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="meta_obesity" name="healthConditions" value="obesity" class="checkbox-input condition-checkbox">
+                                    <label for="meta_obesity" class="checkbox-label" data-translate="conditionObesity">Obesity</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_obesity" name="severity_obesity">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Problems -->
+            <div class="condition-category">
+                <div class="category-header" onclick="toggleCategory('voice')">
+                    <span class="category-title" data-translate="categoryVoice">Voice Problems</span>
+                    <span class="category-arrow">▼</span>
+                </div>
+                <div class="category-content collapsed" id="category-voice">
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="voice_paralysis" name="healthConditions" value="vocal_fold_paralysis" class="checkbox-input condition-checkbox">
+                                    <label for="voice_paralysis" class="checkbox-label" data-translate="conditionVocalFoldParalysis">Unilateral vocal fold paralysis</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_vocal_fold_paralysis" name="severity_vocal_fold_paralysis">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="voice_tension" name="healthConditions" value="muscle_tension_dysphonia" class="checkbox-input condition-checkbox">
+                                    <label for="voice_tension" class="checkbox-label" data-translate="conditionMuscleTensionDysphonia">Muscle Tension Dysphonia</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_muscle_tension_dysphonia" name="severity_muscle_tension_dysphonia">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                                <div class="checkbox-content">
+                                    <input type="checkbox" id="voice_spasmodic" name="healthConditions" value="spasmodic_dysphonia" class="checkbox-input condition-checkbox">
+                                    <label for="voice_spasmodic" class="checkbox-label" data-translate="conditionSpasmodicDysphonia">Spasmodic Dysphonia/laryngeal tremor</label>
+                                </div>
+                            </div>
+                            <select class="severity-select hidden" id="severity_spasmodic_dysphonia" name="severity_spasmodic_dysphonia">
+                                <option value="" data-translate="severitySelect">Select severity</option>
+                                <option value="mild" data-translate="severityMild">Mild</option>
+                                <option value="medium" data-translate="severityMedium">Medium</option>
+                                <option value="severe" data-translate="severitySevere">Severe</option>
+                                <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-row">
+                            <div class="checkbox-card">
+                               <div class="checkbox-content">
+                                   <input type="checkbox" id="voice_lesions" name="healthConditions" value="vocal_lesions" class="checkbox-input condition-checkbox">
+                                   <label for="voice_lesions" class="checkbox-label" data-translate="conditionVocalLesions">Lesions (vocal polyp, nodules etc)</label>
+                               </div>
+                           </div>
+                           <select class="severity-select hidden" id="severity_vocal_lesions" name="severity_vocal_lesions">
+                               <option value="" data-translate="severitySelect">Select severity</option>
+                               <option value="mild" data-translate="severityMild">Mild</option>
+                               <option value="medium" data-translate="severityMedium">Medium</option>
+                               <option value="severe" data-translate="severitySevere">Severe</option>
+                               <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                           </select>
+                       </div>
+                   </div>
+                   <div class="condition-item">
+                       <div class="condition-row">
+                           <div class="checkbox-card">
+                               <div class="checkbox-content">
+                                   <input type="checkbox" id="voice_laryngitis" name="healthConditions" value="laryngitis" class="checkbox-input condition-checkbox">
+                                   <label for="voice_laryngitis" class="checkbox-label" data-translate="conditionLaryngitis">Laryngitis</label>
+                               </div>
+                           </div>
+                           <select class="severity-select hidden" id="severity_laryngitis" name="severity_laryngitis">
+                               <option value="" data-translate="severitySelect">Select severity</option>
+                               <option value="mild" data-translate="severityMild">Mild</option>
+                               <option value="medium" data-translate="severityMedium">Medium</option>
+                               <option value="severe" data-translate="severitySevere">Severe</option>
+                               <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                           </select>
+                       </div>
+                   </div>
+                   <div class="condition-item">
+                       <div class="condition-row">
+                           <div class="checkbox-card">
+                               <div class="checkbox-content">
+                                   <input type="checkbox" id="voice_cancer" name="healthConditions" value="laryngeal_cancer" class="checkbox-input condition-checkbox">
+                                   <label for="voice_cancer" class="checkbox-label" data-translate="conditionLaryngealCancer">Laryngeal cancer</label>
+                               </div>
+                           </div>
+                           <select class="severity-select hidden" id="severity_laryngeal_cancer" name="severity_laryngeal_cancer">
+                               <option value="" data-translate="severitySelect">Select severity</option>
+                               <option value="mild" data-translate="severityMild">Mild</option>
+                               <option value="medium" data-translate="severityMedium">Medium</option>
+                               <option value="severe" data-translate="severitySevere">Severe</option>
+                               <option value="unknown" data-translate="severityUnknown">I do not know</option>
+                           </select>
+                       </div>
+                   </div>
+                   <div class="condition-item">
+                       <div class="condition-row">
+                           <div class="checkbox-card">
+                               <div class="checkbox-content">
+                                   <input type="checkbox" id="voice_other" name="healthConditions" value="voice_other" class="checkbox-input condition-checkbox">
+                                   <label for="voice_other" class="checkbox-label" data-translate="conditionVoiceOther">Other voice problem</label>
+                               </div>
+                           </div>
+                           <input type="text" class="form-input hidden" id="specify_voice_other" name="specify_voice_other" data-translate="specifyVoiceOtherPlaceholder" placeholder="Please specify your voice problem">
+                       </div>
+                   </div>
+               </div>
+           </div>
+
+           <!-- Other Conditions -->
+           <div class="condition-category">
+               <div class="condition-row">
+                   <div class="checkbox-card">
+                       <div class="checkbox-content">
+                           <input type="checkbox" id="condition_other_general" name="healthConditions" value="other_general" class="checkbox-input condition-checkbox">
+                           <label for="condition_other_general" class="checkbox-label" data-translate="conditionOtherGeneral">Other condition (please specify)</label>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+       <!-- Text field for specifying other conditions -->
+       <div class="form-group hidden" id="otherGeneralConditionGroup">
+           <label class="form-label" for="otherGeneralCondition" data-translate="otherGeneralConditionLabel">Please specify your condition</label>
+           <input type="text" class="form-input" id="otherGeneralCondition" name="otherGeneralCondition" data-translate="otherGeneralConditionPlaceholder" placeholder="Describe your condition">
+       </div>
     </form>
 
     <button class="btn btn-primary btn-wide" id="continueButton" onclick="nextStep()" disabled>

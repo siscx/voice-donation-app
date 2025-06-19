@@ -1,4 +1,4 @@
-# questionnaire.py - Questionnaire structure and validation
+# questionnaire.py - Updated schema for enhanced medical conditions
 from datetime import datetime
 
 QUESTIONNAIRE_SCHEMA = {
@@ -20,70 +20,106 @@ QUESTIONNAIRE_SCHEMA = {
         "question": "What is your age group?"
     },
 
-    "chronic_conditions": {
-        "type": "multiple_choice",  # Changed from single_choice to multiple_choice
+    # ENHANCED: New health conditions structure
+    "health_conditions": {
+        "type": "multiple_choice",
         "required": True,
-        "options": ["respiratory", "neurological", "cardiovascular", "other", "none"],
-        # Updated neurologic to neurological
-        "question": "Do you have any diagnosed chronic conditions?",
+        "options": [
+            # None option
+            "none",
+
+            # Neurological conditions
+            "alzheimers", "dementia", "mci", "als", "huntingtons", "parkinsons",
+
+            # Respiratory conditions
+            "asthma", "chronic_cough", "copd", "respiratory_other",
+
+            # Mood/Psychiatric conditions
+            "depression", "anxiety", "substance_use", "bipolar", "autism", "adhd", "mood_other",
+
+            # Metabolic/Endocrine conditions
+            "diabetes_type1", "diabetes_type2", "prediabetes", "thyroid", "obesity",
+
+            # Voice problems
+            "vocal_fold_paralysis", "muscle_tension_dysphonia", "spasmodic_dysphonia",
+            "vocal_lesions", "laryngitis", "laryngeal_cancer", "voice_other",
+
+            # General other
+            "other_general"
+        ],
+        "question": "Do you have any diagnosed health conditions?",
         "option_labels": {
-            "respiratory": "Respiratory condition (asthma, COPD, etc.)",
-            "neurological": "Neurological condition (Parkinson's, MS, etc.)",  # Updated label
-            "cardiovascular": "Cardiovascular condition (heart disease, etc.)",
-            "other": "Other chronic condition",
-            "none": "None"
+            "none": "None - I have no diagnosed health conditions",
+            "alzheimers": "Alzheimer's",
+            "dementia": "Dementia",
+            "mci": "Mild Cognitive Impairment",
+            "als": "ALS",
+            "huntingtons": "Huntington's disease",
+            "parkinsons": "Parkinson's disease",
+            "asthma": "Asthma",
+            "chronic_cough": "Chronic cough",
+            "copd": "COPD",
+            "respiratory_other": "Other respiratory condition",
+            "depression": "Depression disorder",
+            "anxiety": "Anxiety disorder",
+            "substance_use": "Alcohol or substance use disorder",
+            "bipolar": "Bipolar disorder",
+            "autism": "Autism spectrum disorder",
+            "adhd": "ADHD",
+            "mood_other": "Other mood/psychiatric condition",
+            "diabetes_type1": "Diabetes type 1",
+            "diabetes_type2": "Diabetes type 2",
+            "prediabetes": "Prediabetes",
+            "thyroid": "Thyroid Disorder",
+            "obesity": "Obesity",
+            "vocal_fold_paralysis": "Unilateral vocal fold paralysis",
+            "muscle_tension_dysphonia": "Muscle Tension Dysphonia",
+            "spasmodic_dysphonia": "Spasmodic Dysphonia/laryngeal tremor",
+            "vocal_lesions": "Lesions (vocal polyp, nodules etc)",
+            "laryngitis": "Laryngitis",
+            "laryngeal_cancer": "Laryngeal cancer",
+            "voice_other": "Other voice problem",
+            "other_general": "Other condition (please specify)"
         },
-        "exclusive_options": ["none"]  # "none" cannot be selected with other options
+        "exclusive_options": ["none"]
     },
 
-    "other_condition": {  # Updated field name to match frontend
-        "type": "text",
+    # ENHANCED: Severity selections for each condition
+    "condition_severities": {
+        "type": "object",
         "required": False,
-        "depends_on": {"chronic_conditions": "other"},
-        "question": "Please specify your chronic condition:",
-        "max_length": 200
+        "question": "Severity levels for selected conditions",
+        "valid_severities": ["mild", "medium", "severe", "unknown"],
+        "conditions_requiring_severity": [
+            "alzheimers", "dementia", "mci", "als", "huntingtons", "parkinsons",
+            "asthma", "chronic_cough", "copd",
+            "depression", "anxiety", "substance_use", "bipolar", "autism", "adhd",
+            "diabetes_type1", "diabetes_type2", "prediabetes", "thyroid", "obesity",
+            "vocal_fold_paralysis", "muscle_tension_dysphonia", "spasmodic_dysphonia",
+            "vocal_lesions", "laryngitis", "laryngeal_cancer"
+        ]
     },
 
-    "respiratory_severity": {
-        "type": "single_choice",
+    # ENHANCED: Text specifications for "other" conditions
+    "condition_specifications": {
+        "type": "object",
         "required": False,
-        "depends_on": {"chronic_conditions": "respiratory"},
-        "options": ["mild", "medium", "severe"],  # Updated "moderate" to "medium" to match frontend
-        "question": "Please select the severity of your respiratory condition:",
-        "option_labels": {
-            "mild": "Mild",
-            "medium": "Medium",  # Updated to match frontend
-            "severe": "Severe"
+        "question": "Specifications for 'other' conditions",
+        "conditions_requiring_specification": [
+            "respiratory_other", "mood_other", "voice_other", "other_general"
+        ],
+        "specification_labels": {
+            "respiratory_other": "specify_respiratory_other",
+            "mood_other": "specify_mood_other",
+            "voice_other": "specify_voice_other",
+            "other_general": "otherGeneralCondition"
         }
-    },
-
-    "voice_problems": {
-        "type": "single_choice",
-        "required": True,
-        "options": ["vocal_nodules", "vocal_polyps", "vocal_paralysis", "chronic_laryngitis", "other", "none"],
-        "question": "Are you facing any diagnosed voice problems?",
-        "option_labels": {
-            "vocal_nodules": "Vocal nodules",
-            "vocal_polyps": "Vocal polyps",
-            "vocal_paralysis": "Vocal cord paralysis",
-            "chronic_laryngitis": "Chronic laryngitis",
-            "other": "Other voice problem",
-            "none": "None"
-        }
-    },
-
-    "other_voice_problem": {  # Updated field name to match frontend
-        "type": "text",
-        "required": False,
-        "depends_on": {"voice_problems": "other"},
-        "question": "Please specify your voice problem:",
-        "max_length": 200
     }
 }
 
 
 def validate_questionnaire_data(data):
-    """Validate questionnaire responses against schema"""
+    """Enhanced validation for new questionnaire structure"""
     errors = []
     warnings = []
 
@@ -93,59 +129,46 @@ def validate_questionnaire_data(data):
             if field_name not in data or not data[field_name]:
                 errors.append(f"Required field '{field_name}' is missing")
 
-            # Special handling for multiple choice fields
-            elif field_config["type"] == "multiple_choice":
+            # Special handling for health_conditions
+            elif field_name == "health_conditions":
                 if not isinstance(data[field_name], list) or len(data[field_name]) == 0:
                     errors.append(f"Required field '{field_name}' must have at least one selection")
 
-        # Check conditional requirements
-        if "depends_on" in field_config:
-            dependency_field, dependency_value = list(field_config["depends_on"].items())[0]
+    # Validate health conditions exclusivity
+    if "health_conditions" in data:
+        health_conditions = data["health_conditions"]
+        if isinstance(health_conditions, list):
+            if "none" in health_conditions and len(health_conditions) > 1:
+                errors.append("'None' cannot be selected with other health conditions")
 
-            # Handle multiple choice dependencies
-            if dependency_field in data:
-                dependency_met = False
-                if isinstance(data[dependency_field], list):
-                    dependency_met = dependency_value in data[dependency_field]
-                else:
-                    dependency_met = data[dependency_field] == dependency_value
+    # Validate condition severities
+    if "health_conditions" in data and "condition_severities" in data:
+        health_conditions = data["health_conditions"]
+        severities = data["condition_severities"]
 
-                if dependency_met:
-                    if field_config.get("required") and (field_name not in data or not data[field_name]):
-                        errors.append(
-                            f"Field '{field_name}' is required when {dependency_field} includes '{dependency_value}'")
+        severity_config = QUESTIONNAIRE_SCHEMA["condition_severities"]
+        conditions_requiring_severity = severity_config["conditions_requiring_severity"]
 
-    # Validate field values
-    for field_name, value in data.items():
-        if field_name in QUESTIONNAIRE_SCHEMA:
-            field_config = QUESTIONNAIRE_SCHEMA[field_name]
+        for condition in health_conditions:
+            if condition in conditions_requiring_severity:
+                if condition not in severities or not severities[condition]:
+                    errors.append(f"Severity required for condition '{condition}'")
+                elif severities[condition] not in severity_config["valid_severities"]:
+                    errors.append(f"Invalid severity '{severities[condition]}' for condition '{condition}'")
 
-            # Validate single choice options
-            if field_config["type"] == "single_choice":
-                if value and value not in field_config["options"]:
-                    errors.append(f"Invalid option '{value}' for field '{field_name}'")
+    # Validate condition specifications
+    if "health_conditions" in data and "condition_specifications" in data:
+        health_conditions = data["health_conditions"]
+        specifications = data["condition_specifications"]
 
-            # Validate multiple choice options
-            elif field_config["type"] == "multiple_choice":
-                if isinstance(value, list):
-                    # Check for exclusive options (like "none")
-                    if "exclusive_options" in field_config:
-                        exclusive_selected = [opt for opt in value if opt in field_config["exclusive_options"]]
-                        if exclusive_selected and len(value) > 1:
-                            errors.append(
-                                f"Exclusive option(s) {exclusive_selected} cannot be selected with other options for '{field_name}'")
+        spec_config = QUESTIONNAIRE_SCHEMA["condition_specifications"]
+        conditions_requiring_spec = spec_config["conditions_requiring_specification"]
 
-                    # Validate each selected option
-                    for option in value:
-                        if option not in field_config["options"]:
-                            errors.append(f"Invalid option '{option}' for field '{field_name}'")
-                else:
-                    errors.append(f"Field '{field_name}' must be a list")
-
-            # Validate text length
-            elif field_config["type"] == "text":
-                if value and "max_length" in field_config and len(str(value)) > field_config["max_length"]:
-                    errors.append(f"Field '{field_name}' exceeds maximum length of {field_config['max_length']}")
+        for condition in health_conditions:
+            if condition in conditions_requiring_spec:
+                spec_field = spec_config["specification_labels"][condition]
+                if spec_field not in specifications or not specifications[spec_field]:
+                    errors.append(f"Specification required for condition '{condition}'")
 
     return {
         "valid": len(errors) == 0,
@@ -155,7 +178,7 @@ def validate_questionnaire_data(data):
 
 
 def process_questionnaire_data(raw_data):
-    """Process and clean questionnaire data"""
+    """Enhanced processing for new questionnaire structure"""
 
     # Clean data - remove None values and handle special cases
     cleaned_data = {}
@@ -177,25 +200,50 @@ def process_questionnaire_data(raw_data):
     processed_data = {
         "responses": cleaned_data,
         "processed_at": datetime.now().isoformat(),
-        "data_version": "2.1"  # Updated version for language selection support
+        "data_version": "3.0"  # Updated for enhanced medical conditions
     }
 
-    # Add derived fields for analysis
-    chronic_conditions = cleaned_data.get("chronic_conditions", [])
-    if isinstance(chronic_conditions, str):
-        chronic_conditions = [chronic_conditions]  # Handle legacy single value
+    # ENHANCED: Add derived analysis flags
+    health_conditions = cleaned_data.get("health_conditions", [])
+    if isinstance(health_conditions, str):
+        health_conditions = [health_conditions]
 
     processed_data["analysis_flags"] = {
+        # Language flags
         "donation_language": cleaned_data.get("donation_language", "unknown"),
         "is_english_donation": cleaned_data.get("donation_language") == "english",
         "is_arabic_donation": cleaned_data.get("donation_language") == "arabic",
-        "has_chronic_condition": "none" not in chronic_conditions and len(chronic_conditions) > 0,
-        "has_respiratory_condition": "respiratory" in chronic_conditions,
-        "has_neurological_condition": "neurological" in chronic_conditions,
-        "has_cardiovascular_condition": "cardiovascular" in chronic_conditions,
-        "has_multiple_conditions": len([c for c in chronic_conditions if c != "none"]) > 1,
-        "has_voice_problems": cleaned_data.get("voice_problems") != "none",
-        "requires_follow_up": "other" in chronic_conditions or cleaned_data.get("voice_problems") == "other"
+
+        # General health flags
+        "has_any_condition": "none" not in health_conditions and len(health_conditions) > 0,
+        "has_multiple_conditions": len([c for c in health_conditions if c != "none"]) > 1,
+
+        # Category flags
+        "has_neurological_condition": any(c in health_conditions for c in
+                                          ["alzheimers", "dementia", "mci", "als", "huntingtons", "parkinsons"]),
+        "has_respiratory_condition": any(c in health_conditions for c in
+                                         ["asthma", "chronic_cough", "copd", "respiratory_other"]),
+        "has_mood_condition": any(c in health_conditions for c in
+                                  ["depression", "anxiety", "substance_use", "bipolar", "autism", "adhd",
+                                   "mood_other"]),
+        "has_metabolic_condition": any(c in health_conditions for c in
+                                       ["diabetes_type1", "diabetes_type2", "prediabetes", "thyroid", "obesity"]),
+        "has_voice_condition": any(c in health_conditions for c in
+                                   ["vocal_fold_paralysis", "muscle_tension_dysphonia", "spasmodic_dysphonia",
+                                    "vocal_lesions", "laryngitis", "laryngeal_cancer", "voice_other"]),
+
+        # Specific condition flags (for research)
+        "has_dementia_related": any(c in health_conditions for c in ["alzheimers", "dementia", "mci"]),
+        "has_movement_disorder": any(c in health_conditions for c in ["parkinsons", "huntingtons"]),
+        "has_diabetes": any(c in health_conditions for c in ["diabetes_type1", "diabetes_type2", "prediabetes"]),
+
+        # Data quality flags
+        "requires_follow_up": any(c in health_conditions for c in
+                                  ["respiratory_other", "mood_other", "voice_other", "other_general"]),
+        "has_severity_data": "condition_severities" in cleaned_data and len(
+            cleaned_data.get("condition_severities", {})) > 0,
+        "has_specification_data": "condition_specifications" in cleaned_data and len(
+            cleaned_data.get("condition_specifications", {})) > 0
     }
 
     return {

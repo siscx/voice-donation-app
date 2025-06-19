@@ -75,10 +75,31 @@ function switchLanguage(lang) {
         if (translation) {
             el.textContent = translation;
         }
+    }); // <- This closing bracket was missing
+
+    // Update dynamic placeholders for any visible conditional fields
+    const conditionalInputs = [
+        { id: 'specify_respiratory_other', key: 'specifyRespiratoryOtherPlaceholder' },
+        { id: 'specify_mood_other', key: 'specifyMoodOtherPlaceholder' },
+        { id: 'specify_voice_other', key: 'specifyVoiceOtherPlaceholder' },
+        { id: 'otherGeneralCondition', key: 'otherGeneralConditionPlaceholder' }
+    ];
+
+    conditionalInputs.forEach(input => {
+        const element = document.getElementById(input.id);
+        if (element && !element.classList.contains('hidden')) {
+            const translation = translations[lang][input.key];
+            if (translation) {
+                element.placeholder = translation;
+            }
+        }
     });
 }
 
 // Tab switching functionality
+// Complete switchTab function with form clearing functionality
+// Replace your existing switchTab function with this:
+
 function switchTab(tabName) {
     console.log('Switching to tab:', tabName);
 
@@ -106,6 +127,152 @@ function switchTab(tabName) {
         currentStep = 1;
         document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
         document.getElementById('step1').classList.add('active');
+
+        // CLEAR ALL FORM DATA AND RESET STATE
+        clearAllFormData();
+    }
+}
+
+// Add this new function to clear all form data and reset state
+function clearAllFormData() {
+    console.log('Clearing all form data...');
+
+    // Clear basic form fields
+    const form = document.getElementById('questionnaireForm');
+    if (form) {
+        form.reset();
+    }
+
+    // Clear donation language and age group specifically
+    const donationLanguage = document.getElementById('donationLanguage');
+    const ageGroup = document.getElementById('ageGroup');
+    if (donationLanguage) donationLanguage.value = '';
+    if (ageGroup) ageGroup.value = '';
+
+    // Clear all health condition checkboxes
+    document.querySelectorAll('input[name="healthConditions"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    // Clear and hide all severity selects
+    document.querySelectorAll('.severity-select').forEach(select => {
+        select.value = '';
+        select.classList.add('hidden');
+        select.classList.remove('visible');
+    });
+
+    // Clear and hide all specification text inputs
+    const specificationFields = [
+        'specify_respiratory_other',
+        'specify_mood_other',
+        'specify_voice_other',
+        'otherGeneralCondition'
+    ];
+
+    specificationFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.value = '';
+            field.classList.add('hidden');
+        }
+    });
+
+    // Hide other general condition group
+    const otherGeneralGroup = document.getElementById('otherGeneralConditionGroup');
+    if (otherGeneralGroup) {
+        otherGeneralGroup.classList.add('hidden');
+    }
+
+    // Reset checkbox card styling
+    document.querySelectorAll('.checkbox-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    // Collapse all category sections
+    document.querySelectorAll('.category-content').forEach(content => {
+        content.classList.add('collapsed');
+    });
+
+    document.querySelectorAll('.category-header').forEach(header => {
+        header.classList.remove('expanded');
+    });
+
+    // Clear audio recording state
+    clearAudioRecording();
+
+    // Reset continue button state
+    updateContinueButton();
+
+    console.log('Form data cleared successfully');
+}
+
+// Add this function to clear audio recording state
+function clearAudioRecording() {
+    console.log('Clearing audio recording...');
+
+    // Clear audio chunks array
+    if (typeof audioChunks !== 'undefined') {
+        audioChunks = [];
+    }
+
+    // Reset recording UI elements
+    const recordButton = document.getElementById('recordButton');
+    const recordIcon = document.getElementById('recordIcon');
+    const recordingTimer = document.getElementById('recordingTimer');
+    const audioPlayback = document.getElementById('audioPlayback');
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    if (recordButton) {
+        recordButton.classList.remove('recording');
+    }
+
+    if (recordIcon) {
+        recordIcon.textContent = '🎤';
+    }
+
+    if (recordingTimer) {
+        recordingTimer.textContent = '00:00';
+    }
+
+    if (audioPlayback) {
+        audioPlayback.classList.add('hidden');
+    }
+
+    if (audioPlayer) {
+        audioPlayer.src = '';
+    }
+
+    // Clear any active recording interval
+    if (typeof recordingInterval !== 'undefined' && recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    // Stop any active media recorder
+    if (typeof mediaRecorder !== 'undefined' && mediaRecorder && mediaRecorder.state !== 'inactive') {
+        try {
+            mediaRecorder.stop();
+            if (mediaRecorder.stream) {
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+        } catch (error) {
+            console.log('Error stopping media recorder:', error);
+        }
+    }
+
+    // Reset recording status text
+    updateRecordingStatusText('recordingStatusStart');
+
+    console.log('Audio recording cleared successfully');
+}
+
+// Helper function to update recording status with current language
+function updateRecordingStatusText(translationKey) {
+    const currentLang = document.documentElement.lang || 'en';
+    const statusElement = document.getElementById('recordingStatus');
+    const translation = translations[currentLang][translationKey];
+    if (statusElement && translation) {
+        statusElement.textContent = translation;
     }
 }
 
