@@ -140,15 +140,38 @@ function stopTestimonialRotation() {
 }
 
 // Initialize everything when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded, initializing...');
     createParticles();
 
-    // Initialize form validation
-    initializeFormValidation();
+    // Load HTML components
+    await loadComponents();
 
     // Start testimonials rotation on step 1
     startTestimonialRotation();
 
     console.log('Initialization complete');
 });
+
+// Simple HTML include function
+async function includeHTML(elementId, filePath) {
+    try {
+        const response = await fetch(filePath);
+        const html = await response.text();
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.innerHTML = html;
+        }
+    } catch (error) {
+        console.error(`Failed to load ${filePath}:`, error);
+    }
+}
+
+// Load components on page load
+async function loadComponents() {
+    await includeHTML('questionnaire-placeholder', '/static/questionnaire-section.html');
+    await includeHTML('recording-placeholder', '/static/recording-section.html');
+
+    // Re-initialize form validation after loading questionnaire
+    initializeFormValidation();
+}

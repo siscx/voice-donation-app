@@ -1,0 +1,108 @@
+<!-- questionnaire-section.html - Health questionnaire form -->
+<div class="glass-card">
+    <div class="step-header">
+        <div class="step-icon" data-translate="step2Icon">💬</div>
+        <div>
+            <h2 class="step-title" data-translate="step2Title">Health Questionnaire</h2>
+            <p style="color: var(--gray-600); margin-top: 8px;" data-translate="step2Subtitle">Anonymous data helps train our AI models</p>
+        </div>
+    </div>
+
+    <form id="questionnaireForm" class="form-grid">
+        <div class="form-group">
+            <label class="form-label" for="donationLanguage" data-translate="donationLanguageLabel">Recording Language</label>
+            <select class="form-select" id="donationLanguage" name="donationLanguage" required>
+                <option value="" data-translate="donationLanguageSelect">Select the language for your voice recording</option>
+                <option value="english" data-translate="donationLanguageEnglish">English</option>
+                <option value="arabic" data-translate="donationLanguageArabic">Arabic</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="ageGroup" data-translate="ageLabel">Age Range</label>
+            <select class="form-select" id="ageGroup" name="ageGroup" required>
+                <option value="" data-translate="ageSelect">Select your age range</option>
+                <option value="18-25" data-translate="age1825">18-25 years</option>
+                <option value="26-35" data-translate="age2635">26-35 years</option>
+                <option value="36-45" data-translate="age3645">36-45 years</option>
+                <option value="46-55" data-translate="age4655">46-55 years</option>
+                <option value="56-65" data-translate="age5665">56-65 years</option>
+                <option value="66-75" data-translate="age6675">66-75 years</option>
+                <option value="76+" data-translate="age76plus">76+ years</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" data-translate="conditionsLabel">Health Conditions (Select all that apply)</label>
+            <div class="checkbox-grid" id="chronicConditionCheckboxes">
+                <div class="checkbox-card">
+                    <div class="checkbox-content">
+                        <input type="checkbox" id="condition_none" name="chronicConditions" value="none" class="checkbox-input">
+                        <label for="condition_none" class="checkbox-label" data-translate="conditionNone">None</label>
+                    </div>
+                </div>
+                <div class="checkbox-card">
+                    <div class="checkbox-content">
+                        <input type="checkbox" id="condition_respiratory" name="chronicConditions" value="respiratory" class="checkbox-input">
+                        <label for="condition_respiratory" class="checkbox-label" data-translate="conditionRespiratory">Respiratory (Asthma, COPD)</label>
+                    </div>
+                </div>
+                <div class="checkbox-card">
+                    <div class="checkbox-content">
+                        <input type="checkbox" id="condition_neurological" name="chronicConditions" value="neurological" class="checkbox-input">
+                        <label for="condition_neurological" class="checkbox-label" data-translate="conditionNeurological">Neurological (Parkinson's, MS)</label>
+                    </div>
+                </div>
+                <div class="checkbox-card">
+                    <div class="checkbox-content">
+                        <input type="checkbox" id="condition_cardiovascular" name="chronicConditions" value="cardiovascular" class="checkbox-input">
+                        <label for="condition_cardiovascular" class="checkbox-label" data-translate="conditionCardiovascular">Cardiovascular (Heart disease)</label>
+                    </div>
+                </div>
+                <div class="checkbox-card">
+                    <div class="checkbox-content">
+                        <input type="checkbox" id="condition_other" name="chronicConditions" value="other" class="checkbox-input">
+                        <label for="condition_other" class="checkbox-label" data-translate="conditionOther">Other chronic condition</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group hidden" id="otherConditionGroup">
+            <label class="form-label" for="otherCondition" data-translate="otherConditionLabel">Please specify your chronic condition</label>
+            <input type="text" class="form-input" id="otherCondition" name="otherCondition" data-translate="otherConditionPlaceholder" placeholder="Describe your condition">
+        </div>
+
+        <div class="form-group hidden" id="respiratorySeverityGroup">
+            <label class="form-label" for="respiratorySeverity" data-translate="respiratorySeverityLabel">Please select the severity of your respiratory condition</label>
+            <select class="form-select" id="respiratorySeverity" name="respiratorySeverity">
+                <option value="" data-translate="severitySelect">Select severity</option>
+                <option value="mild" data-translate="severityMild">Mild</option>
+                <option value="medium" data-translate="severityMedium">Medium</option>
+                <option value="severe" data-translate="severitySevere">Severe</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="voiceProblems" data-translate="voiceProblemsLabel">Voice Problems</label>
+            <select class="form-select" id="voiceProblems" name="voiceProblems" required>
+                <option value="" data-translate="voiceProblemsSelect">Select voice problems (if any)</option>
+                <option value="none" data-translate="voiceProblemNone">None</option>
+                <option value="vocal_nodules" data-translate="voiceProblemNodules">Vocal nodules</option>
+                <option value="vocal_polyps" data-translate="voiceProblemPolyps">Vocal polyps</option>
+                <option value="vocal_paralysis" data-translate="voiceProblemParalysis">Vocal cord paralysis</option>
+                <option value="chronic_laryngitis" data-translate="voiceProblemLaryngitis">Chronic laryngitis</option>
+                <option value="other" data-translate="voiceProblemOther">Other voice problem</option>
+            </select>
+        </div>
+
+        <div class="form-group hidden" id="otherVoiceProblemGroup">
+            <label class="form-label" for="otherVoiceProblem" data-translate="otherVoiceProblemLabel">Please specify your voice problem</label>
+            <input type="text" class="form-input" id="otherVoiceProblem" name="otherVoiceProblem" data-translate="otherVoiceProblemPlaceholder" placeholder="Describe your voice problem">
+        </div>
+    </form>
+
+    <button class="btn btn-primary btn-wide" id="continueButton" onclick="nextStep()" disabled>
+        <span data-translate="continueButton">Continue to Voice Recording</span>
+    </button>
+</div>

@@ -1,0 +1,42 @@
+<!-- recording-section.html - Voice recording interface -->
+<div class="glass-card">
+    <div class="step-header">
+        <div class="step-icon">🎙️</div>
+        <div>
+            <h2 class="step-title" data-translate="step3Title">Voice Recording</h2>
+        </div>
+    </div>
+    <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="step3Subtitle">
+        Please describe what you see in the image below. Speak naturally for at least 30 seconds.
+    </p>
+
+    <div class="picture-showcase">
+        <img id="randomPicture" class="picture-display" src="" alt="Describe this image">
+        <div class="picture-instruction" data-translate="recordingInstruction">
+            Describe what you see in this image - the people, activities, setting, and any details you notice.
+        </div>
+    </div>
+
+    <!-- Recording Instructions -->
+    <div class="recording-instructions">
+        <div class="instruction-icon">💡</div>
+        <p class="instruction-text" data-translate="recordingInstructions">Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.</p>
+    </div>
+
+    <div class="recording-section">
+        <button class="record-button" id="recordButton" onclick="toggleRecording()">
+            <span id="recordIcon">🎤</span>
+        </button>
+        <div class="recording-status" id="recordingStatus" data-translate="recordingStatusStart">Click to start recording</div>
+        <div class="recording-timer" id="recordingTimer">00:00</div>
+        <div id="audioPlayback" class="hidden" style="margin-top: 20px;">
+            <audio controls id="audioPlayer" style="width: 100%; margin-bottom: 20px;"></audio>
+            <button class="btn btn-primary btn-wide" onclick="nextStep()">
+                <span data-translate="submitButton">Submit Your Donation</span>
+            </button>
+            <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 12px; line-height: 1.4;" data-translate="consentText">
+                By submitting, you grant consent for anonymous use of your voice recording in health research, with data stored securely indefinitely for ongoing scientific analysis.
+            </p>
+        </div>
+    </div>
+</div>
