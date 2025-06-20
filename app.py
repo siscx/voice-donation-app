@@ -197,6 +197,7 @@ def voice_donation():
 
         # Validate questionnaire
         from utils.questionnaire import process_questionnaire_data
+        from utils.database import save_initial_voice_donation
         print("Processing questionnaire data...")
         questionnaire_result = process_questionnaire_data(questionnaire_json)
         print(f"Questionnaire result: {questionnaire_result}")
@@ -211,8 +212,7 @@ def voice_donation():
         # Generate unique recording ID
         recording_id = str(uuid.uuid4())
 
-        # NEW: Extract or generate donation ID
-        questionnaire_json = json.loads(questionnaire_data)
+        # Extract or generate donation ID
         task_metadata = questionnaire_json.get('task_metadata', {})
         donation_id = task_metadata.get('donation_id', recording_id)  # Use recording_id as fallback
 
@@ -223,9 +223,6 @@ def voice_donation():
         if len(audio_data) == 0:
             return jsonify({'error': 'Empty audio file'}), 400
 
-        # Create initial database record with "processing" status
-        from utils.database import save_initial_voice_donation
-
         # Prepare request info for metadata
         request_info = {
             'remote_addr': request.remote_addr,
@@ -233,39 +230,57 @@ def voice_donation():
             'method': request.method
         }
 
-        # Save initial record
-        initial_result = save_initial_voice_donation(
-            recording_id=recording_id,
-            questionnaire_data=questionnaire_result['data'],
-            audio_filename=file.filename,
-            audio_size=len(audio_data),
-            request_info=request_info
-        )
+        # FIXED: Check if this is a multi-task donation
+        is_multi_task = task_metadata.get('total_tasks', 1) > 1
 
-        if not initial_result['success']:
-            print(f"Failed to save initial record: {initial_result['error']}")
-            return jsonify({
-                'error': 'Failed to save initial data',
-                'details': initial_result['error']
-            }), 500
+        if is_multi_task:
+            # Store this task submission, don't process yet
+            success = store_task_submission(
+                recording_id=recording_id,
+                donation_id=donation_id,
+                audio_data=audio_data,
+                filename=file.filename,
+                questionnaire_result=questionnaire_result,
+                request_info=request_info
+            )
 
-        # Start background processing thread
-        processing_thread = threading.Thread(
-            target=process_audio_background,
-            args=(recording_id, audio_data, file.filename, questionnaire_result, request_info),
-            daemon=True
-        )
-        processing_thread.start()
+            if not success:
+                return jsonify({
+                    'error': 'Failed to store task submission'
+                }), 500
 
-        print("SUCCESS: Voice donation submitted, processing started in background")
+            # Check if all tasks for this donation are now submitted
+            if should_start_processing(donation_id, task_metadata.get('total_tasks', 2)):
+                # Start background processing for ALL tasks in this donation
+                start_multi_task_processing(donation_id)
 
-        # BACKGROUND: Return success immediately - user can leave
+        else:
+            # Single task - process immediately
+            save_initial_voice_donation(
+                recording_id=recording_id,
+                questionnaire_data=questionnaire_result['data'],
+                audio_filename=file.filename,
+                audio_size=len(audio_data),
+                request_info=request_info
+            )
+
+            # Start single task processing
+            processing_thread = threading.Thread(
+                target=process_audio_background,
+                args=(recording_id, audio_data, file.filename, questionnaire_result, request_info),
+                daemon=True
+            )
+            processing_thread.start()
+
+        print("SUCCESS: Voice donation submitted, processing will start when all tasks are ready")
+
+        # Return success immediately for both single and multi-task
         return jsonify({
             'success': True,
             'recording_id': recording_id,
             'donation_id': donation_id,
-            'message': 'Thank you! Your voice donation has been submitted successfully.',
-            'status': 'submitted',  # Changed from 'processing'
+            'message': 'Voice donation submitted successfully',
+            'status': 'submitted',
             'processing_info': 'Your recordings are being processed to help advance medical research.',
             'task_info': task_metadata if task_metadata else None
         }), 200
@@ -279,6 +294,118 @@ def voice_donation():
             'message': 'Failed to process voice donation'
         }), 500
 
+
+# In-memory storage for pending multi-task submissions
+pending_submissions = {}
+
+
+def store_task_submission(recording_id, donation_id, audio_data, filename, questionnaire_result, request_info):
+    """Store task submission in memory until all tasks are ready"""
+    try:
+        if donation_id not in pending_submissions:
+            pending_submissions[donation_id] = {}
+
+        task_num = questionnaire_result['data']['task_metadata']['task_number']
+
+        pending_submissions[donation_id][task_num] = {
+            'recording_id': recording_id,
+            'audio_data': audio_data,
+            'filename': filename,
+            'questionnaire_result': questionnaire_result,
+            'request_info': request_info,
+            'submitted_at': datetime.utcnow().isoformat()
+        }
+
+        print(f"Stored task {task_num} for donation {donation_id}")
+        return True
+
+    except Exception as e:
+        print(f"Error storing task submission: {e}")
+        return False
+
+
+def should_start_processing(donation_id, total_tasks):
+    """Check if all tasks for a donation have been submitted"""
+    if donation_id not in pending_submissions:
+        return False
+
+    submitted_tasks = len(pending_submissions[donation_id])
+    print(f"Donation {donation_id}: {submitted_tasks}/{total_tasks} tasks submitted")
+
+    return submitted_tasks >= total_tasks
+
+
+def start_multi_task_processing(donation_id):
+    """Start background processing for all tasks in a donation"""
+    print(f"Starting multi-task processing for donation {donation_id}")
+
+    processing_thread = threading.Thread(
+        target=process_multi_task_background,
+        args=(donation_id,),
+        daemon=True
+    )
+    processing_thread.start()
+
+
+def process_multi_task_background(donation_id):
+    """Process all tasks for a donation sequentially in a single thread"""
+    try:
+        print(f"=== STARTING MULTI-TASK BACKGROUND PROCESSING: {donation_id} ===")
+
+        if donation_id not in pending_submissions:
+            print(f"ERROR: No pending submissions found for donation {donation_id}")
+            return
+
+        tasks = pending_submissions[donation_id]
+        print(f"Processing {len(tasks)} tasks for donation {donation_id}")
+
+        # Process each task sequentially
+        for task_num in sorted(tasks.keys()):
+            task_data = tasks[task_num]
+
+            print(f"Processing task {task_num} for donation {donation_id}")
+
+            # Save initial record
+            from utils.database import save_initial_voice_donation
+            save_initial_voice_donation(
+                recording_id=task_data['recording_id'],
+                questionnaire_data=task_data['questionnaire_result']['data'],
+                audio_filename=task_data['filename'],
+                audio_size=len(task_data['audio_data']),
+                request_info=task_data['request_info']
+            )
+
+            # Process the audio (this is the heavy part)
+            process_audio_background(
+                task_data['recording_id'],
+                task_data['audio_data'],
+                task_data['filename'],
+                task_data['questionnaire_result'],
+                task_data['request_info']
+            )
+
+            print(f"Completed task {task_num} for donation {donation_id}")
+
+        # Clean up pending submissions
+        del pending_submissions[donation_id]
+        print(f"=== COMPLETED ALL TASKS FOR DONATION: {donation_id} ===")
+
+    except Exception as e:
+        print(f"Multi-task background processing error for {donation_id}: {e}")
+        print(traceback.format_exc())
+
+        # Update all tasks as failed
+        if donation_id in pending_submissions:
+            tasks = pending_submissions[donation_id]
+            for task_data in tasks.values():
+                try:
+                    from utils.database import update_voice_donation_status
+                    update_voice_donation_status(task_data['recording_id'], 'failed', error=str(e))
+                except:
+                    pass
+
+            # Clean up
+            del pending_submissions[donation_id]
 
 # Donation status check
 @app.route('/api/donation-status/<donation_id>', methods=['GET'])
