@@ -1,7 +1,6 @@
 #feature_extraction.py
 
 import os
-import psutil
 import tempfile
 import numpy as np
 import librosa
@@ -510,8 +509,36 @@ def extract_all_features(audio_data, filename, request_info=None):
         audio_features.update(extract_speech_activity_features(converted_wav_path))
         print(f"Step 6 completed - speech activity features extracted")
 
-        # Rest of your existing code...
+        # ===== ADD THIS MISSING PART =====
+        # Combine everything into structured output
+        complete_data = {
+            # Metadata section
+            "metadata": metadata,
+
+            # Quality assessment
+            "quality_metrics": quality_metrics,
+
+            # Extracted audio features
+            "audio_features": audio_features,
+
+            # Summary statistics
+            "summary": {
+                "total_features_extracted": len(audio_features),
+                "processing_successful": True,
+                "data_completeness": calculate_completeness(audio_features),
+                "recommended_for_analysis": quality_metrics["signal_quality"] in ["good", "excellent"],
+                "audio_format_converted": not filename.lower().endswith('.wav'),
+                "final_sample_rate": sr,
+                "final_duration": round(len(y) / sr, 2)
+            }
+        }
+
+        # Convert numpy arrays to lists for JSON serialization
+        complete_data = convert_numpy_to_json_serializable(complete_data)
         print(f"=== DIAGNOSTIC SUCCESS: {filename} ===")
+        print(f"Feature extraction successful: {len(audio_features)} features extracted")
+
+        return complete_data
 
     except Exception as e:
         print(f"=== DIAGNOSTIC CRASH: {filename} ===")
@@ -519,14 +546,26 @@ def extract_all_features(audio_data, filename, request_info=None):
         print(f"Error type: {type(e).__name__}")
         print("Stack trace:")
         traceback.print_exc()
-        raise e
+
+        # Return error information with metadata
+        error_metadata = generate_metadata(audio_data, filename, request_info)
+        return {
+            "metadata": error_metadata,
+            "processing_error": str(e),
+            "summary": {
+                "processing_successful": False,
+                "error_type": type(e).__name__
+            }
+        }
 
     finally:
+        # Clean up converted WAV file if it was created
         if converted_wav_path and os.path.exists(converted_wav_path):
             try:
                 os.remove(converted_wav_path)
+                print("Temporary WAV file cleaned up")
             except:
-                pass
+                pass  # Ignore cleanup errors
 
 
 def calculate_completeness(features_dict):

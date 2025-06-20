@@ -12,3 +12,4 @@ scipy==1.11.4
 soundfile==0.12.1
 audioread==3.0.0
 pydub==0.25.1
+psutil==5.9.0
