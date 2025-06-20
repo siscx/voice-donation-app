@@ -259,15 +259,15 @@ def voice_donation():
 
         print("SUCCESS: Voice donation submitted, processing started in background")
 
-        # NEW: Return donation_id in response
+        # BACKGROUND: Return success immediately - user can leave
         return jsonify({
             'success': True,
             'recording_id': recording_id,
-            'donation_id': donation_id,  # NEW: Include donation ID
-            'message': 'Voice donation submitted successfully',
-            'status': 'processing',
-            'processing_info': 'Audio features are being extracted in the background. This usually takes 2-4 minutes.',
-            'task_info': task_metadata if task_metadata else None  # NEW: Include task info
+            'donation_id': donation_id,
+            'message': 'Thank you! Your voice donation has been submitted successfully.',
+            'status': 'submitted',  # Changed from 'processing'
+            'processing_info': 'Your recordings are being processed to help advance medical research.',
+            'task_info': task_metadata if task_metadata else None
         }), 200
 
     except Exception as e:

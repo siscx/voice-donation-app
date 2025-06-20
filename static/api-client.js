@@ -130,8 +130,13 @@ async function submitMultiTaskDonation() {
         const allSuccessful = results.every(result => result.success);
 
         if (allSuccessful) {
-            // Use the donation ID we generated
-            pollMultiTaskCompletion(donationId, results);
+            // BACKGROUND: Show success immediately - no polling needed
+            console.log('All tasks submitted successfully! Processing in background...');
+
+            // Show success page right away
+            document.getElementById('donationId').textContent = `Donation ID: ${donationId}`;
+            document.getElementById('processingStep').classList.remove('active');
+            document.getElementById('step5').classList.add('active');
         } else {
             // Handle partial failures
             const failedTasks = results.filter(result => !result.success);

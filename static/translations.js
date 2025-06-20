@@ -2,11 +2,14 @@
 
 const translations = {
     en: {
+        // Hero Section
         heroTitle: "Donate Your Voice For Health",
         heroSubtitle: "Help us unlock the potential of voice for early health detection. Your donation helps train AI to identify signs of chronic conditions in just 30 seconds of speech—building proactive healthcare for everyone.",
         trustBadge1: "HIPAA Secure",
         trustBadge2: "Anonymous",
         trustBadge3: "AI-Powered",
+
+        // Step 1 - Welcome
         step1Icon: "🚀",
         step1Title: "Your Voice, Our Future",
         step1Text: "Every voice carries hidden health insights. Your unique vocal patterns hold clues that could transform how we detect and prevent illness. Help us build the foundation for accessible healthcare worldwide.",
@@ -15,9 +18,13 @@ const translations = {
         stat2Number: "30s",
         stat2Label: "Time to contribute",
         step1Button: "Begin Your Contribution",
+
+        // Step 2 - Questionnaire
         step2Icon: "💬",
         step2Title: "Health Questionnaire",
         step2Subtitle: "Anonymous data helps train our AI models",
+
+        // Basic Form Fields
         donationLanguageLabel: "Recording Language",
         donationLanguageSelect: "Select the language for your voice recording",
         donationLanguageEnglish: "English",
@@ -31,73 +38,146 @@ const translations = {
         age5665: "56-65 years",
         age6675: "66-75 years",
         age76plus: "76+ years",
-        conditionsLabel: "Health Conditions (Select all that apply)",
-        conditionNone: "None",
-        conditionRespiratory: "Respiratory (Asthma, COPD)",
-        conditionNeurological: "Neurological (Parkinson's, MS)",
-        conditionCardiovascular: "Cardiovascular (Heart disease)",
-        conditionOther: "Other chronic condition",
-        otherConditionLabel: "Please specify your chronic condition",
-        otherConditionPlaceholder: "Describe your condition",
-        respiratorySeverityLabel: "Please select the severity of your respiratory condition",
-        severitySelect: "Select severity",
-        severityMild: "Mild",
-        severityMedium: "Medium",
-        severitySevere: "Severe",
-        voiceProblemsLabel: "Voice Problems",
-        voiceProblemsSelect: "Select voice problems (if any)",
-        voiceProblemNone: "None",
-        voiceProblemNodules: "Vocal nodules",
-        voiceProblemPolyps: "Vocal polyps",
-        voiceProblemParalysis: "Vocal cord paralysis",
-        voiceProblemLaryngitis: "Chronic laryngitis",
-        voiceProblemOther: "Other voice problem",
-        otherVoiceProblemLabel: "Please specify your voice problem",
-        otherVoiceProblemPlaceholder: "Describe your voice problem",
-        continueButton: "Continue to Voice Recording",
-        step3Title: "Voice Recording",
-        recordingInstructions: "Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.",
-        recordingStatusStart: "Click to start recording",
-        recordingStatusRecording: "Recording... Click to stop",
-        recordingStatusComplete: "Recording complete!",
-        processingTitle: "Analyzing Your Voice",
-        processingSubtitle: "Processing Audio Features",
-        processingDescription: "Our AI is extracting over 60 vocal biomarkers from your recording. This analysis helps researchers identify subtle voice patterns that could indicate early signs of health conditions.",
-        processingStatus: "Processing your voice donation...",
-        processingWait: "This usually takes 2-4 minutes. Please keep this page open.",
-        feature1: "✓ Pitch patterns",
-        feature2: "✓ Voice quality",
-        feature3: "✓ Speech rhythm",
-        feature4: "✓ Spectral features",
-        feature5: "✓ Intensity measures",
-        feature6: "✓ Formant frequencies",
-        successIcon: "🎉",
-        successTitle: "Thank You!",
-        successSubtitle: "Your voice sample has been successfully submitted and will contribute to life-changing voice analytics research.",
-        successDescription: "Your anonymous donation contributes to developing AI that can detect health conditions years before symptoms appear, bringing proactive healthcare within reach for everyone.",
-        privacyNote: "Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing.",
+
+        // Language/Dialect Fields
+        nativeLanguageLabel: "What is your native language?",
+        nativeLanguageSelect: "Select your native language",
+        arabicDialectLabel: "Which Arabic dialect do you speak?",
+        arabicDialectSelect: "Select your Arabic dialect",
+        arabicDialectEgyptian: "Egyptian Arabic",
+        arabicDialectLevantine: "Levantine Arabic",
+        arabicDialectGulf: "Gulf Arabic (Khaleeji)",
+        arabicDialectMaghrebi: "Maghrebi Arabic",
+        arabicDialectIraqi: "Iraqi Arabic",
+        arabicDialectSudanese: "Sudanese Arabic",
+        arabicDialectYemeni: "Yemeni Arabic",
+        arabicDialectHejazi: "Hejazi Arabic",
+        arabicDialectNajdi: "Najdi Arabic",
+        arabicDialectMSA: "Modern Standard Arabic (MSA)",
+
+        // Health Conditions
+        conditionsLabel: "Health Conditions",
         conditionsHelper: "Select all conditions that apply to you and indicate their severity",
-        severityUnknown: "I do not know",
+        conditionNone: "None - I have no diagnosed health conditions",
+
+        // Categories
         categoryNeurological: "Neurological Conditions",
         categoryRespiratory: "Respiratory Conditions",
+        categoryMood: "Mood and Psychiatric Conditions",
+        categoryMetabolic: "Metabolic/Endocrine Conditions",
+        categoryVoice: "Voice Problems",
+
+        // Neurological Conditions
         conditionAlzheimers: "Alzheimer's",
         conditionDementia: "Dementia",
         conditionMCI: "Mild Cognitive Impairment",
         conditionALS: "ALS",
         conditionHuntingtons: "Huntington's disease",
         conditionParkinsons: "Parkinson's disease",
+
+        // Respiratory Conditions
         conditionAsthma: "Asthma",
         conditionChronicCough: "Chronic cough",
         conditionCOPD: "COPD",
         conditionRespiratoryOther: "Other respiratory condition",
 
-        // Tab navigation
+        // Mood/Psychiatric Conditions
+        conditionDepression: "Depression disorder",
+        conditionAnxiety: "Anxiety disorder",
+        conditionSubstanceUse: "Alcohol or substance use disorder",
+        conditionBipolar: "Bipolar disorder",
+        conditionAutism: "Autism spectrum disorder",
+        conditionADHD: "ADHD",
+        conditionMoodOther: "Other mood/psychiatric condition",
+
+        // Metabolic/Endocrine Conditions
+        conditionDiabetes1: "Diabetes type 1",
+        conditionDiabetes2: "Diabetes type 2",
+        conditionPrediabetes: "Prediabetes",
+        conditionThyroid: "Thyroid Disorder",
+        conditionObesity: "Obesity",
+
+        // Voice Problems
+        conditionVocalFoldParalysis: "Unilateral vocal fold paralysis",
+        conditionMuscleTensionDysphonia: "Muscle Tension Dysphonia",
+        conditionSpasmodicDysphonia: "Spasmodic Dysphonia/laryngeal tremor",
+        conditionVocalLesions: "Lesions (vocal polyp, nodules etc)",
+        conditionLaryngitis: "Laryngitis",
+        conditionLaryngealCancer: "Laryngeal cancer",
+        conditionVoiceOther: "Other voice problem",
+
+        // Other Conditions
+        conditionOtherGeneral: "Other condition (please specify)",
+        otherGeneralConditionLabel: "Please specify your condition",
+        otherGeneralConditionPlaceholder: "Describe your condition",
+
+        // Severity Options
+        severitySelect: "Select severity",
+        severityMild: "Mild",
+        severityMedium: "Medium",
+        severitySevere: "Severe",
+        severityUnknown: "I do not know",
+
+        // Specification Placeholders
+        specifyRespiratoryOtherPlaceholder: "Please specify your respiratory condition",
+        specifyMoodOtherPlaceholder: "Please specify your mood/psychiatric condition",
+        specifyVoiceOtherPlaceholder: "Please specify your voice problem",
+
+        continueButton: "Continue to Voice Recording",
+
+        // Step 3 - Recording
+        step3Title: "Voice Recording",
+        taskProgress: "Task 1 of 2",
+        recordingInstructions: "Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.",
+
+        // Task 1: Picture Description
+        task1Subtitle: "Please describe what you see in the image below. Speak naturally for at least 30 seconds.",
+        task1Instruction: "Describe what you see in this image - the people, activities, setting, and any details you notice.",
+
+        // Task 2: Weekend Question
+        task2Subtitle: "Please describe your perfect weekend. Speak naturally for at least 30 seconds, up to 1 minute.",
+        task2Question: "What does your perfect weekend look like?",
+        task2Instruction: "Describe your ideal weekend - activities you'd enjoy, places you'd go, people you'd spend time with, and what would make it special for you.",
+
+        // Recording Controls
+        recordingStatusStart: "Click to start recording",
+        recordingStatusRecording: "Recording... Click to stop",
+        recordingStatusComplete: "Recording complete!",
+        continueToTask2: "Continue to Next Task",
+        submitAllTasks: "Submit Voice Donation",
+        consentText: "By submitting, you grant consent for anonymous use of your voice recordings in health research, with data stored securely indefinitely for ongoing scientific analysis.",
+
+        // Processing (UPDATED for background processing)
+        processingTitle: "Submitting Your Voice Donation",
+        processingSubtitle: "Preparing Your Recordings",
+        processingDescription: "Your voice recordings are being submitted for medical research. This will only take a moment.",
+        processingStatus: "Submitting your voice donation...",
+        processingWait: "Please wait while we process your submission.",
+        feature1: "✓ Pitch patterns",
+        feature2: "✓ Voice quality",
+        feature3: "✓ Speech rhythm",
+        feature4: "✓ Spectral features",
+        feature5: "✓ Intensity measures",
+        feature6: "✓ Formant frequencies",
+
+        // Success (UPDATED for background processing)
+        successIcon: "🎉",
+        successTitle: "Thank You!",
+        successSubtitle: "Your voice recordings have been submitted successfully and are being processed to advance medical research.",
+        successDescription: "You can safely close this page. Your anonymous donation contributes to developing AI that can detect health conditions years before symptoms appear, bringing proactive healthcare within reach for everyone.",
+        privacyNote: "Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing.",
+
+        // Tab Navigation
         tabHome: "Home",
         tabAbout: "About Us",
         tabScience: "The Science",
+
+        // About Us Tab
         aboutTitle: "Who We Are",
         aboutContent: "We're a team of clinicians, scientists, and technologists on a mission to make healthcare more accessible and proactive. With deep experience in Voice, health, and AI, we're building tools that can detect subtle changes in your voice to support early screening and remote monitoring. We believe your voice holds powerful clues about your health—and that with the right safeguards, it can help transform care for millions.",
         aboutContent2: "This app is part of that vision. Every voice shared brings us closer to safer, smarter, and more inclusive health solutions.",
+
+        // Science Tab
         scienceTitle: "The Science Behind Voice Biomarkers",
         scienceIntro: "Your voice is more than just sound—it reflects how your body and brain are doing.",
         scienceResearch: "Research from institutions like Mayo Clinic, MIT, and the NIH has shown that subtle changes in voice—such as pitch, rhythm, pauses, and breathiness—can reveal early signs of health changes. This field, known as voice biomarker research, is growing quickly and showing real promise.",
@@ -118,98 +198,18 @@ const translations = {
         testimonial3: '"Your voice holds more health information than you imagine. With just a few seconds of audio, we can begin to detect patterns linked to chronic diseases. But for our research to be accurate and inclusive, we need thousands of voices—different ages, accents, and health backgrounds."',
         testimonial3Author: "- Dr Leila, Neurologist",
         testimonial4: '"Most of the medical AI tools today are trained on data from outside our region. But voice, like language and accent, varies across populations. By donating your voice, you\'re helping us build healthcare solutions that truly reflect and serve our communities."',
-        testimonial4Author: "- Dr Ahmed, Pulmonologist",
-
-        // Enhanced medical conditions - categories
-        categoryMood: "Mood and Psychiatric Conditions",
-        categoryMetabolic: "Metabolic/Endocrine Conditions",
-        categoryVoice: "Voice Problems",
-
-        // Neurological conditions
-        conditionMCI: "Mild Cognitive Impairment",
-        conditionALS: "ALS",
-        conditionHuntingtons: "Huntington's disease",
-        conditionParkinsons: "Parkinson's disease",
-
-        // Mood/Psychiatric conditions
-        conditionDepression: "Depression disorder",
-        conditionAnxiety: "Anxiety disorder",
-        conditionSubstanceUse: "Alcohol or substance use disorder",
-        conditionBipolar: "Bipolar disorder",
-        conditionAutism: "Autism spectrum disorder",
-        conditionADHD: "ADHD",
-        conditionMoodOther: "Other mood/psychiatric condition",
-
-        // Metabolic/Endocrine conditions
-        conditionDiabetes1: "Diabetes type 1",
-        conditionDiabetes2: "Diabetes type 2",
-        conditionPrediabetes: "Prediabetes",
-        conditionThyroid: "Thyroid Disorder",
-        conditionObesity: "Obesity",
-
-        // Voice problems
-        conditionVocalFoldParalysis: "Unilateral vocal fold paralysis",
-        conditionMuscleTensionDysphonia: "Muscle Tension Dysphonia",
-        conditionSpasmodicDysphonia: "Spasmodic Dysphonia/laryngeal tremor",
-        conditionVocalLesions: "Lesions (vocal polyp, nodules etc)",
-        conditionLaryngitis: "Laryngitis",
-        conditionLaryngealCancer: "Laryngeal cancer",
-        conditionVoiceOther: "Other voice problem",
-
-        // Other conditions
-        conditionOtherGeneral: "Other condition (please specify)",
-        otherGeneralConditionLabel: "Please specify your condition",
-        otherGeneralConditionPlaceholder: "Describe your condition",
-
-        // Specify placeholders for "other" conditions
-        specifyRespiratoryOtherPlaceholder: "Please specify your respiratory condition",
-        specifyMoodOtherPlaceholder: "Please specify your mood/psychiatric condition",
-        specifyVoiceOtherPlaceholder: "Please specify your voice problem",
-
-        // Native Language and Dialects section
-        nativeLanguageLabel: "What is your native language?",
-        nativeLanguageSelect: "Select your native language",
-        arabicDialectLabel: "Which Arabic dialect do you speak?",
-        arabicDialectSelect: "Select your Arabic dialect",
-        arabicDialectEgyptian: "Egyptian Arabic",
-        arabicDialectLevantine: "Levantine Arabic",
-        arabicDialectGulf: "Gulf Arabic (Khaleeji)",
-        arabicDialectMaghrebi: "Maghrebi Arabic",
-        arabicDialectIraqi: "Iraqi Arabic",
-        arabicDialectSudanese: "Sudanese Arabic",
-        arabicDialectYemeni: "Yemeni Arabic",
-        arabicDialectHejazi: "Hejazi Arabic",
-        arabicDialectNajdi: "Najdi Arabic",
-        arabicDialectMSA: "Modern Standard Arabic (MSA)",
-
-        // Multi-task translations
-        taskProgress: "Task 1 of 2",
-
-        // Task 1: Picture Description
-        task1Subtitle: "Please describe what you see in the image below. Speak naturally for at least 30 seconds.",
-        task1Instruction: "Describe what you see in this image - the people, activities, setting, and any details you notice.",
-
-        // Task 2: Weekend Question
-        task2Subtitle: "Please describe your perfect weekend. Speak naturally for at least 30 seconds, up to 1 minute.",
-        task2Question: "What does your perfect weekend look like?",
-        task2Instruction: "Describe your ideal weekend - activities you'd enjoy, places you'd go, people you'd spend time with, and what would make it special for you.",
-
-        // Navigation buttons
-        continueToTask2: "Continue to Next Task",
-        submitAllTasks: "Submit Your Voice Donation",
-
-        // Updated consent text for multiple recordings
-        consentText: "By submitting, you grant consent for anonymous use of your voice recordings in health research, with data stored securely indefinitely for ongoing scientific analysis."
-
-
+        testimonial4Author: "- Dr Ahmed, Pulmonologist"
     },
 
     ar: {
+        // Hero Section
         heroTitle: "تبرع بصوتك من أجل الصحة",
         heroSubtitle: "ساعدنا في إطلاق إمكانات الصوت للكشف المبكر عن الصحة. يساعد تبرعك في تدريب الذكاء الاصطناعي على تحديد علامات الحالات المزمنة في 30 ثانية فقط من الكلام—لبناء رعاية صحية استباقية للجميع.",
         trustBadge1: "آمن وفق HIPAA",
         trustBadge2: "مجهول الهوية",
         trustBadge3: "مدعوم بالذكاء الاصطناعي",
+
+        // Step 1 - Welcome
         step1Icon: "🚀",
         step1Title: "صوتك، مستقبلنا",
         step1Text: "كل صوت يحمل رؤى صحية مخفية. تحمل أنماطك الصوتية الفريدة أدلة يمكن أن تحول كيفية اكتشافنا ومنعنا للمرض. ساعدنا في بناء الأساس للرعاية الصحية المتاحة عالمياً.",
@@ -218,9 +218,13 @@ const translations = {
         stat2Number: "30 ثانية",
         stat2Label: "الوقت المطلوب للمساهمة",
         step1Button: "ابدأ بالمساهمة",
+
+        // Step 2 - Questionnaire
         step2Icon: "💬",
         step2Title: "الاستبيان الصحي",
         step2Subtitle: "البيانات المجهولة تساعد في تدريب نماذج الذكاء الاصطناعي",
+
+        // Basic Form Fields
         donationLanguageLabel: "لغة التسجيل",
         donationLanguageSelect: "اختر لغة تسجيلك الصوتي",
         donationLanguageEnglish: "الإنجليزية",
@@ -234,73 +238,146 @@ const translations = {
         age5665: "56-65 سنة",
         age6675: "66-75 سنة",
         age76plus: "76+ سنة",
-        conditionsLabel: "الحالات الصحية (اختر كل ما ينطبق)",
-        conditionNone: "لا يوجد",
-        conditionRespiratory: "تنفسية (الربو، انسداد رئوي)",
-        conditionNeurological: "عصبية (باركنسون، تصلب متعدد)",
-        conditionCardiovascular: "قلبية وعائية (أمراض القلب)",
-        conditionOther: "حالة مزمنة أخرى",
-        otherConditionLabel: "يرجى تحديد حالتك المزمنة",
-        otherConditionPlaceholder: "اوصف حالتك",
-        respiratorySeverityLabel: "يرجى اختيار شدة حالتك التنفسية",
-        severitySelect: "اختر الشدة",
-        severityMild: "خفيف",
-        severityMedium: "متوسط",
-        severitySevere: "شديد",
-        voiceProblemsLabel: "مشاكل الصوت",
-        voiceProblemsSelect: "اختر مشاكل الصوت (إن وجدت)",
-        voiceProblemNone: "لا يوجد",
-        voiceProblemNodules: "عقد صوتية",
-        voiceProblemPolyps: "لحميات صوتية",
-        voiceProblemParalysis: "شلل الحبال الصوتية",
-        voiceProblemLaryngitis: "التهاب الحنجرة المزمن",
-        voiceProblemOther: "مشكلة صوتية أخرى",
-        otherVoiceProblemLabel: "يرجى تحديد مشكلتك الصوتية",
-        otherVoiceProblemPlaceholder: "اوصف مشكلتك الصوتية",
-        continueButton: "المتابعة إلى تسجيل الصوت",
-        step3Title: "تسجيل الصوت",
-        recordingInstructions: "يرجى التحدث على بُعد حوالي 20 سم (8 بوصات) من ميكروفون جهازك، في بيئة هادئة إن أمكن.",
-        recordingStatusStart: "اضغط لبدء التسجيل",
-        recordingStatusRecording: "جاري التسجيل... اضغط للتوقف",
-        recordingStatusComplete: "اكتمل التسجيل!",
-        processingTitle: "تحليل صوتك",
-        processingSubtitle: "معالجة الميزات الصوتية",
-        processingDescription: "يقوم الذكاء الاصطناعي بتحليل أكثر من 60 مؤشر صوتي من تسجيلك. يساعد هذا التحليل الباحثين في تحديد الأنماط الصوتية الدقيقة التي قد تشير إلى علامات مبكرة للحالات الصحية.",
-        processingStatus: "جاري معالجة تبرعك الصوتي...",
-        processingWait: "يستغرق هذا عادة 2-4 دقائق. يرجى إبقاء هذه الصفحة مفتوحة.",
-        feature1: "✓ أنماط الطبقة الصوتية",
-        feature2: "✓ جودة الصوت",
-        feature3: "✓ إيقاع الكلام",
-        feature4: "✓ الميزات الطيفية",
-        feature5: "✓ قياسات الشدة",
-        feature6: "✓ ترددات التكوين",
-        successIcon: "🎉",
-        successTitle: "شكراً لك!",
-        successSubtitle: "تم إرسال عينة صوتك بنجاح وستساهم في أبحاث التحليل الصوتي المغيرة للحياة.",
-        successDescription: "يساهم تبرعك المجهول في تطوير ذكاء اصطناعي يمكنه اكتشاف الحالات الصحية قبل سنوات من ظهور الأعراض، مما يجعل الرعاية الصحية الاستباقية في متناول الجميع.",
-        privacyNote: "يتم تخزين بياناتك بأمان واستخدامها بشكل مجهول للبحوث الصحية. لطلب إزالة تبرعك، يرجى مراسلة privacy@munsait.com وتضمين معرف التبرع أعلاه لمعالجة أسرع.",
+
+        // Language/Dialect Fields
+        nativeLanguageLabel: "ما هي لغتك الأم؟",
+        nativeLanguageSelect: "اختر لغتك الأم",
+        arabicDialectLabel: "ما هي اللهجة العربية التي تتحدث بها؟",
+        arabicDialectSelect: "اختر لهجتك العربية",
+        arabicDialectEgyptian: "العربية المصرية",
+        arabicDialectLevantine: "العربية الشامية",
+        arabicDialectGulf: "العربية الخليجية",
+        arabicDialectMaghrebi: "العربية المغاربية",
+        arabicDialectIraqi: "العربية العراقية",
+        arabicDialectSudanese: "العربية السودانية",
+        arabicDialectYemeni: "العربية اليمنية",
+        arabicDialectHejazi: "العربية الحجازية",
+        arabicDialectNajdi: "العربية النجدية",
+        arabicDialectMSA: "العربية الفصحى الحديثة",
+
+        // Health Conditions
+        conditionsLabel: "الحالات الصحية",
         conditionsHelper: "اختر كل الحالات التي تنطبق عليك وحدد شدتها",
-        severityUnknown: "لا أعرف",
+        conditionNone: "لا يوجد - ليس لدي أي حالات صحية مشخصة",
+
+        // Categories
         categoryNeurological: "الحالات العصبية",
         categoryRespiratory: "الحالات التنفسية",
+        categoryMood: "حالات المزاج والطب النفسي",
+        categoryMetabolic: "حالات التمثيل الغذائي/الغدد الصماء",
+        categoryVoice: "مشاكل الصوت",
+
+        // Neurological Conditions
         conditionAlzheimers: "الزهايمر",
         conditionDementia: "الخرف",
         conditionMCI: "ضعف إدراكي خفيف",
         conditionALS: "التصلب الجانبي الضموري",
         conditionHuntingtons: "مرض هنتنغتون",
         conditionParkinsons: "مرض باركنسون",
+
+        // Respiratory Conditions
         conditionAsthma: "الربو",
         conditionChronicCough: "السعال المزمن",
         conditionCOPD: "مرض الانسداد الرئوي المزمن",
         conditionRespiratoryOther: "حالة تنفسية أخرى",
 
-        // Tab navigation
+        // Mood/Psychiatric Conditions
+        conditionDepression: "اضطراب الاكتئاب",
+        conditionAnxiety: "اضطراب القلق",
+        conditionSubstanceUse: "اضطراب تعاطي الكحول أو المواد",
+        conditionBipolar: "اضطراب ثنائي القطب",
+        conditionAutism: "اضطراب طيف التوحد",
+        conditionADHD: "اضطراب نقص الانتباه وفرط النشاط",
+        conditionMoodOther: "حالة مزاج/نفسية أخرى",
+
+        // Metabolic/Endocrine Conditions
+        conditionDiabetes1: "السكري من النوع الأول",
+        conditionDiabetes2: "السكري من النوع الثاني",
+        conditionPrediabetes: "مقدمات السكري",
+        conditionThyroid: "اضطراب الغدة الدرقية",
+        conditionObesity: "السمنة",
+
+        // Voice Problems
+        conditionVocalFoldParalysis: "شلل الحبل الصوتي الأحادي",
+        conditionMuscleTensionDysphonia: "خلل النطق بتوتر العضلات",
+        conditionSpasmodicDysphonia: "خلل النطق التشنجي/رعشة الحنجرة",
+        conditionVocalLesions: "آفات (لحمية صوتية، عقد إلخ)",
+        conditionLaryngitis: "التهاب الحنجرة",
+        conditionLaryngealCancer: "سرطان الحنجرة",
+        conditionVoiceOther: "مشكلة صوتية أخرى",
+
+        // Other Conditions
+        conditionOtherGeneral: "حالة أخرى (يرجى التحديد)",
+        otherGeneralConditionLabel: "يرجى تحديد حالتك",
+        otherGeneralConditionPlaceholder: "اوصف حالتك",
+
+        // Severity Options
+        severitySelect: "اختر الشدة",
+        severityMild: "خفيف",
+        severityMedium: "متوسط",
+        severitySevere: "شديد",
+        severityUnknown: "لا أعرف",
+
+        // Specification Placeholders
+        specifyRespiratoryOtherPlaceholder: "يرجى تحديد حالتك التنفسية",
+        specifyMoodOtherPlaceholder: "يرجى تحديد حالتك النفسية/المزاجية",
+        specifyVoiceOtherPlaceholder: "يرجى تحديد مشكلتك الصوتية",
+
+        continueButton: "المتابعة إلى تسجيل الصوت",
+
+        // Step 3 - Recording
+        step3Title: "تسجيل الصوت",
+        taskProgress: "المهمة 1 من 2",
+        recordingInstructions: "يرجى التحدث على بُعد حوالي 20 سم (8 بوصات) من ميكروفون جهازك، في بيئة هادئة إن أمكن.",
+
+        // Task 1: Picture Description
+        task1Subtitle: "يرجى وصف ما تراه في الصورة أدناه. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل.",
+        task1Instruction: "صف ما تراه في هذه الصورة - الأشخاص والأنشطة والبيئة وأي تفاصيل تلاحظها.",
+
+        // Task 2: Weekend Question
+        task2Subtitle: "يرجى وصف عطلة نهاية الأسبوع المثالية لك. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل، وحتى دقيقة واحدة.",
+        task2Question: "كيف تبدو عطلة نهاية الأسبوع المثالية لك؟",
+        task2Instruction: "صف عطلة نهاية الأسبوع المثالية لك - الأنشطة التي ستستمتع بها، والأماكن التي ستذهب إليها، والأشخاص الذين ستقضي الوقت معهم، وما الذي سيجعلها مميزة بالنسبة لك.",
+
+        // Recording Controls
+        recordingStatusStart: "اضغط لبدء التسجيل",
+        recordingStatusRecording: "جاري التسجيل... اضغط للتوقف",
+        recordingStatusComplete: "اكتمل التسجيل!",
+        continueToTask2: "المتابعة إلى المهمة التالية",
+        submitAllTasks: "أرسل التبرع الصوتي",
+        consentText: "من خلال الإرسال، فإنك توافق على الاستخدام المجهول لتسجيلاتك الصوتية في الأبحاث الصحية، مع تخزين البيانات بشكل آمن إلى أجل غير مسمى للتحليل العلمي المستمر.",
+
+        // Processing (UPDATED for background processing)
+        processingTitle: "إرسال تبرعك الصوتي",
+        processingSubtitle: "تحضير تسجيلاتك",
+        processingDescription: "جاري إرسال تسجيلاتك الصوتية للبحوث الطبية. سيستغرق هذا لحظة فقط.",
+        processingStatus: "جاري إرسال تبرعك الصوتي...",
+        processingWait: "يرجى الانتظار بينما نعالج إرسالك.",
+        feature1: "✓ أنماط الطبقة الصوتية",
+        feature2: "✓ جودة الصوت",
+        feature3: "✓ إيقاع الكلام",
+        feature4: "✓ الميزات الطيفية",
+        feature5: "✓ قياسات الشدة",
+        feature6: "✓ ترددات التكوين",
+
+        // Success (UPDATED for background processing)
+        successIcon: "🎉",
+        successTitle: "شكراً لك!",
+        successSubtitle: "تم إرسال تسجيلاتك الصوتية بنجاح وجاري معالجتها لتطوير البحوث الطبية.",
+        successDescription: "يمكنك إغلاق هذه الصفحة بأمان. يساهم تبرعك المجهول في تطوير ذكاء اصطناعي يمكنه اكتشاف الحالات الصحية قبل سنوات من ظهور الأعراض، مما يجعل الرعاية الصحية الاستباقية في متناول الجميع.",
+        privacyNote: "يتم تخزين بياناتك بأمان واستخدامها بشكل مجهول للبحوث الصحية. لطلب إزالة تبرعك، يرجى مراسلة privacy@munsait.com وتضمين معرف التبرع أعلاه لمعالجة أسرع.",
+
+        // Tab Navigation
         tabHome: "الرئيسية",
         tabAbout: "من نحن",
         tabScience: "العلم",
+
+        // About Us Tab
         aboutTitle: "من نحن",
         aboutContent: "نحن فريق من الأطباء والعلماء والتقنيين في مهمة لجعل الرعاية الصحية أكثر إتاحة واستباقية. مع خبرة عميقة في الصوت والصحة والذكاء الاصطناعي، نحن نبني أدوات يمكنها اكتشاف التغييرات الدقيقة في صوتك لدعم الفحص المبكر والمراقبة عن بُعد. نحن نؤمن أن صوتك يحمل أدلة قوية حول صحتك—وأنه مع الضمانات المناسبة، يمكن أن يساعد في تحويل الرعاية لملايين الأشخاص.",
         aboutContent2: "هذا التطبيق جزء من تلك الرؤية. كل صوت يتم مشاركته يقربنا من حلول صحية أكثر أماناً وذكاءً وشمولاً.",
+
+        // Science Tab
         scienceTitle: "العلم وراء المؤشرات الحيوية الصوتية",
         scienceIntro: "صوتك أكثر من مجرد صوت—إنه يعكس كيف يعمل جسمك ودماغك.",
         scienceResearch: "أظهرت الأبحاث من مؤسسات مثل مايو كلينك وإم آي تي والمعاهد الوطنية للصحة أن التغييرات الدقيقة في الصوت—مثل النبرة والإيقاع والتوقفات وضيق التنفس—يمكن أن تكشف عن علامات مبكرة للتغييرات الصحية. هذا المجال، المعروف باسم بحث المؤشرات الحيوية الصوتية، ينمو بسرعة ويظهر وعداً حقيقياً.",
@@ -321,90 +398,7 @@ const translations = {
         testimonial3: '"صوتك يحمل معلومات صحية أكثر مما تتخيل. مع بضع ثوانٍ فقط من الصوت، يمكننا البدء في اكتشاف الأنماط المرتبطة بالأمراض المزمنة. لكن لكي يكون بحثنا دقيقاً وشاملاً، نحتاج إلى آلاف الأصوات—أعمار ولهجات وخلفيات صحية مختلفة."',
         testimonial3Author: "- د. ليلى، طبيبة أعصاب",
         testimonial4: '"معظم أدوات الذكاء الاصطناعي الطبية اليوم مدربة على بيانات من خارج منطقتنا. لكن الصوت، مثل اللغة واللهجة، يختلف عبر السكان. من خلال التبرع بصوتك، أنت تساعدنا في بناء حلول رعاية صحية تعكس وتخدم مجتمعاتنا حقاً."',
-        testimonial4Author: "- د. أحمد، طبيب رئة",
-
-        // Enhanced medical conditions - categories
-        categoryMood: "حالات المزاج والطب النفسي",
-        categoryMetabolic: "حالات التمثيل الغذائي/الغدد الصماء",
-        categoryVoice: "مشاكل الصوت",
-
-        // Neurological conditions
-        conditionMCI: "ضعف إدراكي خفيف",
-        conditionALS: "التصلب الجانبي الضموري",
-        conditionHuntingtons: "مرض هنتنغتون",
-        conditionParkinsons: "مرض باركنسون",
-
-        // Mood/Psychiatric conditions
-        conditionDepression: "اضطراب الاكتئاب",
-        conditionAnxiety: "اضطراب القلق",
-        conditionSubstanceUse: "اضطراب تعاطي الكحول أو المواد",
-        conditionBipolar: "اضطراب ثنائي القطب",
-        conditionAutism: "اضطراب طيف التوحد",
-        conditionADHD: "اضطراب نقص الانتباه وفرط النشاط",
-        conditionMoodOther: "حالة مزاج/نفسية أخرى",
-
-        // Metabolic/Endocrine conditions
-        conditionDiabetes1: "السكري من النوع الأول",
-        conditionDiabetes2: "السكري من النوع الثاني",
-        conditionPrediabetes: "مقدمات السكري",
-        conditionThyroid: "اضطراب الغدة الدرقية",
-        conditionObesity: "السمنة",
-
-        // Voice problems
-        conditionVocalFoldParalysis: "شلل الحبل الصوتي الأحادي",
-        conditionMuscleTensionDysphonia: "خلل النطق بتوتر العضلات",
-        conditionSpasmodicDysphonia: "خلل النطق التشنجي/رعشة الحنجرة",
-        conditionVocalLesions: "آفات (لحمية صوتية، عقد إلخ)",
-        conditionLaryngitis: "التهاب الحنجرة",
-        conditionLaryngealCancer: "سرطان الحنجرة",
-        conditionVoiceOther: "مشكلة صوتية أخرى",
-
-        // Other conditions
-        conditionOtherGeneral: "حالة أخرى (يرجى التحديد)",
-        otherGeneralConditionLabel: "يرجى تحديد حالتك",
-        otherGeneralConditionPlaceholder: "اوصف حالتك",
-
-        // Specify placeholders for "other" conditions
-        specifyRespiratoryOtherPlaceholder: "يرجى تحديد حالتك التنفسية",
-        specifyMoodOtherPlaceholder: "يرجى تحديد حالتك النفسية/المزاجية",
-        specifyVoiceOtherPlaceholder: "يرجى تحديد مشكلتك الصوتية",
-
-        // Native Language and Dialects section
-        nativeLanguageLabel: "ما هي لغتك الأم؟",
-        nativeLanguageSelect: "اختر لغتك الأم",
-        arabicDialectLabel: "ما هي اللهجة العربية التي تتحدث بها؟",
-        arabicDialectSelect: "اختر لهجتك العربية",
-        arabicDialectEgyptian: "العربية المصرية",
-        arabicDialectLevantine: "العربية الشامية",
-        arabicDialectGulf: "العربية الخليجية",
-        arabicDialectMaghrebi: "العربية المغاربية",
-        arabicDialectIraqi: "العربية العراقية",
-        arabicDialectSudanese: "العربية السودانية",
-        arabicDialectYemeni: "العربية اليمنية",
-        arabicDialectHejazi: "العربية الحجازية",
-        arabicDialectNajdi: "العربية النجدية",
-        arabicDialectMSA: "العربية الفصحى الحديثة",
-
-        // Multi-task translations
-        taskProgress: "المهمة 1 من 2",
-
-        // Task 1: Picture Description
-        task1Subtitle: "يرجى وصف ما تراه في الصورة أدناه. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل.",
-        task1Instruction: "صف ما تراه في هذه الصورة - الأشخاص والأنشطة والبيئة وأي تفاصيل تلاحظها.",
-
-        // Task 2: Weekend Question
-        task2Subtitle: "يرجى وصف عطلة نهاية الأسبوع المثالية لك. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل، وحتى دقيقة واحدة.",
-        task2Question: "كيف تبدو عطلة نهاية الأسبوع المثالية لك؟",
-        task2Instruction: "صف عطلة نهاية الأسبوع المثالية لك - الأنشطة التي ستستمتع بها، والأماكن التي ستذهب إليها، والأشخاص الذين ستقضي الوقت معهم، وما الذي سيجعلها مميزة بالنسبة لك.",
-
-        // Navigation buttons
-        continueToTask2: "المتابعة إلى المهمة التالية",
-        submitAllTasks: "أرسل تبرعك الصوتي",
-
-        // Updated consent text for multiple recordings
-        consentText: "من خلال الإرسال، فإنك توافق على الاستخدام المجهول لتسجيلاتك الصوتية في الأبحاث الصحية، مع تخزين البيانات بشكل آمن إلى أجل غير مسمى للتحليل العلمي المستمر."
-
-
+        testimonial4Author: "- د. أحمد، طبيب رئة"
     }
 };
 
