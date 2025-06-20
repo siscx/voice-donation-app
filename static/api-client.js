@@ -111,8 +111,19 @@ async function submitMultiTaskDonation() {
         }
 
         // Submit all tasks in parallel for faster processing
-        console.log('Submitting all tasks in parallel...');
-        const results = await Promise.all(submissions);
+//        console.log('Submitting all tasks in parallel...');
+//        const results = await Promise.all(submissions);
+//
+        // DIAGNOSTIC: Process tasks sequentially instead of parallel
+        console.log('Testing sequential processing...');
+        const results = [];
+
+        for (const submission of submissions) {
+            console.log('Processing submission:', submission);
+            const result = await submission;
+            results.push(result);
+            console.log('Completed submission:', result);
+        }
 
         console.log('All submissions completed:', results);
 

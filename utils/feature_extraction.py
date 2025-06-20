@@ -464,88 +464,63 @@ def extract_energy_based_features(wav_file_path):
 
 
 def extract_all_features(audio_data, filename, request_info=None):
-    """
-    Extract all features from audio data (bytes) plus comprehensive metadata
-    Handles multiple audio formats and converts to optimal WAV for analysis
-    Returns dictionary with all extracted features and metadata
-    """
+    """Add diagnostic logging to identify crash point"""
+    import os
+    import psutil
+
+    process = psutil.Process()
+    print(f"=== DIAGNOSTIC START: {filename} ===")
+    print(f"Memory before processing: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+    print(f"Audio data size: {len(audio_data) / 1024 / 1024:.1f} MB")
+
     converted_wav_path = None
 
     try:
         # Convert audio to high-quality WAV for analysis
-        print(f"Converting {filename} to WAV for analysis...")
+        print(f"Step 1: Converting {filename} to WAV...")
         converted_wav_path = convert_audio_to_wav(audio_data, filename)
-        print(f"Conversion successful, analyzing WAV file...")
+        print(f"Memory after conversion: {process.memory_info().rss / 1024 / 1024:.1f} MB")
 
         # Load the converted/original WAV with librosa
+        print(f"Step 2: Loading with librosa...")
         y, sr = librosa.load(converted_wav_path, sr=None)
         print(f"Audio loaded: {len(y)} samples at {sr}Hz ({len(y) / sr:.2f} seconds)")
+        print(f"Memory after librosa load: {process.memory_info().rss / 1024 / 1024:.1f} MB")
 
         # Generate metadata and quality metrics
+        print(f"Step 3: Generating metadata...")
         metadata = generate_metadata(audio_data, filename, request_info)
         quality_metrics = validate_audio_quality(y, sr)
+        print(f"Memory after metadata: {process.memory_info().rss / 1024 / 1024:.1f} MB")
 
         # Extract features from all modules
-        print("Extracting librosa features...")
+        print("Step 4: Extracting librosa features...")
         audio_features = {}
         audio_features.update(extract_librosa_features(y, sr))
+        print(f"Memory after librosa features: {process.memory_info().rss / 1024 / 1024:.1f} MB")
 
-        print("Extracting parselmouth features...")
+        print("Step 5: Extracting parselmouth features...")
         audio_features.update(extract_parselmouth_features(converted_wav_path))
+        print(f"Memory after parselmouth features: {process.memory_info().rss / 1024 / 1024:.1f} MB")
 
-        print("Extracting speech activity features...")
+        print("Step 6: Extracting speech activity features...")
         audio_features.update(extract_speech_activity_features(converted_wav_path))
+        print(f"Memory after speech features: {process.memory_info().rss / 1024 / 1024:.1f} MB")
 
-        # Combine everything into structured output
-        complete_data = {
-            # Metadata section
-            "metadata": metadata,
-
-            # Quality assessment
-            "quality_metrics": quality_metrics,
-
-            # Extracted audio features
-            "audio_features": audio_features,
-
-            # Summary statistics
-            "summary": {
-                "total_features_extracted": len(audio_features),
-                "processing_successful": True,
-                "data_completeness": calculate_completeness(audio_features),
-                "recommended_for_analysis": quality_metrics["signal_quality"] in ["good", "excellent"],
-                "audio_format_converted": not filename.lower().endswith('.wav'),
-                "final_sample_rate": sr,
-                "final_duration": round(len(y) / sr, 2)
-            }
-        }
-
-        # Convert numpy arrays to lists for JSON serialization
-        complete_data = convert_numpy_to_json_serializable(complete_data)
-        print(f"Feature extraction successful: {len(audio_features)} features extracted")
-
-        return complete_data
+        # Rest of your existing code...
+        print(f"=== DIAGNOSTIC SUCCESS: {filename} ===")
 
     except Exception as e:
-        print(f"Audio processing failed: {e}")
-        # Return error information with metadata
-        error_metadata = generate_metadata(audio_data, filename, request_info)
-        return {
-            "metadata": error_metadata,
-            "processing_error": str(e),
-            "summary": {
-                "processing_successful": False,
-                "error_type": type(e).__name__
-            }
-        }
+        print(f"=== DIAGNOSTIC CRASH: {filename} at step: {e} ===")
+        print(f"Memory at crash: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+        raise e
 
     finally:
-        # Clean up converted WAV file if it was created
         if converted_wav_path and os.path.exists(converted_wav_path):
             try:
                 os.remove(converted_wav_path)
-                print("Temporary WAV file cleaned up")
             except:
-                pass  # Ignore cleanup errors
+                pass
 
 
 def calculate_completeness(features_dict):
