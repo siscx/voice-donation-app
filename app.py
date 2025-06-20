@@ -365,26 +365,35 @@ def process_multi_task_background(donation_id):
 
             print(f"Processing task {task_num} for donation {donation_id}")
 
-            # Save initial record
-            from utils.database import save_initial_voice_donation
-            save_initial_voice_donation(
-                recording_id=task_data['recording_id'],
-                questionnaire_data=task_data['questionnaire_result']['data'],
-                audio_filename=task_data['filename'],
-                audio_size=len(task_data['audio_data']),
-                request_info=task_data['request_info']
-            )
+            try:
+                # Save initial record
+                print(f"STEP A: Importing save_initial_voice_donation for task {task_num}")
+                from utils.database import save_initial_voice_donation
 
-            # Process the audio (this is the heavy part)
-            process_audio_background(
-                task_data['recording_id'],
-                task_data['audio_data'],
-                task_data['filename'],
-                task_data['questionnaire_result'],
-                task_data['request_info']
-            )
+                print(f"STEP B: Calling save_initial_voice_donation for task {task_num}")
+                save_initial_voice_donation(
+                    recording_id=task_data['recording_id'],
+                    questionnaire_data=task_data['questionnaire_result']['data'],
+                    audio_filename=task_data['filename'],
+                    audio_size=len(task_data['audio_data']),
+                    request_info=task_data['request_info']
+                )
 
-            print(f"Completed task {task_num} for donation {donation_id}")
+                print(f"STEP C: Starting audio processing for task {task_num}")
+                # Process the audio (this is the heavy part)
+                process_audio_background(
+                    task_data['recording_id'],
+                    task_data['audio_data'],
+                    task_data['filename'],
+                    task_data['questionnaire_result'],
+                    task_data['request_info']
+                )
+
+                print(f"STEP D: Completed task {task_num} for donation {donation_id}")
+
+            except Exception as task_error:
+                print(f"ERROR in task {task_num} processing: {task_error}")
+                print(f"Task error traceback: {traceback.format_exc()}")
 
         # Clean up pending submissions
         del pending_submissions[donation_id]
@@ -393,19 +402,6 @@ def process_multi_task_background(donation_id):
     except Exception as e:
         print(f"Multi-task background processing error for {donation_id}: {e}")
         print(traceback.format_exc())
-
-        # Update all tasks as failed
-        if donation_id in pending_submissions:
-            tasks = pending_submissions[donation_id]
-            for task_data in tasks.values():
-                try:
-                    from utils.database import update_voice_donation_status
-                    update_voice_donation_status(task_data['recording_id'], 'failed', error=str(e))
-                except:
-                    pass
-
-            # Clean up
-            del pending_submissions[donation_id]
 
 # Donation status check
 @app.route('/api/donation-status/<donation_id>', methods=['GET'])
