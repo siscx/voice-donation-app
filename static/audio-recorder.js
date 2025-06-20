@@ -8,23 +8,14 @@ let recordingInterval;
 let minRecordingTime = 30000;
 let maxRecordingTime = 40000;
 
-// Picture URLs
-const pictureUrls = [
-    'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=350&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500&h=350&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=350&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=500&h=350&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=500&h=350&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=350&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=350&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500&h=350&fit=crop&crop=center'
-];
+// UPDATED: Single standardized picture URL
+const STANDARDIZED_PICTURE_URL = 'https://images.unsplash.com/photo-1680727293560-cabbce326e3b?w=500&h=350&fit=crop&crop=center&q=80&auto=format';
 
-function loadRandomPicture() {
-    const randomIndex = Math.floor(Math.random() * pictureUrls.length);
+function loadStandardizedPicture() {
     const imgElement = document.getElementById('randomPicture');
     if (imgElement) {
-        imgElement.src = pictureUrls[randomIndex];
+        imgElement.src = STANDARDIZED_PICTURE_URL;
+        imgElement.alt = "Kitchen scene with family activity - describe what you see";
     }
 }
 

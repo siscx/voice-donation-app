@@ -41,9 +41,9 @@ function nextStep() {
     document.getElementById(`step${currentStep}`).classList.remove('active');
     currentStep++;
 
-    // Load random picture when entering recording step
+    // UPDATED: Load standardized picture when entering recording step
     if (currentStep === 3) {
-    loadRandomPicture();
+        loadStandardizedPicture(); // Changed from loadRandomPicture()
     }
 
     // Stop testimonials when leaving step 1
