@@ -13,6 +13,22 @@ QUESTIONNAIRE_SCHEMA = {
         }
     },
 
+    "native_language": {
+        "type": "single_choice",
+        "required": False,
+        "depends_on": {"donation_language": "english"},
+        "options": ["english", "spanish", "french", "arabic", "hindi", "chinese", "other"],
+        "question": "What is your native language?"
+    },
+
+    "arabic_dialect": {
+        "type": "single_choice",
+        "required": False,
+        "depends_on": {"donation_language": "arabic"},
+        "options": ["egyptian", "levantine", "gulf", "maghrebi", "iraqi", "sudanese", "yemeni", "hejazi", "najdi", "msa"],
+        "question": "Which Arabic dialect do you speak?"
+    },
+
     "age_group": {
         "type": "single_choice",
         "required": True,
@@ -170,6 +186,27 @@ def validate_questionnaire_data(data):
                 if spec_field not in specifications or not specifications[spec_field]:
                     errors.append(f"Specification required for condition '{condition}'")
 
+    # NEW: Validate conditional language fields
+    donation_language = data.get("donation_language")
+
+    if donation_language == "english":
+        # Native language should be provided when donation language is English
+        if "native_language" not in data or not data["native_language"]:
+            warnings.append("Native language recommended when donating in English")
+
+        # Arabic dialect should not be provided
+        if data.get("arabic_dialect"):
+            errors.append("Arabic dialect should not be selected when donation language is English")
+
+    elif donation_language == "arabic":
+        # Arabic dialect should be provided when donation language is Arabic
+        if "arabic_dialect" not in data or not data["arabic_dialect"]:
+            warnings.append("Arabic dialect recommended when donating in Arabic")
+
+        # Native language should not be provided
+        if data.get("native_language"):
+            errors.append("Native language should not be selected when donation language is Arabic")
+
     return {
         "valid": len(errors) == 0,
         "errors": errors,
@@ -243,7 +280,28 @@ def process_questionnaire_data(raw_data):
         "has_severity_data": "condition_severities" in cleaned_data and len(
             cleaned_data.get("condition_severities", {})) > 0,
         "has_specification_data": "condition_specifications" in cleaned_data and len(
-            cleaned_data.get("condition_specifications", {})) > 0
+            cleaned_data.get("condition_specifications", {})) > 0,
+
+        # Language and dialect flags
+        "native_language": cleaned_data.get("native_language", "unknown"),
+        "arabic_dialect": cleaned_data.get("arabic_dialect", "unknown"),
+        "is_native_english_speaker": cleaned_data.get("native_language") == "en",
+        "is_multilingual": (
+                cleaned_data.get("donation_language") == "english" and
+                cleaned_data.get("native_language") not in ["en", "", None]),
+        "has_language_accent_data": bool(
+            cleaned_data.get("native_language") or cleaned_data.get("arabic_dialect")),
+
+        # Dialect-specific flags for research
+        "speaks_egyptian_arabic": cleaned_data.get("arabic_dialect") == "egyptian",
+        "speaks_gulf_arabic": cleaned_data.get("arabic_dialect") == "gulf",
+        "speaks_levantine_arabic": cleaned_data.get("arabic_dialect") == "levantine",
+        "speaks_maghrebi_arabic": cleaned_data.get("arabic_dialect") == "maghrebi",
+
+        # Cross-language analysis flags
+        "donation_matches_native": (
+                (cleaned_data.get("donation_language") == "english" and cleaned_data.get("native_language") == "en") or
+                (cleaned_data.get("donation_language") == "arabic" and cleaned_data.get("native_language") == "ar"))
     }
 
     return {

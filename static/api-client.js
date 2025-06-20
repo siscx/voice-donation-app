@@ -52,6 +52,8 @@ function collectEnhancedQuestionnaireData() {
     const questionnaireData = {
         donation_language: donationLanguage,
         age_group: ageGroup,
+        native_language: document.getElementById('nativeLanguage')?.value || null,
+        arabic_dialect: document.getElementById('arabicDialect')?.value || null,
         health_conditions: healthConditions,
         condition_severities: conditionSeverities,
         condition_specifications: conditionSpecifications

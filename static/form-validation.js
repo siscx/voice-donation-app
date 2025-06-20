@@ -227,5 +227,82 @@ function initializeFormValidation() {
         }
     });
 
+    // Populate native language dropdown
+    populateNativeLanguageDropdown();
+
+    // Add donation language change listener
+    const donationLanguageSelect = document.getElementById('donationLanguage');
+    if (donationLanguageSelect) {
+        donationLanguageSelect.addEventListener('change', handleDonationLanguageChange);
+    }
+
+    // Add new fields to validation
+    const newFormInputs = ['nativeLanguage', 'arabicDialect'];
+    newFormInputs.forEach(inputId => {
+        const element = document.getElementById(inputId);
+        if (element) {
+            element.addEventListener('change', updateContinueButton);
+        }
+    });
+
     updateContinueButton();
+}
+
+// Add this new function
+function handleDonationLanguageChange() {
+    const donationLanguage = document.getElementById('donationLanguage').value;
+    const nativeLanguageGroup = document.getElementById('nativeLanguageGroup');
+    const arabicDialectGroup = document.getElementById('arabicDialectGroup');
+
+    // Hide both groups initially
+    if (nativeLanguageGroup) nativeLanguageGroup.classList.add('hidden');
+    if (arabicDialectGroup) arabicDialectGroup.classList.add('hidden');
+
+    // Clear their values
+    const nativeLanguageSelect = document.getElementById('nativeLanguage');
+    const arabicDialectSelect = document.getElementById('arabicDialect');
+    if (nativeLanguageSelect) nativeLanguageSelect.value = '';
+    if (arabicDialectSelect) arabicDialectSelect.value = '';
+
+    // Show appropriate group
+    if (donationLanguage === 'english' && nativeLanguageGroup) {
+        nativeLanguageGroup.classList.remove('hidden');
+    } else if (donationLanguage === 'arabic' && arabicDialectGroup) {
+        arabicDialectGroup.classList.remove('hidden');
+    }
+
+    updateContinueButton();
+}
+
+function populateNativeLanguageDropdown() {
+    const select = document.getElementById('nativeLanguage');
+    if (!select) return;
+
+    console.log('ISO639 available:', typeof ISO6391);
+
+    if (typeof ISO6391 !== 'undefined') {
+        try {
+            // Get all languages with their codes and names
+            const languages = ISO6391.getAllCodes().map(code => ({
+                code: code,
+                name: ISO6391.getName(code)
+            }));
+
+            console.log('Languages loaded:', languages.length);
+
+            // Sort alphabetically by name
+            languages.sort((a, b) => a.name.localeCompare(b.name));
+
+            languages.forEach(({code, name}) => {
+                const option = document.createElement('option');
+                option.value = code;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error with ISO6391:', error);
+        }
+    } else {
+        console.log('ISO6391 not loaded');
+    }
 }

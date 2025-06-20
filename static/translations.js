@@ -168,7 +168,23 @@ const translations = {
         // Specify placeholders for "other" conditions
         specifyRespiratoryOtherPlaceholder: "Please specify your respiratory condition",
         specifyMoodOtherPlaceholder: "Please specify your mood/psychiatric condition",
-        specifyVoiceOtherPlaceholder: "Please specify your voice problem"
+        specifyVoiceOtherPlaceholder: "Please specify your voice problem",
+
+        // Native Language and Dialects section
+        nativeLanguageLabel: "What is your native language?",
+        nativeLanguageSelect: "Select your native language",
+        arabicDialectLabel: "Which Arabic dialect do you speak?",
+        arabicDialectSelect: "Select your Arabic dialect",
+        arabicDialectEgyptian: "Egyptian Arabic",
+        arabicDialectLevantine: "Levantine Arabic",
+        arabicDialectGulf: "Gulf Arabic (Khaleeji)",
+        arabicDialectMaghrebi: "Maghrebi Arabic",
+        arabicDialectIraqi: "Iraqi Arabic",
+        arabicDialectSudanese: "Sudanese Arabic",
+        arabicDialectYemeni: "Yemeni Arabic",
+        arabicDialectHejazi: "Hejazi Arabic",
+        arabicDialectNajdi: "Najdi Arabic",
+        arabicDialectMSA: "Modern Standard Arabic (MSA)"
     },
 
     ar: {
@@ -338,7 +354,23 @@ const translations = {
         // Specify placeholders for "other" conditions
         specifyRespiratoryOtherPlaceholder: "يرجى تحديد حالتك التنفسية",
         specifyMoodOtherPlaceholder: "يرجى تحديد حالتك النفسية/المزاجية",
-        specifyVoiceOtherPlaceholder: "يرجى تحديد مشكلتك الصوتية"
+        specifyVoiceOtherPlaceholder: "يرجى تحديد مشكلتك الصوتية",
+
+        // Native Language and Dialects section
+        nativeLanguageLabel: "ما هي لغتك الأم؟",
+        nativeLanguageSelect: "اختر لغتك الأم",
+        arabicDialectLabel: "ما هي اللهجة العربية التي تتحدث بها؟",
+        arabicDialectSelect: "اختر لهجتك العربية",
+        arabicDialectEgyptian: "العربية المصرية",
+        arabicDialectLevantine: "العربية الشامية",
+        arabicDialectGulf: "العربية الخليجية",
+        arabicDialectMaghrebi: "العربية المغاربية",
+        arabicDialectIraqi: "العربية العراقية",
+        arabicDialectSudanese: "العربية السودانية",
+        arabicDialectYemeni: "العربية اليمنية",
+        arabicDialectHejazi: "العربية الحجازية",
+        arabicDialectNajdi: "العربية النجدية",
+        arabicDialectMSA: "العربية الفصحى الحديثة"
     }
 };
 

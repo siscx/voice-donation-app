@@ -18,6 +18,33 @@
             </select>
         </div>
 
+        <!-- Native Language Group (shows when English is selected) -->
+        <div class="form-group hidden" id="nativeLanguageGroup">
+            <label class="form-label" for="nativeLanguage" data-translate="nativeLanguageLabel">What is your native language?</label>
+            <select class="form-select" id="nativeLanguage" name="nativeLanguage">
+                <option value="" data-translate="nativeLanguageSelect">Select your native language</option>
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </div>
+
+        <!-- Arabic Dialect Group (shows when Arabic is selected) -->
+        <div class="form-group hidden" id="arabicDialectGroup">
+            <label class="form-label" for="arabicDialect" data-translate="arabicDialectLabel">Which Arabic dialect do you speak?</label>
+            <select class="form-select" id="arabicDialect" name="arabicDialect">
+                <option value="" data-translate="arabicDialectSelect">Select your Arabic dialect</option>
+                <option value="egyptian" data-translate="arabicDialectEgyptian">Egyptian Arabic</option>
+                <option value="levantine" data-translate="arabicDialectLevantine">Levantine Arabic</option>
+                <option value="gulf" data-translate="arabicDialectGulf">Gulf Arabic (Khaleeji)</option>
+                <option value="maghrebi" data-translate="arabicDialectMaghrebi">Maghrebi Arabic</option>
+                <option value="iraqi" data-translate="arabicDialectIraqi">Iraqi Arabic</option>
+                <option value="sudanese" data-translate="arabicDialectSudanese">Sudanese Arabic</option>
+                <option value="yemeni" data-translate="arabicDialectYemeni">Yemeni Arabic</option>
+                <option value="hejazi" data-translate="arabicDialectHejazi">Hejazi Arabic</option>
+                <option value="najdi" data-translate="arabicDialectNajdi">Najdi Arabic</option>
+                <option value="msa" data-translate="arabicDialectMSA">Modern Standard Arabic (MSA)</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label class="form-label" for="ageGroup" data-translate="ageLabel">Age Range</label>
             <select class="form-select" id="ageGroup" name="ageGroup" required>

@@ -281,14 +281,22 @@ class VoiceDataValidator:
                     for value, count in value_counts.items():
                         print(f"    {value}: {count} ({count / total_records * 100:.1f}%)")
 
-    def check_questionnaire_data_quality(self, df):
+    def check_questionnaire_data_quality(self, df, total_records=None):
         """NEW: Check questionnaire data quality specifically"""
         print("\n📋 QUESTIONNAIRE DATA QUALITY")
         print("=" * 50)
 
+        total_records = len(df)
+
         # Check for required fields completion
-        required_fields = ['survey_donation_language', 'survey_age_group', 'survey_chronic_conditions',
-                           'survey_voice_problems']
+        required_fields = [
+            'survey_donation_language',
+            'survey_age_group',
+            'survey_chronic_conditions',
+            'survey_voice_problems',
+            'survey_native_language',  # NEW
+            'survey_arabic_dialect'  # NEW
+        ]
 
         for field in required_fields:
             if field in df.columns:
@@ -317,6 +325,33 @@ class VoiceDataValidator:
             if other_voice_selected != other_voice_specified:
                 print(
                     f"  ⚠️  Mismatch: {abs(other_voice_selected - other_voice_specified)} voice problem records missing conditional data")
+
+        # Language distribution analysis
+        if 'survey_native_language' in df.columns:
+            native_lang_counts = df['survey_native_language'].value_counts()
+            print(f"\nNative Language Distribution:")
+            for lang, count in native_lang_counts.items():
+                print(f"  {lang}: {count} ({count / total_records * 100:.1f}%)")
+
+        if 'survey_arabic_dialect' in df.columns:
+            dialect_counts = df['survey_arabic_dialect'].value_counts()
+            print(f"\nArabic Dialect Distribution:")
+            for dialect, count in dialect_counts.items():
+                print(f"  {dialect}: {count} ({count / total_records * 100:.1f}%)")
+
+        # Cross-language validation
+        if 'survey_donation_language' in df.columns:
+            print(f"\nLanguage Consistency Check:")
+            english_donations = (df['survey_donation_language'] == 'english').sum()
+            arabic_donations = (df['survey_donation_language'] == 'arabic').sum()
+
+            if 'survey_native_language' in df.columns:
+                native_lang_provided = df['survey_native_language'].notna().sum()
+                print(f"  English donations with native language data: {native_lang_provided}/{english_donations}")
+
+            if 'survey_arabic_dialect' in df.columns:
+                dialect_provided = df['survey_arabic_dialect'].notna().sum()
+                print(f"  Arabic donations with dialect data: {dialect_provided}/{arabic_donations}")
 
     def suggest_optimal_ranges(self, df):
         """Suggest optimal ranges based on actual data distribution"""
