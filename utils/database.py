@@ -54,13 +54,18 @@ def create_tables():
 
 
 def save_initial_voice_donation(recording_id, questionnaire_data, audio_filename, audio_size, request_info):
-    """Save initial voice donation record with processing status"""
+    """Save initial voice donation record with multi-task support"""
     dynamodb = get_dynamodb_resource()
     table = dynamodb.Table('voice-donations')
+
+    # Extract task metadata
+    task_metadata = questionnaire_data.get('task_metadata', {})
+    donation_id = task_metadata.get('donation_id', recording_id)  # Fallback to recording_id
 
     # Prepare the initial record
     record = {
         'recording_id': recording_id,
+        'donation_id': donation_id,  # NEW: User-facing donation ID
         'created_at': datetime.utcnow().isoformat(),
         'status': 'processing',
         'questionnaire': questionnaire_data,
@@ -72,12 +77,23 @@ def save_initial_voice_donation(recording_id, questionnaire_data, audio_filename
         'processing_started_at': datetime.utcnow().isoformat()
     }
 
+    # NEW: Add task metadata if present
+    if task_metadata:
+        record['task_metadata'] = task_metadata
+        record['task_number'] = task_metadata.get('task_number', 1)
+        record['task_type'] = task_metadata.get('task_type', 'unknown')
+        record['total_tasks_in_donation'] = task_metadata.get('total_tasks', 1)
+
     try:
         # Convert floats to Decimals for DynamoDB compatibility
         dynamodb_record = prepare_for_dynamodb(record)
-
         table.put_item(Item=dynamodb_record)
-        return {'success': True, 'message': 'Initial voice donation record saved successfully'}
+
+        return {
+            'success': True,
+            'message': 'Initial voice donation record saved successfully',
+            'donation_id': donation_id
+        }
     except ClientError as e:
         return {'success': False, 'error': str(e)}
 
@@ -257,4 +273,46 @@ def test_database_connection():
         }
 
     except ClientError as e:
+        return {'success': False, 'error': str(e)}
+
+
+def get_donation_recordings_status(donation_id):
+    """Get status of all recordings in a donation"""
+    dynamodb = get_dynamodb_resource()
+    table = dynamodb.Table('voice-donations')
+
+    try:
+        # Query all recordings for this donation
+        response = table.scan(
+            FilterExpression='donation_id = :donation_id',
+            ExpressionAttributeValues={':donation_id': donation_id}
+        )
+
+        recordings = response.get('Items', [])
+
+        if not recordings:
+            return {'success': False, 'error': 'Donation not found'}
+
+        # Analyze donation status
+        statuses = [r.get('status', 'unknown') for r in recordings]
+        completed_count = statuses.count('completed')
+        failed_count = statuses.count('failed')
+
+        # Determine overall donation status
+        if failed_count > 0:
+            donation_status = 'failed'
+        elif completed_count == len(recordings):
+            donation_status = 'completed'
+        else:
+            donation_status = 'processing'
+
+        return {
+            'success': True,
+            'recordings': recordings,
+            'donation_status': donation_status,
+            'completed_count': completed_count,
+            'total_count': len(recordings)
+        }
+
+    except Exception as e:
         return {'success': False, 'error': str(e)}

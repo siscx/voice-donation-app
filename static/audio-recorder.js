@@ -1,14 +1,33 @@
-// audio-recorder.js - All audio recording functionality
+// audio-recorder.js - Multi-task audio recording functionality
 
 // Global recording variables
 let mediaRecorder;
 let audioChunks = [];
 let recordingStartTime;
 let recordingInterval;
-let minRecordingTime = 30000;
-let maxRecordingTime = 40000;
 
-// UPDATED: Single standardized picture URL
+// NEW: Multi-task variables
+let currentTask = 1;
+let totalTasks = 2;
+let taskRecordings = {}; // Store recordings for each task
+let minRecordingTime = 30000; // 30 seconds
+let maxRecordingTime = 40000; // 40 seconds for task 1
+
+// Task-specific settings
+const taskSettings = {
+    1: {
+        minTime: 30000,  // 30 seconds
+        maxTime: 40000,  // 40 seconds
+        title: "Picture Description"
+    },
+    2: {
+        minTime: 30000,  // 30 seconds
+        maxTime: 60000,  // 60 seconds
+        title: "Weekend Question"
+    }
+};
+
+// Standardized picture URL
 const STANDARDIZED_PICTURE_URL = 'https://images.unsplash.com/photo-1680727293560-cabbce326e3b?w=500&h=350&fit=crop&crop=center&q=80&auto=format';
 
 function loadStandardizedPicture() {
@@ -17,6 +36,145 @@ function loadStandardizedPicture() {
         imgElement.src = STANDARDIZED_PICTURE_URL;
         imgElement.alt = "Kitchen scene with family activity - describe what you see";
     }
+}
+
+// NEW: Update task progress and UI
+function updateTaskUI() {
+    // Update progress indicator
+    const progressElement = document.getElementById('taskProgress');
+    if (progressElement) {
+        const currentLang = document.documentElement.lang || 'en';
+        const progressText = translations[currentLang]['taskProgress'].replace('1', currentTask).replace('2', totalTasks);
+        progressElement.textContent = progressText;
+    }
+
+    // Show/hide task content
+    for (let i = 1; i <= totalTasks; i++) {
+        const taskElement = document.getElementById(`task${i}`);
+        if (taskElement) {
+            if (i === currentTask) {
+                taskElement.classList.remove('hidden');
+                taskElement.classList.add('active');
+            } else {
+                taskElement.classList.add('hidden');
+                taskElement.classList.remove('active');
+            }
+        }
+    }
+
+    // Update recording limits for current task
+    const settings = taskSettings[currentTask];
+    minRecordingTime = settings.minTime;
+    maxRecordingTime = settings.maxTime;
+
+    // Update button visibility
+    updateTaskButtons();
+}
+
+// NEW: Update task-specific buttons
+function updateTaskButtons() {
+    const task1Button = document.querySelector('.task1-button');
+    const task2Button = document.querySelector('.task2-button');
+
+    if (currentTask === 1) {
+        task1Button?.classList.remove('hidden');
+        task2Button?.classList.add('hidden');
+    } else if (currentTask === 2) {
+        task1Button?.classList.add('hidden');
+        task2Button?.classList.remove('hidden');
+    }
+}
+
+// NEW: Move to next task
+function nextTask() {
+    if (!audioChunks || audioChunks.length === 0) {
+        alert('Please complete the current recording first.');
+        return;
+    }
+
+    // Store current task recording
+    const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+    taskRecordings[currentTask] = {
+        blob: audioBlob,
+        taskType: currentTask === 1 ? 'picture_description' : 'weekend_question',
+        duration: audioBlob.size // We can calculate actual duration later if needed
+    };
+
+    console.log(`Task ${currentTask} recording stored:`, taskRecordings[currentTask]);
+
+    // Move to next task
+    currentTask++;
+
+    if (currentTask <= totalTasks) {
+        // Reset recording state for next task
+        resetRecordingState();
+        updateTaskUI();
+
+        console.log(`Moved to task ${currentTask}`);
+    } else {
+        // All tasks completed - this shouldn't happen with current UI
+        console.log('All tasks completed');
+    }
+}
+
+// NEW: Submit all task recordings
+function submitAllTasks() {
+    if (!audioChunks || audioChunks.length === 0) {
+        alert('Please complete the current recording first.');
+        return;
+    }
+
+    // Store final task recording
+    const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+    taskRecordings[currentTask] = {
+        blob: audioBlob,
+        taskType: currentTask === 1 ? 'picture_description' : 'weekend_question',
+        duration: audioBlob.size
+    };
+
+    console.log('All task recordings ready for submission:', taskRecordings);
+
+    // Call the submission function (will be updated in api-client.js)
+    submitMultiTaskDonation();
+}
+
+// NEW: Reset recording state between tasks
+function resetRecordingState() {
+    audioChunks = [];
+
+    // Reset UI elements
+    const recordButton = document.getElementById('recordButton');
+    const recordIcon = document.getElementById('recordIcon');
+    const recordingTimer = document.getElementById('recordingTimer');
+    const audioPlayback = document.getElementById('audioPlayback');
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    if (recordButton) recordButton.classList.remove('recording');
+    if (recordIcon) recordIcon.textContent = '🎤';
+    if (recordingTimer) recordingTimer.textContent = '00:00';
+    if (audioPlayback) audioPlayback.classList.add('hidden');
+    if (audioPlayer) audioPlayer.src = '';
+
+    // Clear any active recording interval
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    // Stop any active media recorder
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        try {
+            mediaRecorder.stop();
+            if (mediaRecorder.stream) {
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+        } catch (error) {
+            console.log('Error stopping media recorder:', error);
+        }
+    }
+
+    // Reset recording status text
+    updateRecordingStatusText('recordingStatusStart');
 }
 
 function toggleRecording() {
@@ -35,7 +193,7 @@ function toggleRecording() {
 
 async function startRecording() {
     try {
-        console.log('Requesting microphone access...');
+        console.log(`Starting recording for task ${currentTask}...`);
         const stream = await navigator.mediaDevices.getUserMedia({
             audio: {
                 sampleRate: 44100,
@@ -44,9 +202,7 @@ async function startRecording() {
                 autoGainControl: false
             }
         });
-        console.log('Microphone access granted');
 
-        // Prefer uncompressed formats for medical analysis
         const mimeTypes = [
             'audio/wav',
             'audio/webm;codecs=pcm',
@@ -60,13 +216,8 @@ async function startRecording() {
         for (let type of mimeTypes) {
             if (MediaRecorder.isTypeSupported(type)) {
                 mimeType = type;
-                console.log('Selected MIME type:', mimeType);
                 break;
             }
-        }
-
-        if (!mimeType) {
-            console.log('Using default MIME type (browser-specific)');
         }
 
         mediaRecorder = new MediaRecorder(stream, {
@@ -76,14 +227,13 @@ async function startRecording() {
         audioChunks = [];
 
         mediaRecorder.ondataavailable = event => {
-            console.log('Data chunk received:', event.data.size, 'bytes', 'type:', event.data.type);
             if (event.data.size > 0) {
                 audioChunks.push(event.data);
             }
         };
 
         mediaRecorder.onstop = () => {
-            console.log('Recording stopped. Total chunks:', audioChunks.length);
+            console.log(`Recording stopped for task ${currentTask}`);
             const totalSize = audioChunks.reduce((sum, chunk) => sum + chunk.size, 0);
             console.log('Total audio size:', totalSize, 'bytes');
 
@@ -93,8 +243,6 @@ async function startRecording() {
             }
 
             const audioBlob = new Blob(audioChunks, { type: mimeType });
-            console.log('Final blob size:', audioBlob.size, 'type:', audioBlob.type);
-
             const audioUrl = URL.createObjectURL(audioBlob);
 
             const audioPlayer = document.getElementById('audioPlayer');
@@ -104,7 +252,6 @@ async function startRecording() {
             }
         };
 
-        // Start recording with smaller timeslice for better data flow
         mediaRecorder.start(500);
         recordingStartTime = Date.now();
 
@@ -145,13 +292,13 @@ function updateTimer() {
         timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    // Enable stop button after 30 seconds
-    if (elapsed >= 30) {
+    // Enable stop button after minimum time
+    if (elapsed >= minRecordingTime / 1000) {
         updateRecordingStatusText('recordingStatusRecording');
     }
 
-    // Auto-stop after 40 seconds
-    if (elapsed >= 40) {
+    // Auto-stop after maximum time
+    if (elapsed >= maxRecordingTime / 1000) {
         stopRecording();
     }
 }
@@ -164,4 +311,13 @@ function updateRecordingStatusText(translationKey) {
     if (statusElement && translation) {
         statusElement.textContent = translation;
     }
+}
+
+// NEW: Initialize multi-task recording
+function initializeMultiTaskRecording() {
+    currentTask = 1;
+    taskRecordings = {};
+    updateTaskUI();
+    loadStandardizedPicture();
+    console.log('Multi-task recording initialized');
 }

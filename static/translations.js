@@ -56,14 +56,10 @@ const translations = {
         otherVoiceProblemPlaceholder: "Describe your voice problem",
         continueButton: "Continue to Voice Recording",
         step3Title: "Voice Recording",
-        step3Subtitle: "Please describe what you see in the image below. Speak naturally for at least 30 seconds.",
-        recordingInstruction: "Describe what you see in this image - the people, activities, setting, and any details you notice.",
         recordingInstructions: "Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.",
         recordingStatusStart: "Click to start recording",
         recordingStatusRecording: "Recording... Click to stop",
         recordingStatusComplete: "Recording complete!",
-        submitButton: "Submit Your Donation",
-        consentText: "By submitting, you grant consent for anonymous use of your voice recording in health research, with data stored securely indefinitely for ongoing scientific analysis.",
         processingTitle: "Analyzing Your Voice",
         processingSubtitle: "Processing Audio Features",
         processingDescription: "Our AI is extracting over 60 vocal biomarkers from your recording. This analysis helps researchers identify subtle voice patterns that could indicate early signs of health conditions.",
@@ -184,7 +180,28 @@ const translations = {
         arabicDialectYemeni: "Yemeni Arabic",
         arabicDialectHejazi: "Hejazi Arabic",
         arabicDialectNajdi: "Najdi Arabic",
-        arabicDialectMSA: "Modern Standard Arabic (MSA)"
+        arabicDialectMSA: "Modern Standard Arabic (MSA)",
+
+        // Multi-task translations
+        taskProgress: "Task 1 of 2",
+
+        // Task 1: Picture Description
+        task1Subtitle: "Please describe what you see in the image below. Speak naturally for at least 30 seconds.",
+        task1Instruction: "Describe what you see in this image - the people, activities, setting, and any details you notice.",
+
+        // Task 2: Weekend Question
+        task2Subtitle: "Please describe your perfect weekend. Speak naturally for at least 30 seconds, up to 1 minute.",
+        task2Question: "What does your perfect weekend look like?",
+        task2Instruction: "Describe your ideal weekend - activities you'd enjoy, places you'd go, people you'd spend time with, and what would make it special for you.",
+
+        // Navigation buttons
+        continueToTask2: "Continue to Next Task",
+        submitAllTasks: "Submit Your Voice Donation",
+
+        // Updated consent text for multiple recordings
+        consentText: "By submitting, you grant consent for anonymous use of your voice recordings in health research, with data stored securely indefinitely for ongoing scientific analysis."
+
+
     },
 
     ar: {
@@ -242,14 +259,10 @@ const translations = {
         otherVoiceProblemPlaceholder: "اوصف مشكلتك الصوتية",
         continueButton: "المتابعة إلى تسجيل الصوت",
         step3Title: "تسجيل الصوت",
-        step3Subtitle: "يرجى وصف ما تراه في الصورة أدناه. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل.",
-        recordingInstruction: "صف ما تراه في هذه الصورة - الأشخاص والأنشطة والبيئة وأي تفاصيل تلاحظها.",
         recordingInstructions: "يرجى التحدث على بُعد حوالي 20 سم (8 بوصات) من ميكروفون جهازك، في بيئة هادئة إن أمكن.",
         recordingStatusStart: "اضغط لبدء التسجيل",
         recordingStatusRecording: "جاري التسجيل... اضغط للتوقف",
         recordingStatusComplete: "اكتمل التسجيل!",
-        submitButton: "أرسل تبرعك",
-        consentText: "من خلال الإرسال، فإنك توافق على الاستخدام المجهول لتسجيل صوتك في الأبحاث الصحية، مع تخزين البيانات بشكل آمن إلى أجل غير مسمى للتحليل العلمي المستمر.",
         processingTitle: "تحليل صوتك",
         processingSubtitle: "معالجة الميزات الصوتية",
         processingDescription: "يقوم الذكاء الاصطناعي بتحليل أكثر من 60 مؤشر صوتي من تسجيلك. يساعد هذا التحليل الباحثين في تحديد الأنماط الصوتية الدقيقة التي قد تشير إلى علامات مبكرة للحالات الصحية.",
@@ -370,7 +383,28 @@ const translations = {
         arabicDialectYemeni: "العربية اليمنية",
         arabicDialectHejazi: "العربية الحجازية",
         arabicDialectNajdi: "العربية النجدية",
-        arabicDialectMSA: "العربية الفصحى الحديثة"
+        arabicDialectMSA: "العربية الفصحى الحديثة",
+
+        // Multi-task translations
+        taskProgress: "المهمة 1 من 2",
+
+        // Task 1: Picture Description
+        task1Subtitle: "يرجى وصف ما تراه في الصورة أدناه. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل.",
+        task1Instruction: "صف ما تراه في هذه الصورة - الأشخاص والأنشطة والبيئة وأي تفاصيل تلاحظها.",
+
+        // Task 2: Weekend Question
+        task2Subtitle: "يرجى وصف عطلة نهاية الأسبوع المثالية لك. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل، وحتى دقيقة واحدة.",
+        task2Question: "كيف تبدو عطلة نهاية الأسبوع المثالية لك؟",
+        task2Instruction: "صف عطلة نهاية الأسبوع المثالية لك - الأنشطة التي ستستمتع بها، والأماكن التي ستذهب إليها، والأشخاص الذين ستقضي الوقت معهم، وما الذي سيجعلها مميزة بالنسبة لك.",
+
+        // Navigation buttons
+        continueToTask2: "المتابعة إلى المهمة التالية",
+        submitAllTasks: "أرسل تبرعك الصوتي",
+
+        // Updated consent text for multiple recordings
+        consentText: "من خلال الإرسال، فإنك توافق على الاستخدام المجهول لتسجيلاتك الصوتية في الأبحاث الصحية، مع تخزين البيانات بشكل آمن إلى أجل غير مسمى للتحليل العلمي المستمر."
+
+
     }
 };
 

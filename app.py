@@ -210,7 +210,13 @@ def voice_donation():
 
         # Generate unique recording ID
         recording_id = str(uuid.uuid4())
-        print(f"Generated recording_id: {recording_id}")
+
+        # NEW: Extract or generate donation ID
+        questionnaire_json = json.loads(questionnaire_data)
+        task_metadata = questionnaire_json.get('task_metadata', {})
+        donation_id = task_metadata.get('donation_id', recording_id)  # Use recording_id as fallback
+
+        print(f"Generated recording_id: {recording_id}, donation_id: {donation_id}")
 
         # Read audio data
         audio_data = file.read()
@@ -253,13 +259,15 @@ def voice_donation():
 
         print("SUCCESS: Voice donation submitted, processing started in background")
 
-        # Return success immediately
+        # NEW: Return donation_id in response
         return jsonify({
             'success': True,
             'recording_id': recording_id,
+            'donation_id': donation_id,  # NEW: Include donation ID
             'message': 'Voice donation submitted successfully',
             'status': 'processing',
-            'processing_info': 'Audio features are being extracted in the background. This usually takes 2-4 minutes.'
+            'processing_info': 'Audio features are being extracted in the background. This usually takes 2-4 minutes.',
+            'task_info': task_metadata if task_metadata else None  # NEW: Include task info
         }), 200
 
     except Exception as e:
@@ -272,38 +280,35 @@ def voice_donation():
         }), 500
 
 
-# New endpoint to check donation processing status
-@app.route('/api/donation-status/<recording_id>', methods=['GET'])
-def check_donation_status(recording_id):
+# Donation status check
+@app.route('/api/donation-status/<donation_id>', methods=['GET'])
+def check_donation_status(donation_id):
+    """Check status of all recordings in a donation"""
     try:
-        from utils.database import get_voice_donation_status
+        from utils.database import get_donation_recordings_status
 
-        result = get_voice_donation_status(recording_id)
+        result = get_donation_recordings_status(donation_id)
 
         if not result['success']:
             return jsonify({
-                'error': 'Recording not found',
-                'recording_id': recording_id
+                'error': 'Donation not found',
+                'donation_id': donation_id
             }), 404
 
-        status_data = result['data']
-
         return jsonify({
-            'recording_id': recording_id,
-            'status': status_data['status'],
-            'created_at': status_data.get('created_at'),
-            'completed_at': status_data.get('completed_at'),
-            'error_message': status_data.get('error_message'),
-            'features_extracted': status_data.get('features_extracted', 0)
+            'donation_id': donation_id,
+            'recordings': result['recordings'],
+            'donation_status': result['donation_status'],
+            'completed_count': result['completed_count'],
+            'total_count': result['total_count']
         }), 200
 
     except Exception as e:
-        print(f"STATUS CHECK ERROR: {e}")
+        print(f"DONATION STATUS CHECK ERROR: {e}")
         return jsonify({
             'error': str(e),
             'message': 'Failed to check donation status'
         }), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -304,6 +304,18 @@ def process_questionnaire_data(raw_data):
                 (cleaned_data.get("donation_language") == "arabic" and cleaned_data.get("native_language") == "ar"))
     }
 
+    # Extract task metadata if present
+    task_metadata = raw_data.get('task_metadata', {})
+
+    if task_metadata:
+        processed_data["task_metadata"] = {
+            "task_number": task_metadata.get("task_number", 1),
+            "task_type": task_metadata.get("task_type", "unknown"),
+            "total_tasks": task_metadata.get("total_tasks", 1),
+            "donation_id": task_metadata.get("donation_id"),
+            "is_multi_task_donation": task_metadata.get("total_tasks", 1) > 1
+        }
+
     return {
         "success": True,
         "data": processed_data,

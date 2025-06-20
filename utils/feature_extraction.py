@@ -150,6 +150,17 @@ def generate_metadata(audio_data, filename, request_info=None):
             "platform": request_info.get('platform', 'unknown')
         })
 
+    # Task information if available in request_info
+    if request_info and 'task_metadata' in request_info:
+        task_metadata = request_info['task_metadata']
+        metadata.update({
+            "task_number": task_metadata.get("task_number", 1),
+            "task_type": task_metadata.get("task_type", "unknown"),
+            "donation_id": task_metadata.get("donation_id"),
+            "total_tasks_in_donation": task_metadata.get("total_tasks", 1),
+            "is_multi_task_donation": task_metadata.get("total_tasks", 1) > 1
+        })
+
     return metadata
 
 

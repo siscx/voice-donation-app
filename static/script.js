@@ -26,24 +26,12 @@ function nextStep() {
         return;
     }
 
-    // Check for audio recording on step 3
-    if (currentStep === 3 && !audioChunks.length) {
-        alert('Please record your voice first.');
-        return;
-    }
-
-    // Submit donation on step 3
-    if (currentStep === 3) {
-        submitDonation();
-        return;
-    }
-
     document.getElementById(`step${currentStep}`).classList.remove('active');
     currentStep++;
 
-    // UPDATED: Load standardized picture when entering recording step
+    // UPDATED: Initialize multi-task recording when entering recording step
     if (currentStep === 3) {
-        loadStandardizedPicture(); // Changed from loadRandomPicture()
+        initializeMultiTaskRecording(); // New function from audio-recorder.js
     }
 
     // Stop testimonials when leaving step 1
@@ -52,6 +40,25 @@ function nextStep() {
     }
 
     document.getElementById(`step${currentStep}`).classList.add('active');
+}
+
+function clearMultiTaskRecording() {
+    console.log('Clearing multi-task recording...');
+
+    // Clear task recordings
+    if (typeof taskRecordings !== 'undefined') {
+        taskRecordings = {};
+    }
+
+    // Reset task state
+    if (typeof currentTask !== 'undefined') {
+        currentTask = 1;
+    }
+
+    // Clear current audio recording (existing function)
+    clearAudioRecording();
+
+    console.log('Multi-task recording cleared successfully');
 }
 
 // Language switching
@@ -199,6 +206,9 @@ function clearAllFormData() {
 
     // Clear audio recording state
     clearAudioRecording();
+
+    // NEW: Clear multi-task recording state
+    clearMultiTaskRecording();
 
     // Reset continue button state
     updateContinueButton();

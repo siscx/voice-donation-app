@@ -1,17 +1,17 @@
-// api-client.js - All API communication logic
+// api-client.js - Multi-task API communication logic
 
 // API Configuration - Smart environment detection
 const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:5000/api'  // Local development
     : window.location.origin + '/api'; // Production
 
-// ENHANCED: New function to collect questionnaire data for enhanced medical conditions
+// ENHANCED: New function to collect questionnaire data for multi-task submissions
 function collectEnhancedQuestionnaireData() {
     // Get basic fields
     const donationLanguage = document.getElementById('donationLanguage').value;
     const ageGroup = document.getElementById('ageGroup').value;
 
-    // Get selected health conditions (NEW ENHANCED SYSTEM)
+    // Get selected health conditions
     const healthConditions = Array.from(document.querySelectorAll('input[name="healthConditions"]:checked'))
         .map(cb => cb.value);
 
@@ -26,12 +26,8 @@ function collectEnhancedQuestionnaireData() {
         }
     });
 
-    console.log('Condition severities:', conditionSeverities);
-
     // Collect specification data for "other" conditions
     const conditionSpecifications = {};
-
-    // Check for each "other" condition specification
     const specificationFields = [
         'specify_respiratory_other',
         'specify_mood_other',
@@ -46,9 +42,7 @@ function collectEnhancedQuestionnaireData() {
         }
     });
 
-    console.log('Condition specifications:', conditionSpecifications);
-
-    // Structure the data according to new schema
+    // Structure the data according to schema
     const questionnaireData = {
         donation_language: donationLanguage,
         age_group: ageGroup,
@@ -63,54 +57,101 @@ function collectEnhancedQuestionnaireData() {
     return questionnaireData;
 }
 
-async function submitDonation() {
+// NEW: Submit multiple task recordings
+async function submitMultiTaskDonation() {
     try {
-        console.log('=== STARTING SUBMISSION ===');
+        console.log('=== STARTING MULTI-TASK SUBMISSION ===');
 
-        // Prepare form data
-        const formData = new FormData();
-
-        // Add audio file - ensure we have audio data
-        if (!audioChunks || audioChunks.length === 0) {
-            alert('No audio recorded. Please record your voice first.');
+        // Validate we have recordings for all tasks
+        if (!taskRecordings || Object.keys(taskRecordings).length !== totalTasks) {
+            alert('Please complete all recording tasks first.');
             return;
         }
 
-        console.log('Audio chunks:', audioChunks.length, 'Total size:', audioChunks.reduce((total, chunk) => total + chunk.size, 0));
+        console.log('Task recordings ready:', taskRecordings);
 
-        // Create blob with proper MIME type
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
-        console.log('Audio blob size:', audioBlob.size);
-
-        if (audioBlob.size === 0) {
-            alert('Audio recording is empty. Please try recording again.');
-            return;
-        }
-
-        formData.append('audio', audioBlob, 'voice_donation.webm');
-
-        // ENHANCED: Add questionnaire data using new collection method
+        // Prepare questionnaire data (same for all tasks)
         const questionnaireData = collectEnhancedQuestionnaireData();
-        console.log('Enhanced questionnaire data:', questionnaireData);
-        formData.append('questionnaire', JSON.stringify(questionnaireData));
+
+        // Generate single donation ID for all tasks in this donation
+        const donationId = generateDonationId();
+        console.log('Generated donation ID:', donationId);
 
         // Show processing screen
         document.getElementById(`step${currentStep}`).classList.remove('active');
         document.getElementById('processingStep').classList.add('active');
 
-        // Submit to API (try real async endpoint)
+        // Submit each task recording
+        const submissions = [];
+        for (const [taskNum, recording] of Object.entries(taskRecordings)) {
+            console.log(`Preparing submission for task ${taskNum}:`, recording.taskType);
+
+            const formData = new FormData();
+
+            // Add audio file with task-specific filename
+            const filename = `voice_donation_task${taskNum}_${recording.taskType}.webm`;
+            formData.append('audio', recording.blob, filename);
+
+            // Add questionnaire data with task metadata
+            const taskQuestionnaireData = {
+                ...questionnaireData,
+                task_metadata: {
+                    task_number: parseInt(taskNum),
+                    task_type: recording.taskType,
+                    total_tasks: totalTasks,
+                    donation_id: donationId // Use donation_id instead of session_id
+                }
+            };
+
+            formData.append('questionnaire', JSON.stringify(taskQuestionnaireData));
+
+            // Create submission promise
+            const submissionPromise = submitSingleTask(formData, taskNum, recording.taskType);
+            submissions.push(submissionPromise);
+        }
+
+        // Submit all tasks in parallel for faster processing
+        console.log('Submitting all tasks in parallel...');
+        const results = await Promise.all(submissions);
+
+        console.log('All submissions completed:', results);
+
+        // Check if all submissions succeeded
+        const allSuccessful = results.every(result => result.success);
+
+        if (allSuccessful) {
+            // Use the donation ID we generated
+            pollMultiTaskCompletion(donationId, results);
+        } else {
+            // Handle partial failures
+            const failedTasks = results.filter(result => !result.success);
+            throw new Error(`Some tasks failed to submit: ${failedTasks.map(r => r.error).join(', ')}`);
+        }
+
+    } catch (error) {
+        console.error('=== MULTI-TASK SUBMISSION ERROR ===');
+        console.error('Error details:', error);
+
+        alert(`There was an error submitting your recordings: ${error.message}`);
+
+        // Go back to recording step
+        document.getElementById('processingStep').classList.remove('active');
+        document.getElementById(`step${currentStep}`).classList.add('active');
+    }
+}
+
+// NEW: Submit a single task recording
+async function submitSingleTask(formData, taskNum, taskType) {
+    try {
         const submitUrl = `${API_BASE_URL}/voice-donation`;
-        console.log('Submitting to:', submitUrl);
+        console.log(`Submitting task ${taskNum} (${taskType}) to:`, submitUrl);
 
         const response = await fetch(submitUrl, {
             method: 'POST',
             body: formData
         });
 
-        console.log('Response status:', response.status);
-
         const responseText = await response.text();
-        console.log('Raw response:', responseText);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${responseText}`);
@@ -123,40 +164,86 @@ async function submitDonation() {
             throw new Error(`Invalid JSON response: ${responseText}`);
         }
 
-        console.log('Parsed result:', result);
+        console.log(`Task ${taskNum} submission result:`, result);
 
-        if (result.success && result.status === 'processing') {
-            // Store recording ID and start polling
-            const recordingId = result.recording_id;
-
-            // Update processing display with waiting message
-            updateProcessingDisplay(recordingId, 'processing');
-
-            // Start polling for completion
-            pollDonationStatus(recordingId);
-        } else if (result.success) {
-            // Old-style synchronous response - show success immediately
-            document.getElementById('donationId').textContent = `Donation ID: ${result.recording_id}`;
-            document.getElementById('processingStep').classList.remove('active');
-            document.getElementById('step5').classList.add('active');
-        } else {
-            throw new Error(result.message || result.error || 'Unknown error occurred');
-        }
+        return {
+            success: result.success,
+            task_number: taskNum,
+            task_type: taskType,
+            recording_id: result.recording_id,
+            donation_id: result.donation_id || result.recording_id, // Fallback for compatibility
+            status: result.status
+        };
 
     } catch (error) {
-        console.error('=== SUBMISSION ERROR ===');
-        console.error('Error details:', error);
-        console.error('Error stack:', error.stack);
-
-        alert(`There was an error submitting your donation: ${error.message}`);
-
-        // Go back to recording step
-        document.getElementById('processingStep').classList.remove('active');
-        document.getElementById(`step${currentStep}`).classList.add('active');
+        console.error(`Task ${taskNum} submission failed:`, error);
+        return {
+            success: false,
+            task_number: taskNum,
+            task_type: taskType,
+            error: error.message
+        };
     }
 }
 
-function updateProcessingDisplay(recordingId, status) {
+// NEW: Poll for completion of all tasks in a donation
+async function pollMultiTaskCompletion(donationId, submissions) {
+    const maxAttempts = 80; // Poll for up to ~7 minutes (80 * 5 seconds)
+    let attempts = 0;
+
+    // Update processing display
+    updateMultiTaskProcessingDisplay(donationId, 'processing', submissions);
+
+    const poll = async () => {
+        try {
+            attempts++;
+            console.log(`Multi-task polling attempt ${attempts} for donation ${donationId}`);
+
+            // Check status of the entire donation (not individual recordings)
+            const response = await fetch(`${API_BASE_URL}/donation-status/${donationId}`);
+
+            if (!response.ok) {
+                throw new Error(`Status check failed: ${response.status}`);
+            }
+
+            const donationData = await response.json();
+            console.log('Donation status check result:', donationData);
+
+            if (donationData.donation_status === 'completed') {
+                // All tasks in donation completed - show success
+                console.log('All tasks completed successfully!');
+                document.getElementById('donationId').textContent = `Donation ID: ${donationId}`;
+                document.getElementById('processingStep').classList.remove('active');
+                document.getElementById('step5').classList.add('active');
+                return;
+            } else if (donationData.donation_status === 'failed') {
+                // Some tasks failed
+                const failedRecordings = donationData.recordings.filter(r => r.status === 'failed');
+                throw new Error(`Task processing failed: ${failedRecordings.map(r => r.error_message || 'Unknown error').join(', ')}`);
+            } else if (attempts < maxAttempts) {
+                // Still processing - continue polling
+                setTimeout(poll, 5000); // Poll every 5 seconds
+            } else {
+                // Timeout
+                throw new Error('Processing is taking longer than expected. Please check back later or contact support.');
+            }
+
+        } catch (error) {
+            console.error('Multi-task status polling error:', error);
+            alert(`Error checking processing status: ${error.message}`);
+
+            // Go back to recording step
+            document.getElementById('processingStep').classList.remove('active');
+            document.getElementById(`step${currentStep}`).classList.add('active');
+        }
+    };
+
+    // Start polling after 3 seconds (longer delay for multiple tasks)
+    setTimeout(poll, 3000);
+}
+
+// NEW: Update processing display for multi-task
+function updateMultiTaskProcessingDisplay(donationId, status, submissions) {
     const currentLang = document.documentElement.lang || 'en';
 
     // Update processing status text
@@ -166,59 +253,31 @@ function updateProcessingDisplay(recordingId, status) {
     if (statusElement && waitElement) {
         if (status === 'processing') {
             statusElement.textContent = translations[currentLang]['processingStatus'];
-            waitElement.textContent = translations[currentLang]['processingWait'];
+            waitElement.textContent = `Processing voice recordings. This usually takes 2-4 minutes. Please keep this page open.`;
         } else if (status === 'completed') {
             statusElement.textContent = translations[currentLang]['processingSubtitle'];
-            waitElement.textContent = translations[currentLang]['processingDescription'];
+            waitElement.textContent = `Successfully processed voice recordings with advanced AI analysis.`;
         }
+    }
+
+    // Keep original feature descriptions (don't mention specific tasks)
+    const featureGrid = document.querySelector('.feature-grid');
+    if (featureGrid) {
+        // Don't modify the feature grid - keep original descriptions
+        // The HTML already has the correct feature descriptions
     }
 }
 
-async function pollDonationStatus(recordingId) {
-    const maxAttempts = 60; // Poll for up to 5 minutes (60 * 5 seconds)
-    let attempts = 0;
+// NEW: Generate a user-friendly donation ID
+function generateDonationId() {
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const random = Math.random().toString(36).substr(2, 6).toUpperCase();
+    return `DON_${date}_${random}`;
+}
 
-    const poll = async () => {
-        try {
-            attempts++;
-            console.log(`Polling attempt ${attempts} for ${recordingId}`);
-
-            const response = await fetch(`${API_BASE_URL}/donation-status/${recordingId}`);
-
-            if (!response.ok) {
-                throw new Error(`Status check failed: ${response.status}`);
-            }
-
-            const statusData = await response.json();
-            console.log('Status check result:', statusData);
-
-            if (statusData.status === 'completed') {
-                // Processing complete - show success
-                document.getElementById('donationId').textContent = `Donation ID: ${recordingId}`;
-                document.getElementById('processingStep').classList.remove('active');
-                document.getElementById('step5').classList.add('active');
-                return;
-            } else if (statusData.status === 'failed') {
-                // Processing failed
-                throw new Error(`Processing failed: ${statusData.error_message || 'Unknown processing error'}`);
-            } else if (statusData.status === 'processing') {
-                // Still processing - continue polling
-                if (attempts < maxAttempts) {
-                    setTimeout(poll, 5000); // Poll every 5 seconds
-                } else {
-                    throw new Error('Processing is taking longer than expected. Please check back later or contact support.');
-                }
-            }
-
-        } catch (error) {
-            console.error('Status polling error:', error);
-            alert(`Error checking processing status: ${error.message}`);
-            // Go back to recording step
-            document.getElementById('processingStep').classList.remove('active');
-            document.getElementById(`step${currentStep}`).classList.add('active');
-        }
-    };
-
-    // Start polling after 2 seconds
-    setTimeout(poll, 2000);
+// LEGACY: Keep the old submitDonation function for backward compatibility (if needed)
+async function submitDonation() {
+    // This is the old single-task submission - can be removed if not needed elsewhere
+    console.warn('submitDonation() called - use submitMultiTaskDonation() instead');
+    return submitMultiTaskDonation();
 }

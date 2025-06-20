@@ -1,41 +1,90 @@
-<!-- recording-section.html - Voice recording interface -->
+<!-- recording-section.html - Multi-task voice recording interface -->
 <div class="glass-card">
     <div class="step-header">
         <div class="step-icon">🎙️</div>
         <div>
             <h2 class="step-title" data-translate="step3Title">Voice Recording</h2>
-        </div>
-    </div>
-    <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="step3Subtitle">
-        Please describe what you see in the image below. Speak naturally for at least 30 seconds.
-    </p>
-
-    <div class="picture-showcase">
-        <img id="randomPicture" class="picture-display" src="" alt="Describe this image">
-        <div class="picture-instruction" data-translate="recordingInstruction">
-            Describe what you see in this image - the people, activities, setting, and any details you notice.
+            <!-- NEW: Task Progress Indicator -->
+            <div class="task-progress">
+                <span id="taskProgress" data-translate="taskProgress">Task 1 of 2</span>
+            </div>
         </div>
     </div>
 
-    <!-- Recording Instructions -->
-    <div class="recording-instructions">
-        <div class="instruction-icon">💡</div>
-        <p class="instruction-text" data-translate="recordingInstructions">Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.</p>
+    <!-- NEW: Task-specific content container -->
+    <div id="taskContainer">
+
+        <!-- Task 1: Picture Description -->
+        <div id="task1" class="task-content active">
+            <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="task1Subtitle">
+                Please describe what you see in the image below. Speak naturally for at least 30 seconds.
+            </p>
+
+            <div class="picture-showcase">
+                <img id="randomPicture" class="picture-display" src="" alt="Describe this image">
+                <div class="picture-instruction" data-translate="task1Instruction">
+                    Describe what you see in this image - the people, activities, setting, and any details you notice.
+                </div>
+            </div>
+
+            <!-- Recording Instructions -->
+            <div class="recording-instructions">
+                <div class="instruction-icon">💡</div>
+                <p class="instruction-text" data-translate="recordingInstructions">Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.</p>
+            </div>
+        </div>
+
+        <!-- Task 2: Weekend Question -->
+        <div id="task2" class="task-content hidden">
+            <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="task2Subtitle">
+                Please describe your perfect weekend. Speak naturally for at least 30 seconds, up to 1 minute.
+            </p>
+
+            <div class="question-showcase">
+                <div class="question-icon">🌟</div>
+                <h3 class="question-title" data-translate="task2Question">What does your perfect weekend look like?</h3>
+                <div class="question-instruction" data-translate="task2Instruction">
+                    Describe your ideal weekend - activities you'd enjoy, places you'd go, people you'd spend time with, and what would make it special for you.
+                </div>
+            </div>
+
+            <!-- Recording Instructions for Task 2 -->
+            <div class="recording-instructions">
+                <div class="instruction-icon">💡</div>
+                <p class="instruction-text" data-translate="recordingInstructions">Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.</p>
+            </div>
+        </div>
     </div>
 
+    <!-- Recording Controls (shared between tasks) -->
     <div class="recording-section">
         <button class="record-button" id="recordButton" onclick="toggleRecording()">
             <span id="recordIcon">🎤</span>
         </button>
         <div class="recording-status" id="recordingStatus" data-translate="recordingStatusStart">Click to start recording</div>
         <div class="recording-timer" id="recordingTimer">00:00</div>
+
+        <!-- Audio playback (shared) -->
         <div id="audioPlayback" class="hidden" style="margin-top: 20px;">
             <audio controls id="audioPlayer" style="width: 100%; margin-bottom: 20px;"></audio>
-            <button class="btn btn-primary btn-wide" onclick="nextStep()">
-                <span data-translate="submitButton">Submit Your Donation</span>
-            </button>
+
+            <!-- NEW: Task-specific buttons -->
+            <div id="taskButtons">
+                <!-- Button for Task 1 -->
+                <button class="btn btn-primary btn-wide task1-button" id="continueToTask2" onclick="nextTask()">
+                    <span data-translate="continueToTask2">Continue to Next Task</span>
+                    <span>→</span>
+                </button>
+
+                <!-- Button for Task 2 -->
+                <button class="btn btn-primary btn-wide task2-button hidden" id="submitAllTasks" onclick="submitAllTasks()">
+                    <span data-translate="submitAllTasks">Submit Your Voice Donation</span>
+                    <span>✓</span>
+                </button>
+            </div>
+
             <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 12px; line-height: 1.4;" data-translate="consentText">
-                By submitting, you grant consent for anonymous use of your voice recording in health research, with data stored securely indefinitely for ongoing scientific analysis.
+                By submitting, you grant consent for anonymous use of your voice recordings in health research, with data stored securely indefinitely for ongoing scientific analysis.
             </p>
         </div>
     </div>
