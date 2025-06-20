@@ -1,6 +1,7 @@
 #feature_extraction.py
 
 import os
+import psutil
 import tempfile
 import numpy as np
 import librosa
@@ -466,12 +467,15 @@ def extract_energy_based_features(wav_file_path):
 def extract_all_features(audio_data, filename, request_info=None):
     """Add diagnostic logging to identify crash point"""
     import os
-    import psutil
+    import traceback
+    import gc
 
-    process = psutil.Process()
     print(f"=== DIAGNOSTIC START: {filename} ===")
-    print(f"Memory before processing: {process.memory_info().rss / 1024 / 1024:.1f} MB")
     print(f"Audio data size: {len(audio_data) / 1024 / 1024:.1f} MB")
+    print(f"Process ID: {os.getpid()}")
+
+    # Simple memory tracking without psutil
+    gc.collect()  # Force garbage collection
 
     converted_wav_path = None
 
@@ -479,40 +483,42 @@ def extract_all_features(audio_data, filename, request_info=None):
         # Convert audio to high-quality WAV for analysis
         print(f"Step 1: Converting {filename} to WAV...")
         converted_wav_path = convert_audio_to_wav(audio_data, filename)
-        print(f"Memory after conversion: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+        print(f"Step 1 completed - WAV conversion successful")
 
         # Load the converted/original WAV with librosa
         print(f"Step 2: Loading with librosa...")
         y, sr = librosa.load(converted_wav_path, sr=None)
         print(f"Audio loaded: {len(y)} samples at {sr}Hz ({len(y) / sr:.2f} seconds)")
-        print(f"Memory after librosa load: {process.memory_info().rss / 1024 / 1024:.1f} MB")
 
         # Generate metadata and quality metrics
         print(f"Step 3: Generating metadata...")
         metadata = generate_metadata(audio_data, filename, request_info)
         quality_metrics = validate_audio_quality(y, sr)
-        print(f"Memory after metadata: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+        print(f"Step 3 completed - metadata generated")
 
         # Extract features from all modules
         print("Step 4: Extracting librosa features...")
         audio_features = {}
         audio_features.update(extract_librosa_features(y, sr))
-        print(f"Memory after librosa features: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+        print(f"Step 4 completed - {len(audio_features)} librosa features extracted")
 
         print("Step 5: Extracting parselmouth features...")
         audio_features.update(extract_parselmouth_features(converted_wav_path))
-        print(f"Memory after parselmouth features: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+        print(f"Step 5 completed - parselmouth features extracted")
 
         print("Step 6: Extracting speech activity features...")
         audio_features.update(extract_speech_activity_features(converted_wav_path))
-        print(f"Memory after speech features: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+        print(f"Step 6 completed - speech activity features extracted")
 
         # Rest of your existing code...
         print(f"=== DIAGNOSTIC SUCCESS: {filename} ===")
 
     except Exception as e:
-        print(f"=== DIAGNOSTIC CRASH: {filename} at step: {e} ===")
-        print(f"Memory at crash: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+        print(f"=== DIAGNOSTIC CRASH: {filename} ===")
+        print(f"Error: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        print("Stack trace:")
+        traceback.print_exc()
         raise e
 
     finally:

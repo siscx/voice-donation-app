@@ -117,12 +117,11 @@ async function submitMultiTaskDonation() {
         // DIAGNOSTIC: Process tasks sequentially instead of parallel
         console.log('Testing sequential processing...');
         const results = [];
-
         for (const submission of submissions) {
-            console.log('Processing submission:', submission);
+            console.log('Processing submission sequentially...');
             const result = await submission;
             results.push(result);
-            console.log('Completed submission:', result);
+            console.log('Submission completed:', result.success);
         }
 
         console.log('All submissions completed:', results);
