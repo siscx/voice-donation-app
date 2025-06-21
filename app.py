@@ -252,7 +252,15 @@ def voice_donation():
             # Check if all tasks for this donation are now submitted
             if should_start_processing(donation_id, task_metadata.get('total_tasks', 2)):
                 # Start background processing for ALL tasks in this donation
+
+                print(f"=== ABOUT TO START BACKGROUND PROCESSING ===")
+                print(f"Donation ID: {donation_id}")
+                print(f"Current pending submissions: {list(pending_submissions.keys())}")
+                print(f"Tasks for this donation: {len(pending_submissions.get(donation_id, {}))}")
+
                 start_multi_task_processing(donation_id)
+
+                print(f"=== BACKGROUND PROCESSING CALL COMPLETED ===")
 
         else:
             # Single task - process immediately
