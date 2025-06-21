@@ -274,6 +274,10 @@ def voice_donation():
 
         print("SUCCESS: Voice donation submitted, processing will start when all tasks are ready")
 
+        print(f"=== ABOUT TO RETURN HTTP RESPONSE FOR {donation_id} ===")
+        print(f"Current time: {datetime.utcnow()}")
+        print(f"Is multi-task: {is_multi_task}")
+
         # Return success immediately for both single and multi-task
         return jsonify({
             'success': True,
@@ -350,6 +354,15 @@ def start_multi_task_processing(donation_id):
 def process_multi_task_background(donation_id):
     """Process all tasks for a donation sequentially in a single thread"""
     try:
+        print(f"=== BACKGROUND THREAD STARTED FOR: {donation_id} ===")
+
+        # Add startup delay for Cloud Run
+        import time
+        print("Waiting 10 seconds for environment to stabilize...")
+        time.sleep(10)
+
+        print(f"=== STARTING PROCESSING: {donation_id} ===")
+
         print(f"=== STARTING MULTI-TASK BACKGROUND PROCESSING: {donation_id} ===")
 
         if donation_id not in pending_submissions:
