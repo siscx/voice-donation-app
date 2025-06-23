@@ -79,6 +79,15 @@ print(f"=== STARTUP: AWS Status: {aws_connected} - {aws_message} ===")
 # In-memory storage for pending multi-task submissions
 pending_submissions = {}
 
+@app.route('/debug-railway', methods=['GET'])
+def debug_railway():
+    import os
+    return {
+        'port': os.environ.get('PORT', 'not set'),
+        'all_env_vars': dict(os.environ),
+        'railway_service_name': os.environ.get('RAILWAY_SERVICE_NAME', 'not set'),
+        'railway_environment': os.environ.get('RAILWAY_ENVIRONMENT', 'not set')
+    }
 
 # Routes
 @app.route('/')
