@@ -464,52 +464,36 @@ def extract_energy_based_features(wav_file_path):
 
 
 def extract_all_features(audio_data, filename, request_info=None):
-    """Add diagnostic logging to identify crash point"""
+    """Extract comprehensive audio features from voice recording"""
     import os
     import traceback
-    import gc
 
-    print(f"=== DIAGNOSTIC START: {filename} ===")
-    print(f"Audio data size: {len(audio_data) / 1024 / 1024:.1f} MB")
-    print(f"Process ID: {os.getpid()}")
-
-    # Simple memory tracking without psutil
-    gc.collect()  # Force garbage collection
+    print(f"Processing {filename} ({len(audio_data) / 1024 / 1024:.1f} MB)")
 
     converted_wav_path = None
 
     try:
         # Convert audio to high-quality WAV for analysis
-        print(f"Step 1: Converting {filename} to WAV...")
+        print("Converting to WAV...")
         converted_wav_path = convert_audio_to_wav(audio_data, filename)
-        print(f"Step 1 completed - WAV conversion successful")
 
         # Load the converted/original WAV with librosa
-        print(f"Step 2: Loading with librosa...")
+        print("Loading audio...")
         y, sr = librosa.load(converted_wav_path, sr=None)
         print(f"Audio loaded: {len(y)} samples at {sr}Hz ({len(y) / sr:.2f} seconds)")
 
         # Generate metadata and quality metrics
-        print(f"Step 3: Generating metadata...")
+        print("Generating metadata...")
         metadata = generate_metadata(audio_data, filename, request_info)
         quality_metrics = validate_audio_quality(y, sr)
-        print(f"Step 3 completed - metadata generated")
 
         # Extract features from all modules
-        print("Step 4: Extracting librosa features...")
+        print("Extracting features...")
         audio_features = {}
         audio_features.update(extract_librosa_features(y, sr))
-        print(f"Step 4 completed - {len(audio_features)} librosa features extracted")
-
-        print("Step 5: Extracting parselmouth features...")
         audio_features.update(extract_parselmouth_features(converted_wav_path))
-        print(f"Step 5 completed - parselmouth features extracted")
-
-        print("Step 6: Extracting speech activity features...")
         audio_features.update(extract_speech_activity_features(converted_wav_path))
-        print(f"Step 6 completed - speech activity features extracted")
 
-        # ===== ADD THIS MISSING PART =====
         # Combine everything into structured output
         complete_data = {
             # Metadata section
@@ -535,15 +519,12 @@ def extract_all_features(audio_data, filename, request_info=None):
 
         # Convert numpy arrays to lists for JSON serialization
         complete_data = convert_numpy_to_json_serializable(complete_data)
-        print(f"=== DIAGNOSTIC SUCCESS: {filename} ===")
         print(f"Feature extraction successful: {len(audio_features)} features extracted")
 
         return complete_data
 
     except Exception as e:
-        print(f"=== DIAGNOSTIC CRASH: {filename} ===")
-        print(f"Error: {str(e)}")
-        print(f"Error type: {type(e).__name__}")
+        print(f"Feature extraction failed for {filename}: {str(e)}")
         print("Stack trace:")
         traceback.print_exc()
 
@@ -563,7 +544,6 @@ def extract_all_features(audio_data, filename, request_info=None):
         if converted_wav_path and os.path.exists(converted_wav_path):
             try:
                 os.remove(converted_wav_path)
-                print("Temporary WAV file cleaned up")
             except:
                 pass  # Ignore cleanup errors
 
