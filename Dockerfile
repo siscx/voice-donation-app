@@ -30,4 +30,6 @@ EXPOSE $PORT
 # CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--timeout", "300", "app:app"]
 # CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "--workers", "1", "--timeout", "300", "app:app"]
 # CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 300 app:app"]
-CMD ["sh", "-c", "python -m gunicorn --bind 0.0.0.0:$PORT app:app"]
+# CMD ["sh", "-c", "python -m gunicorn --bind 0.0.0.0:$PORT app:app"]
+# Start the application - let Python handle the port
+CMD ["python", "app.py"]
