@@ -424,12 +424,13 @@ def process_audio_background(recording_id, audio_data, filename, questionnaire_r
 print("=== STARTUP: All routes configured ===")
 
 if __name__ == '__main__':
-    # Railway uses port 5000 by default
-    port = int(os.environ.get('PORT', 5000))  # Changed from 8080 to 5000
+    # Force port 5000 to match Railway networking config
+    port = 5000  # Ignore environment variable completely
     host = '0.0.0.0'
 
     print(f"=== STARTUP: Railway deployment detected ===")
     print(f"=== STARTUP: PORT env var: {os.environ.get('PORT', 'not set')} ===")
+    print(f"=== STARTUP: FORCING port 5000 to match networking ===")
     print(f"=== STARTUP: Starting server on {host}:{port} ===")
 
     app.run(debug=False, host=host, port=port, threaded=True)
