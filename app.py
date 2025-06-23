@@ -1,7 +1,6 @@
-# app.py - Clean version with AWS diagnostics
-print("=== STARTUP: Beginning app.py ===")
+# app.py - Clean version for Railway deployment
 
-# Basic imports (no AWS dependencies)
+# Basic imports
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
@@ -12,24 +11,20 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 
-print("=== STARTUP: Basic imports successful ===")
+print("Starting voice donation API...")
 
 # Load environment variables
 load_dotenv()
-print("=== STARTUP: Environment loaded ===")
 
 app = Flask(__name__)
 CORS(app)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-print("=== STARTUP: Flask app created ===")
-
 
 # Test AWS connection function
 def test_aws_connection():
-    """Test AWS connectivity with timeout"""
+    """Test AWS connectivity"""
     try:
-        print("=== STARTUP: Testing AWS connection ===")
         import boto3
 
         # Check credentials
@@ -37,57 +32,40 @@ def test_aws_connection():
         aws_secret = os.getenv('AWS_SECRET_ACCESS_KEY')
         aws_region = os.getenv('AWS_REGION')
 
-        print(f"=== STARTUP: Credentials present: {bool(aws_key and aws_secret)} ===")
-        print(f"=== STARTUP: Region: {aws_region} ===")
+        print(f"AWS credentials present: {bool(aws_key and aws_secret)}")
+        print(f"AWS region: {aws_region}")
 
         if not all([aws_key, aws_secret, aws_region]):
             return False, "Missing AWS credentials"
 
-        # Quick connection test
-        dynamodb = boto3.resource('dynamodb',
-                                  aws_access_key_id=aws_key,
-                                  aws_secret_access_key=aws_secret,
-                                  region_name=aws_region)
-
-        # Test with timeout
-        import signal
-        def timeout_handler(signum, frame):
-            raise TimeoutError("Connection timeout")
-
-        signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(5)  # 5 second timeout
-
+        # Simple connection test
         try:
-            list(dynamodb.tables.all())
-            signal.alarm(0)
-            print("=== STARTUP: AWS connection successful ===")
+            dynamodb = boto3.resource('dynamodb',
+                                      aws_access_key_id=aws_key,
+                                      aws_secret_access_key=aws_secret,
+                                      region_name=aws_region)
+
+            # Quick test - just check if we can list one table
+            tables = list(dynamodb.tables.limit(1))
+            print("AWS connection successful")
             return True, "Connected"
+
         except Exception as e:
-            signal.alarm(0)
-            print(f"=== STARTUP: AWS connection failed: {e} ===")
+            print(f"AWS connection failed: {e}")
             return False, str(e)
 
     except Exception as e:
-        print(f"=== STARTUP: AWS test error: {e} ===")
+        print(f"AWS test error: {e}")
         return False, str(e)
 
 
 # Test AWS on startup
 aws_connected, aws_message = test_aws_connection()
-print(f"=== STARTUP: AWS Status: {aws_connected} - {aws_message} ===")
+print(f"AWS Status: {aws_connected} - {aws_message}")
 
 # In-memory storage for pending multi-task submissions
 pending_submissions = {}
 
-@app.route('/debug-railway', methods=['GET'])
-def debug_railway():
-    import os
-    return {
-        'port': os.environ.get('PORT', 'not set'),
-        'all_env_vars': dict(os.environ),
-        'railway_service_name': os.environ.get('RAILWAY_SERVICE_NAME', 'not set'),
-        'railway_environment': os.environ.get('RAILWAY_ENVIRONMENT', 'not set')
-    }
 
 # Routes
 @app.route('/')
@@ -188,7 +166,7 @@ if aws_connected:
     @app.route('/api/voice-donation', methods=['POST'])
     def voice_donation():
         try:
-            print("=== VOICE DONATION REQUEST RECEIVED ===")
+            print("Voice donation request received")
 
             if 'audio' not in request.files:
                 return jsonify({'error': 'No audio file provided'}), 400
@@ -247,7 +225,7 @@ if aws_connected:
 
                 # Check if all tasks submitted
                 if should_start_processing(donation_id, task_metadata.get('total_tasks', 2)):
-                    print(f"=== STARTING BACKGROUND PROCESSING FOR {donation_id} ===")
+                    print(f"Starting background processing for {donation_id}")
                     start_multi_task_processing(donation_id)
             else:
                 # Single task processing
@@ -267,7 +245,7 @@ if aws_connected:
                 )
                 processing_thread.start()
 
-            print(f"=== RETURNING RESPONSE FOR {donation_id} ===")
+            print(f"Returning response for {donation_id}")
 
             return jsonify({
                 'success': True,
@@ -278,7 +256,7 @@ if aws_connected:
             }), 200
 
         except Exception as e:
-            print(f"VOICE DONATION ERROR: {e}")
+            print(f"Voice donation error: {e}")
             print(traceback.format_exc())
             return jsonify({
                 'error': str(e),
@@ -304,7 +282,7 @@ if aws_connected:
             }), 200
 
         except Exception as e:
-            print(f"DONATION STATUS ERROR: {e}")
+            print(f"Donation status error: {e}")
             return jsonify({'error': str(e)}), 500
 
 else:
@@ -359,7 +337,7 @@ def start_multi_task_processing(donation_id):
 
 def process_multi_task_background(donation_id):
     try:
-        print(f"=== BACKGROUND PROCESSING STARTED: {donation_id} ===")
+        print(f"Background processing started: {donation_id}")
 
         if donation_id not in pending_submissions:
             print(f"ERROR: No submissions for {donation_id}")
@@ -394,7 +372,7 @@ def process_multi_task_background(donation_id):
                 print(f"Task {task_num} error: {e}")
 
         del pending_submissions[donation_id]
-        print(f"=== COMPLETED: {donation_id} ===")
+        print(f"Completed all tasks for donation: {donation_id}")
     except Exception as e:
         print(f"Background processing error: {e}")
 
@@ -421,16 +399,12 @@ def process_audio_background(recording_id, audio_data, filename, questionnaire_r
         print(f"Audio processing error for {recording_id}: {e}")
 
 
-print("=== STARTUP: All routes configured ===")
+print("All routes configured")
 
 if __name__ == '__main__':
     # Force port 5000 to match Railway networking config
-    port = 5000  # Ignore environment variable completely
+    port = 5000
     host = '0.0.0.0'
 
-    print(f"=== STARTUP: Railway deployment detected ===")
-    print(f"=== STARTUP: PORT env var: {os.environ.get('PORT', 'not set')} ===")
-    print(f"=== STARTUP: FORCING port 5000 to match networking ===")
-    print(f"=== STARTUP: Starting server on {host}:{port} ===")
-
+    print(f"Starting server on {host}:{port}")
     app.run(debug=False, host=host, port=port, threaded=True)
