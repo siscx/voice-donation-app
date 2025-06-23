@@ -414,18 +414,15 @@ def process_audio_background(recording_id, audio_data, filename, questionnaire_r
 
 print("=== STARTUP: All routes configured ===")
 
-if __name__ == '__main__':
-    # Railway-specific port configuration
-    port = int(os.environ.get('PORT', 8080))
-    host = os.environ.get('HOST', '0.0.0.0')
+# Comment out the Flask dev server for gunicorn
+# if __name__ == '__main__':
+#     port = int(os.environ.get('PORT', 8080))
+#     host = os.environ.get('HOST', '0.0.0.0')
+#     print(f"=== STARTUP: Railway deployment detected ===")
+#     print(f"=== STARTUP: PORT env var: {os.environ.get('PORT', 'not set')} ===")
+#     print(f"=== STARTUP: Starting server on {host}:{port} ===")
+#     app.run(debug=False, host=host, port=port, threaded=True)
 
-    print(f"=== STARTUP: Railway deployment detected ===")
-    print(f"=== STARTUP: PORT env var: {os.environ.get('PORT', 'not set')} ===")
-    print(f"=== STARTUP: Starting server on {host}:{port} ===")
-
-    app.run(
-        debug=False,
-        host=host,
-        port=port,
-        threaded=True
-    )
+# Add gunicorn-specific logging
+print("=== STARTUP: App configured for gunicorn ===")
+print(f"=== STARTUP: PORT setting: {os.environ.get('PORT', 'not set')} ===")
