@@ -12,17 +12,29 @@
     <script src="https://cdn.jsdelivr.net/npm/iso-639-1@2.1.15/build/index.min.js"></script>
 </head>
 <body>
-    <!-- Language Switcher -->
-    <div class="language-switcher">
-        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
-        <button class="lang-btn" onclick="switchLanguage('ar')" id="lang-ar">AR</button>
+    <!-- Hamburger Menu -->
+    <div class="main-tabs" onclick="toggleMenu()">
+        <div class="hamburger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </div>
 
-    <!-- Main Navigation Tabs -->
-    <div class="main-tabs">
+    <div class="menu-dropdown" id="menuDropdown">
         <button class="tab-btn active" onclick="switchTab('home')" data-translate="tabHome">Home</button>
         <button class="tab-btn" onclick="switchTab('about')" data-translate="tabAbout">About Us</button>
         <button class="tab-btn" onclick="switchTab('science')" data-translate="tabScience">The Science</button>
+    </div>
+
+    <!-- Compact Language Switcher -->
+    <div class="language-switcher" onclick="toggleLanguageMenu()">
+        <div class="language-icon">🌐</div>
+    </div>
+
+    <div class="language-dropdown" id="languageDropdown">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('ar')" id="lang-ar">AR</button>
     </div>
 
     <!-- Animated background particles -->

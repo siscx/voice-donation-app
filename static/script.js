@@ -74,6 +74,9 @@ function clearMultiTaskRecording() {
 
 // Language switching
 function switchLanguage(lang) {
+    // Close the language dropdown when language is selected
+    document.getElementById('languageDropdown').classList.remove('show');
+
     console.log('switchLanguage called with:', lang);
 
     document.documentElement.lang = lang;
@@ -119,6 +122,9 @@ function switchLanguage(lang) {
 // Replace your existing switchTab function with this:
 
 function switchTab(tabName) {
+    // Close the hamburger menu when tab is selected
+    document.getElementById('menuDropdown').classList.remove('show');
+
     console.log('Switching to tab:', tabName);
 
     // Hide all tab content
@@ -326,6 +332,36 @@ function stopTestimonialRotation() {
         clearInterval(testimonialInterval);
     }
 }
+
+// Toggle hamburger menu
+function toggleMenu() {
+    const dropdown = document.getElementById('menuDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Toggle language dropdown
+function toggleLanguageMenu() {
+    const dropdown = document.getElementById('languageDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    const menuDropdown = document.getElementById('menuDropdown');
+    const langDropdown = document.getElementById('languageDropdown');
+    const hamburger = document.querySelector('.main-tabs');
+    const langSwitcher = document.querySelector('.language-switcher');
+
+    // Close menu dropdown if clicked outside
+    if (!hamburger.contains(event.target) && !menuDropdown.contains(event.target)) {
+        menuDropdown.classList.remove('show');
+    }
+
+    // Close language dropdown if clicked outside
+    if (!langSwitcher.contains(event.target) && !langDropdown.contains(event.target)) {
+        langDropdown.classList.remove('show');
+    }
+});
 
 // Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', async function() {
