@@ -28,13 +28,14 @@ const taskSettings = {
 };
 
 // Standardized picture URL
-const STANDARDIZED_PICTURE_URL = 'https://images.unsplash.com/photo-1680727293560-cabbce326e3b?w=500&h=350&fit=crop&crop=center&q=80&auto=format';
+const STANDARDIZED_PICTURE_URL = '/static/images/img.jpeg';
+//'https://images.unsplash.com/photo-1680727293560-cabbce326e3b?w=500&h=350&fit=crop&crop=center&q=80&auto=format';
 
 function loadStandardizedPicture() {
     const imgElement = document.getElementById('randomPicture');
     if (imgElement) {
         imgElement.src = STANDARDIZED_PICTURE_URL;
-        imgElement.alt = "Kitchen scene with family activity - describe what you see";
+        imgElement.alt = "Afternoon tea scene - please describe what you see";
     }
 }
 
