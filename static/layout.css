@@ -4,9 +4,14 @@
 .container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 16px;
     position: relative;
     z-index: 2;
+}
+
+/* Full width for landing page */
+.tab-content#tab-home .container {
+    max-width: 1200px;  /* Wider for landing */
 }
 
 /* Language switcher */
@@ -99,7 +104,7 @@
 /* Hero section with animated elements */
 .hero {
     text-align: center;
-    padding: 60px 40px;
+    padding: 35px 30px;  /* ← Tighter */
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(16, 185, 129, 0.08));
     border-radius: 32px;
     backdrop-filter: blur(30px);

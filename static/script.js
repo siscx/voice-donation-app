@@ -29,6 +29,14 @@ function nextStep() {
     document.getElementById(`step${currentStep}`).classList.remove('active');
     currentStep++;
 
+    // Hide hero after leaving landing page
+    if (currentStep === 2) {
+        const hero = document.querySelector('.hero');
+        if (hero) {
+            hero.style.display = 'none';
+        }
+    }
+
     // UPDATED: Initialize multi-task recording when entering recording step
     if (currentStep === 3) {
         initializeMultiTaskRecording(); // New function from audio-recorder.js
@@ -40,6 +48,9 @@ function nextStep() {
     }
 
     document.getElementById(`step${currentStep}`).classList.add('active');
+
+    // Scroll to top when moving to next step
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function clearMultiTaskRecording() {

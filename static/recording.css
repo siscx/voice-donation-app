@@ -3,14 +3,14 @@
 /* Modern recording interface */
 .recording-section {
     text-align: center;
-    padding: 60px 20px;
+    padding: 40px 20px;
 }
 
 .picture-showcase {
     background: linear-gradient(135deg, var(--gray-50), white);
     border-radius: 24px;
-    padding: 30px;
-    margin-bottom: 40px;
+    padding: 24px;  /* ← Tighter */
+    margin-bottom: 28px;  /* ← Tighter */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
@@ -40,11 +40,11 @@
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
     border: 1px solid rgba(245, 158, 11, 0.2);
     border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 30px;
+    padding: 10px 16px;  /* ← Much thinner */
+    margin-bottom: 16px;  /* ← Tighter */
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;  /* ← Smaller gap */
     text-align: left;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .instruction-text {
-    font-size: 1rem;
+    font-size: 0.85rem;
     color: var(--gray-700);
     font-weight: 500;
     margin: 0;
@@ -303,8 +303,8 @@
 .question-showcase {
     background: linear-gradient(135deg, var(--gray-50), white);
     border-radius: 24px;
-    padding: 40px 30px;
-    margin-bottom: 40px;
+    padding: 28px 24px;  /* ← Tighter */
+    margin-bottom: 28px;  /* ← Tighter */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     text-align: center;
     border: 2px solid rgba(99, 102, 241, 0.1);

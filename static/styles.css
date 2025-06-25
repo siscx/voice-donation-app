@@ -1,4 +1,4 @@
-/* styles.css - Main stylesheet with imports and base styles */
+/* styles.css - Main stylesheet with imports and base styles - Universally Tighter */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -65,34 +65,55 @@ body {
     text-align: right;
 }
 
-/* Responsive design */
+/* Enhanced Responsive Design - Tighter for All Screens */
 @media (max-width: 768px) {
     .container {
-        padding: 16px;
+        padding: 12px;
     }
 
     .glass-card {
-        padding: 24px;
-        border-radius: 20px;
+        padding: 18px;
+        border-radius: 16px;
     }
 
     .hero {
-        padding: 40px 24px;
+        padding: 25px 16px;
     }
 
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+        margin-bottom: 25px;
     }
 
     .step-header {
         flex-direction: column;
         text-align: center;
-        gap: 16px;
+        gap: 12px;
+    }
+
+    .step-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    .step-title {
+        font-size: 1.4rem;
     }
 
     .trust-badges {
         flex-direction: column;
         align-items: center;
+        gap: 8px;
+    }
+
+    .trust-badge {
+        padding: 8px 16px;
+        font-size: 0.85rem;
     }
 
     .checkbox-grid {
@@ -100,5 +121,104 @@ body {
     }
 
     .main-tabs {
-        top: 70px;
+        top: 15px;
         left: 10px;
+        padding: 6px;
+    }
+
+    .tab-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+
+    .language-switcher {
+        top: 15px;
+        right: 15px;
+        padding: 6px;
+    }
+
+    .lang-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+
+    .stats-grid {
+        gap: 16px;
+        margin: 25px 0;
+    }
+
+    .stat-card {
+        padding: 20px 16px;
+    }
+
+    .recording-section {
+        padding: 25px 12px;
+    }
+
+    .record-button {
+        width: 100px;
+        height: 100px;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .recording-timer {
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+    }
+
+    .picture-display {
+        height: 240px;
+        margin-bottom: 16px;
+    }
+
+    .picture-showcase, .question-showcase {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .recording-instructions {
+        padding: 12px;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .instruction-text {
+        font-size: 0.9rem;
+    }
+
+    .success-section {
+        padding: 30px 20px;
+    }
+
+    .success-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+    }
+
+    .success-title {
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+    }
+
+    .success-subtitle {
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    .testimonials-banner {
+        margin-top: 25px;
+        padding: 16px;
+        min-height: 90px;
+    }
+
+    .testimonial-text {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+
+    .testimonial-author {
+        font-size: 0.85rem;
+    }
+}
