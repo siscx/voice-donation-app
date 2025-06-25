@@ -462,6 +462,55 @@ def extract_energy_based_features(wav_file_path):
             "avg_segment_length": 5
         }
 
+def extract_phonation_duration_analysis(wav_file_path):
+    """Extract maximum phonation time and voice quality metrics for sustained vowel tasks"""
+    try:
+        sound = parselmouth.Sound(wav_file_path)
+        pitch = sound.to_pitch()
+
+        # Create point process for voice pulse detection
+        point_process = parselmouth.praat.call([sound, pitch], "To PointProcess (cc)")
+
+        # Get basic counts
+        n_pulses = parselmouth.praat.call(point_process, "Get number of points")
+
+        # Calculate voice breaks (periods longer than 20ms indicate voice breaks)
+        max_voiced_period = 0.02  # 20ms threshold
+        voice_breaks_duration = 0
+
+        if n_pulses > 1:
+            periods = []
+            for i in range(1, n_pulses):
+                period = parselmouth.praat.call(point_process, "Get time from index", i + 1) - \
+                         parselmouth.praat.call(point_process, "Get time from index", i)
+                periods.append(period)
+                if period > max_voiced_period:
+                    voice_breaks_duration += period
+
+        # Calculate actual phonation time
+        total_duration = sound.duration
+        actual_phonation_time = total_duration - voice_breaks_duration
+
+        return {
+            'total_recording_duration': total_duration,
+            'actual_phonation_time': actual_phonation_time,
+            'voice_breaks_duration': voice_breaks_duration,
+            'voice_breaks_percentage': (voice_breaks_duration / total_duration) * 100 if total_duration > 0 else 0,
+            'number_of_pulses': n_pulses,
+            'phonation_efficiency': (actual_phonation_time / total_duration) * 100 if total_duration > 0 else 0
+        }
+
+    except Exception as e:
+        print(f"Phonation analysis failed: {e}")
+        return {
+            'total_recording_duration': 0,
+            'actual_phonation_time': 0,
+            'voice_breaks_duration': 0,
+            'voice_breaks_percentage': 0,
+            'number_of_pulses': 0,
+            'phonation_efficiency': 0,
+            'error': str(e)
+        }
 
 def extract_all_features(audio_data, filename, request_info=None):
     """Extract comprehensive audio features from voice recording"""
@@ -492,7 +541,18 @@ def extract_all_features(audio_data, filename, request_info=None):
         audio_features = {}
         audio_features.update(extract_librosa_features(y, sr))
         audio_features.update(extract_parselmouth_features(converted_wav_path))
-        audio_features.update(extract_speech_activity_features(converted_wav_path))
+
+        # NEW: Check task type and add appropriate analysis
+        task_metadata = request_info.get('task_metadata', {}) if request_info else {}
+        task_type = task_metadata.get('task_type', 'speech')
+
+        if task_type == 'maximum_phonation_time':
+            print("Adding phonation analysis for MPT task...")
+            phonation_analysis = extract_phonation_duration_analysis(converted_wav_path)
+            audio_features.update(phonation_analysis)
+        else:
+            print("Adding speech activity analysis...")
+            audio_features.update(extract_speech_activity_features(converted_wav_path))
 
         # Combine everything into structured output
         complete_data = {

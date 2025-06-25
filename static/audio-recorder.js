@@ -8,7 +8,7 @@ let recordingInterval;
 
 // NEW: Multi-task variables
 let currentTask = 1;
-let totalTasks = 2;
+let totalTasks = 3;
 let taskRecordings = {}; // Store recordings for each task
 let minRecordingTime = 30000; // 30 seconds
 let maxRecordingTime = 40000; // 40 seconds for task 1
@@ -16,11 +16,16 @@ let maxRecordingTime = 40000; // 40 seconds for task 1
 // Task-specific settings
 const taskSettings = {
     1: {
+        minTime: 3000,   // 3 seconds minimum for MPT
+        maxTime: 45000,  // 45 seconds max for MPT
+        title: "Maximum Phonation Time"
+    },
+    2: {
         minTime: 30000,  // 30 seconds
         maxTime: 40000,  // 40 seconds
         title: "Picture Description"
     },
-    2: {
+    3: {
         minTime: 30000,  // 30 seconds
         maxTime: 60000,  // 60 seconds
         title: "Weekend Question"
@@ -45,7 +50,8 @@ function updateTaskUI() {
     const progressElement = document.getElementById('taskProgress');
     if (progressElement) {
         const currentLang = document.documentElement.lang || 'en';
-        const progressText = translations[currentLang]['taskProgress'].replace('1', currentTask).replace('2', totalTasks);
+//        const progressText = translations[currentLang]['taskProgress'].replace('1', currentTask).replace('2', totalTasks);
+        const progressText = `Task ${currentTask} of ${totalTasks}`;
         progressElement.textContent = progressText;
     }
 
@@ -77,16 +83,17 @@ function updateTaskButtons() {
     const task1Button = document.querySelector('.task1-button');
     const task2Button = document.querySelector('.task2-button');
 
-    if (currentTask === 1) {
+    if (currentTask === 1 || currentTask === 2) {
+        // Tasks 1 & 2 - show "Continue to Next Task" button
         task1Button?.classList.remove('hidden');
         task2Button?.classList.add('hidden');
-    } else if (currentTask === 2) {
+    } else if (currentTask === 3) {
+        // Task 3 - show "Submit All Tasks" button
         task1Button?.classList.add('hidden');
         task2Button?.classList.remove('hidden');
     }
 }
 
-// NEW: Move to next task
 function nextTask() {
     if (!audioChunks || audioChunks.length === 0) {
         alert('Please complete the current recording first.');
@@ -97,7 +104,8 @@ function nextTask() {
     const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
     taskRecordings[currentTask] = {
         blob: audioBlob,
-        taskType: currentTask === 1 ? 'picture_description' : 'weekend_question',
+        taskType: currentTask === 1 ? 'maximum_phonation_time' :
+        currentTask === 2 ? 'picture_description' : 'weekend_question',
         duration: audioBlob.size // We can calculate actual duration later if needed
     };
 
@@ -129,7 +137,8 @@ function submitAllTasks() {
     const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
     taskRecordings[currentTask] = {
         blob: audioBlob,
-        taskType: currentTask === 1 ? 'picture_description' : 'weekend_question',
+        taskType: currentTask === 1 ? 'maximum_phonation_time' :
+          currentTask === 2 ? 'picture_description' : 'weekend_question',
         duration: audioBlob.size
     };
 

@@ -11,18 +11,39 @@
         </div>
     </div>
 
-    <!-- NEW: Task-specific content container -->
+    <!-- Task-specific content container -->
     <div id="taskContainer">
 
-        <!-- Task 1: Picture Description -->
+        <!-- Task 1: Maximum Phonation Time - NEW -->
         <div id="task1" class="task-content active">
             <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="task1Subtitle">
+                Say "ahhh" (like /e/ sound) for as long as you can. Try to sustain the sound steadily.
+            </p>
+
+            <div class="question-showcase">
+                <div class="question-icon">🫁</div>
+                <h3 class="question-title" data-translate="task1Question">Maximum Phonation Time Test</h3>
+                <div class="question-instruction" data-translate="task1Instruction">
+                    Take a deep breath and say "ahhh" for as long as you can. Keep the sound steady and continuous until you run out of breath.
+                </div>
+            </div>
+
+            <!-- Recording Instructions for MPT -->
+            <div class="recording-instructions">
+                <div class="instruction-icon">💡</div>
+                <p class="instruction-text" data-translate="recordingInstructions">Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.</p>
+            </div>
+        </div>
+
+        <!-- Task 2: Picture Description -->
+        <div id="task2" class="task-content hidden">
+            <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="task2Subtitle">
                 Please describe what you see in the image below. Speak naturally for at least 30 seconds.
             </p>
 
             <div class="picture-showcase">
                 <img id="randomPicture" class="picture-display" src="" alt="Describe this image">
-                <div class="picture-instruction" data-translate="task1Instruction">
+                <div class="picture-instruction" data-translate="task2Instruction">
                     Describe what you see in this image - the people, activities, setting, and any details you notice.
                 </div>
             </div>
@@ -34,21 +55,21 @@
             </div>
         </div>
 
-        <!-- Task 2: Weekend Question -->
-        <div id="task2" class="task-content hidden">
-            <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="task2Subtitle">
+        <!-- Task 3: Weekend Question -->
+        <div id="task3" class="task-content hidden">
+            <p style="margin-bottom: 30px; color: var(--gray-600); text-align: center;" data-translate="task3Subtitle">
                 Please describe your perfect weekend. Speak naturally for at least 30 seconds, up to 1 minute.
             </p>
 
             <div class="question-showcase">
                 <div class="question-icon">🌟</div>
-                <h3 class="question-title" data-translate="task2Question">What does your perfect weekend look like?</h3>
-                <div class="question-instruction" data-translate="task2Instruction">
+                <h3 class="question-title" data-translate="task3Question">What does your perfect weekend look like?</h3>
+                <div class="question-instruction" data-translate="task3Instruction">
                     Describe your ideal weekend - activities you'd enjoy, places you'd go, people you'd spend time with, and what would make it special for you.
                 </div>
             </div>
 
-            <!-- Recording Instructions for Task 2 -->
+            <!-- Recording Instructions for Task 3 -->
             <div class="recording-instructions">
                 <div class="instruction-icon">💡</div>
                 <p class="instruction-text" data-translate="recordingInstructions">Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.</p>

@@ -127,17 +127,22 @@ const translations = {
 
         // Step 3 - Recording
         step3Title: "Voice Recording",
-        taskProgress: "Task 1 of 2",
+        taskProgress: "Task 1 of 3",
         recordingInstructions: "Please speak about 20 cm (8 inches) from your device's microphone, in a quiet environment if possible.",
 
-        // Task 1: Picture Description
-        task1Subtitle: "Please describe what you see in the image below. Speak naturally for at least 30 seconds.",
-        task1Instruction: "Describe what you see in this image - the people, activities, setting, and any details you notice.",
+        // Task 1: Maximum Phonation Time
+        task1Subtitle: "Say 'ahhh' (like /e/ sound) for as long as you can. Try to sustain the sound steadily.",
+        task1Question: "Maximum Phonation Time Test",
+        task1Instruction: "Take a deep breath and say 'ahhh' for as long as you can. Keep the sound steady and continuous until you run out of breath.",
 
-        // Task 2: Weekend Question
-        task2Subtitle: "Please describe your perfect weekend. Speak naturally for at least 30 seconds, up to 1 minute.",
-        task2Question: "What does your perfect weekend look like?",
-        task2Instruction: "Describe your ideal weekend - activities you'd enjoy, places you'd go, people you'd spend time with, and what would make it special for you.",
+        // Task 2: Picture Description
+        task2Subtitle: "Please describe what you see in the image below. Speak naturally for at least 30 seconds.",
+        task2Instruction: "Describe what you see in this image - the people, activities, setting, and any details you notice.",
+
+        // Task 3: Weekend Question
+        task3Subtitle: "Please describe your perfect weekend. Speak naturally for at least 30 seconds, up to 1 minute.",
+        task3Question: "What does your perfect weekend look like?",
+        task3Instruction: "Describe your ideal weekend - activities you'd enjoy, places you'd go, people you'd spend time with, and what would make it special for you.",
 
         // Recording Controls
         recordingStatusStart: "Click to start recording",
@@ -327,17 +332,22 @@ const translations = {
 
         // Step 3 - Recording
         step3Title: "تسجيل الصوت",
-        taskProgress: "المهمة 1 من 2",
+        taskProgress: "المهمة 1 من 3",
         recordingInstructions: "يرجى التحدث على بُعد حوالي 20 سم (8 بوصات) من ميكروفون جهازك، في بيئة هادئة إن أمكن.",
 
-        // Task 1: Picture Description
-        task1Subtitle: "يرجى وصف ما تراه في الصورة أدناه. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل.",
-        task1Instruction: "صف ما تراه في هذه الصورة - الأشخاص والأنشطة والبيئة وأي تفاصيل تلاحظها.",
+        // Task 1: Maximum Phonation Time
+        task1Subtitle: "قل 'آآآه' (مثل صوت /e/) لأطول فترة ممكنة. حاول الحفاظ على الصوت ثابتاً ومستمراً.",
+        task1Question: "اختبار أقصى زمن للنطق",
+        task1Instruction: "خذ نفساً عميقاً وقل 'آآآه' لأطول فترة ممكنة. حافظ على الصوت ثابتاً ومستمراً حتى ينتهي نفسك.",
 
-        // Task 2: Weekend Question
-        task2Subtitle: "يرجى وصف عطلة نهاية الأسبوع المثالية لك. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل، وحتى دقيقة واحدة.",
-        task2Question: "كيف تبدو عطلة نهاية الأسبوع المثالية لك؟",
-        task2Instruction: "صف عطلة نهاية الأسبوع المثالية لك - الأنشطة التي ستستمتع بها، والأماكن التي ستذهب إليها، والأشخاص الذين ستقضي الوقت معهم، وما الذي سيجعلها مميزة بالنسبة لك.",
+        // Task 2: Picture Description
+        task2Subtitle: "يرجى وصف ما تراه في الصورة أدناه. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل.",
+        task2Instruction: "صف ما تراه في هذه الصورة - الأشخاص والأنشطة والبيئة وأي تفاصيل تلاحظها.",
+
+        // Task 3: Weekend Question
+        task3Subtitle: "يرجى وصف عطلة نهاية الأسبوع المثالية لك. تحدث بشكل طبيعي لمدة 30 ثانية على الأقل، وحتى دقيقة واحدة.",
+        task3Question: "كيف تبدو عطلة نهاية الأسبوع المثالية لك؟",
+        task3Instruction: "صف عطلة نهاية الأسبوع المثالية لك - الأنشطة التي ستستمتع بها، والأماكن التي ستذهب إليها، والأشخاص الذين ستقضي الوقت معهم، وما الذي سيجعلها مميزة بالنسبة لك.",
 
         // Recording Controls
         recordingStatusStart: "اضغط لبدء التسجيل",

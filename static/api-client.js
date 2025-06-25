@@ -2,7 +2,7 @@
 
 // API Configuration - Smart environment detection
 const API_BASE_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:8080/api'  // Local development
+    ? 'http://localhost:5000/api'  // ← Fix this port
     : window.location.origin + '/api'; // Production
 
 // ENHANCED: New function to collect questionnaire data for multi-task submissions
