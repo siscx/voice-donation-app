@@ -4,23 +4,18 @@ const translations = {
     en: {
         // Hero Section
         heroTitle: "Donate Your Voice For Health",
-        heroSubtitle: "Help us unlock the potential of voice for early health detection. Your donation helps train AI to identify signs of chronic conditions in just 30 seconds of speech—building proactive healthcare for everyone.",
-        trustBadge1: "HIPAA Secure",
-        trustBadge2: "Anonymous",
-        trustBadge3: "AI-Powered",
+        heroSubtitle: "Help us unlock the potential of voice for early health detection. Your donation helps train AI to identify signs of chronic conditions in under 3 minutes of voice recordings—building proactive healthcare for everyone.",
 
         // Step 1 - Welcome
-        step1Icon: "🚀",
         step1Title: "Your Voice, Our Future",
         step1Text: "Every voice carries hidden health insights. Your unique vocal patterns hold clues that could transform how we detect and prevent illness. Help us build the foundation for accessible healthcare worldwide.",
         stat1Number: "60+",
         stat1Label: "Voice features analyzed",
-        stat2Number: "30s",
+        stat2Number: "3min",
         stat2Label: "Time to contribute",
         step1Button: "Begin Your Contribution",
 
         // Step 2 - Questionnaire
-        step2Icon: "💬",
         step2Title: "Health Questionnaire",
         step2Subtitle: "Anonymous data helps train our AI models",
 
@@ -193,14 +188,14 @@ const translations = {
         conditionCardiovascular2: "• Cardiovascular diseases",
         conditionMental: "• Mental health challenges",
         scienceAI: "By combining voice data with AI, researchers are developing tools that can help detect and monitor health conditions—non-invasively, passively, and at scale.",
-        scienceMission: "Your voice donation supports this mission. With just a few seconds of speech, you're helping build the science needed to make healthcare more proactive, accessible, and personalized—for everyone.",
+        scienceMission: "Your voice donation supports this mission. With just a brief speech sample, you're helping build the science needed to make healthcare more proactive, accessible, and personalized—for everyone.",
 
         // Testimonials
-        testimonial1: '"When I found out that a 40-second voice recording could help researchers detect diseases earlier, I didn\'t hesitate. It felt empowering to know that something so easy for me could be so meaningful for someone else. I donated my voice for science, and I\'d do it again in a heartbeat."',
+        testimonial1: '"When I found out that a short voice recording could help researchers detect diseases earlier, I didn\'t hesitate. It felt empowering to know that something so easy for me could be so meaningful for someone else. I donated my voice for science, and I\'d do it again in a heartbeat."',
         testimonial1Author: "- Jamal, 65 years old, UAE",
         testimonial2: '"It\'s incredible to think my voice could help someone track their health better. I love knowing I\'m part of a project that could change how we fight chronic illness in our region."',
         testimonial2Author: "- Salma, 43 years old, Morocco",
-        testimonial3: '"Your voice holds more health information than you imagine. With just a few seconds of audio, we can begin to detect patterns linked to chronic diseases. But for our research to be accurate and inclusive, we need thousands of voices—different ages, accents, and health backgrounds."',
+        testimonial3: '"Your voice holds more health information than you imagine. With just a brief audio sample, we can begin to detect patterns linked to chronic diseases. But for our research to be accurate and inclusive, we need thousands of voices—different ages, accents, and health backgrounds."',
         testimonial3Author: "- Dr Leila, Neurologist",
         testimonial4: '"Most of the medical AI tools today are trained on data from outside our region. But voice, like language and accent, varies across populations. By donating your voice, you\'re helping us build healthcare solutions that truly reflect and serve our communities."',
         testimonial4Author: "- Dr Ahmed, Pulmonologist"
@@ -209,23 +204,18 @@ const translations = {
     ar: {
         // Hero Section
         heroTitle: "تبرع بصوتك من أجل الصحة",
-        heroSubtitle: "ساعدنا في إطلاق إمكانات الصوت للكشف المبكر عن الصحة. يساعد تبرعك في تدريب الذكاء الاصطناعي على تحديد علامات الحالات المزمنة في 30 ثانية فقط من الكلام—لبناء رعاية صحية استباقية للجميع.",
-        trustBadge1: "آمن وفق HIPAA",
-        trustBadge2: "مجهول الهوية",
-        trustBadge3: "مدعوم بالذكاء الاصطناعي",
+        heroSubtitle: "ساعدنا في إطلاق إمكانات الصوت للكشف المبكر عن الصحة. يساعد تبرعك في تدريب الذكاء الاصطناعي على تحديد علامات الحالات المزمنة في أقل من 3 دقائق من التسجيلات الصوتية—لبناء رعاية صحية استباقية للجميع.",
 
         // Step 1 - Welcome
-        step1Icon: "🚀",
         step1Title: "صوتك، مستقبلنا",
         step1Text: "كل صوت يحمل رؤى صحية مخفية. تحمل أنماطك الصوتية الفريدة أدلة يمكن أن تحول كيفية اكتشافنا ومنعنا للمرض. ساعدنا في بناء الأساس للرعاية الصحية المتاحة عالمياً.",
         stat1Number: "60+",
         stat1Label: "ميزات صوتية تم تحليلها",
-        stat2Number: "30 ثانية",
+        stat2Number: "3 دقائق",
         stat2Label: "الوقت المطلوب للمساهمة",
         step1Button: "ابدأ بالمساهمة",
 
         // Step 2 - Questionnaire
-        step2Icon: "💬",
         step2Title: "الاستبيان الصحي",
         step2Subtitle: "البيانات المجهولة تساعد في تدريب نماذج الذكاء الاصطناعي",
 
@@ -398,14 +388,14 @@ const translations = {
         conditionCardiovascular2: "• أمراض القلب والأوعية الدموية",
         conditionMental: "• تحديات الصحة النفسية",
         scienceAI: "من خلال الجمع بين بيانات الصوت والذكاء الاصطناعي، يطور الباحثون أدوات يمكنها المساعدة في اكتشاف ومراقبة الحالات الصحية—بطريقة غير جراحية وسلبية وعلى نطاق واسع.",
-        scienceMission: "تبرعك بالصوت يدعم هذه المهمة. مع بضع ثوانٍ فقط من الكلام، أنت تساعد في بناء العلم المطلوب لجعل الرعاية الصحية أكثر استباقية وإتاحة وتخصيصاً—للجميع.",
+        scienceMission: "تبرعك بالصوت يدعم هذه المهمة. مع تسجيل قصير فقط من الكلام، أنت تساعد في بناء العلم المطلوب لجعل الرعاية الصحية أكثر استباقية وإتاحة وتخصيصاً—للجميع.",
 
         // Testimonials
-        testimonial1: '"عندما اكتشفت أن تسجيل صوتي لمدة 40 ثانية يمكن أن يساعد الباحثين في اكتشاف الأمراض مبكراً، لم أتردد. شعرت بالتمكين عندما علمت أن شيئاً سهلاً بالنسبة لي يمكن أن يكون مفيداً جداً لشخص آخر. تبرعت بصوتي للعلم، وسأفعل ذلك مرة أخرى دون تردد."',
+        testimonial1: '"عندما اكتشفت أن تسجيل صوتي قصير يمكن أن يساعد الباحثين في اكتشاف الأمراض مبكراً، لم أتردد. شعرت بالتمكين عندما علمت أن شيئاً سهلاً بالنسبة لي يمكن أن يكون مفيداً جداً لشخص آخر. تبرعت بصوتي للعلم، وسأفعل ذلك مرة أخرى دون تردد."',
         testimonial1Author: "- جمال، 65 عاماً، الإمارات",
         testimonial2: '"من المذهل أن أفكر في أن صوتي يمكن أن يساعد شخصاً ما في تتبع صحته بشكل أفضل. أحب معرفة أنني جزء من مشروع يمكن أن يغير كيفية مكافحتنا للأمراض المزمنة في منطقتنا."',
         testimonial2Author: "- سلمى، 43 عاماً، المغرب",
-        testimonial3: '"صوتك يحمل معلومات صحية أكثر مما تتخيل. مع بضع ثوانٍ فقط من الصوت، يمكننا البدء في اكتشاف الأنماط المرتبطة بالأمراض المزمنة. لكن لكي يكون بحثنا دقيقاً وشاملاً، نحتاج إلى آلاف الأصوات—أعمار ولهجات وخلفيات صحية مختلفة."',
+        testimonial3: '"صوتك يحمل معلومات صحية أكثر مما تتخيل. مع عينة صوتية قصيرة فقط، يمكننا البدء في اكتشاف الأنماط المرتبطة بالأمراض المزمنة. لكن لكي يكون بحثنا دقيقاً وشاملاً، نحتاج إلى آلاف الأصوات—أعمار ولهجات وخلفيات صحية مختلفة."',
         testimonial3Author: "- د. ليلى، طبيبة أعصاب",
         testimonial4: '"معظم أدوات الذكاء الاصطناعي الطبية اليوم مدربة على بيانات من خارج منطقتنا. لكن الصوت، مثل اللغة واللهجة، يختلف عبر السكان. من خلال التبرع بصوتك، أنت تساعدنا في بناء حلول رعاية صحية تعكس وتخدم مجتمعاتنا حقاً."',
         testimonial4Author: "- د. أحمد، طبيب رئة"
