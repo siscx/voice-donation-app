@@ -1073,8 +1073,18 @@
 
         function updateLastUpdated(timestamp) {
             const date = new Date(timestamp);
+            // Convert to Dubai timezone
+            const dubaiTime = date.toLocaleString('en-US', {
+                timeZone: 'Asia/Dubai',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
             document.getElementById('lastUpdated').textContent =
-                `Last updated: ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
+                `Last updated: ${dubaiTime} (Dubai time)`;
         }
 
         // Load data on page load
