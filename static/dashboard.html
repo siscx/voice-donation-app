@@ -550,7 +550,6 @@
             <h3 style="margin-bottom: 20px; color: #2d3748;">Voice Data Browser</h3>
             <div class="browser-controls">
                 <input type="text" id="searchInput" placeholder="Search by Donation ID..." class="search-input">
-                <button onclick="exportData()" class="export-btn">Export CSV</button>
             </div>
             <div class="table-container">
                 <table class="data-table" id="dataTable">
@@ -1068,11 +1067,6 @@
 
             console.log('Setting featuresGrid HTML:', html.length, 'characters');
             featuresGrid.innerHTML = html;
-        }
-
-        function exportData() {
-            // Simple CSV export functionality
-            alert('CSV export functionality - will be implemented with real data API');
         }
 
         function updateLastUpdated(timestamp) {

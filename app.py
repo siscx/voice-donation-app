@@ -484,7 +484,22 @@ def process_audio_background(recording_id, audio_data, filename, questionnaire_r
 # Dashboard
 @app.route('/dashboard')
 def dashboard():
-    """Serve the dashboard HTML"""
+    """Serve the dashboard HTML with passphrase protection"""
+    passphrase = request.args.get('passphrase')
+    correct_passphrase = os.getenv('DASHBOARD_PASSPHRASE', 'Munsait2025')
+
+    if passphrase != correct_passphrase:
+        return '''
+        <html><body style="font-family: Arial; text-align: center; margin-top: 100px;">
+        <h2>Dashboard Access</h2>
+        <p>Enter passphrase to view dashboard:</p>
+        <form method="get">
+            <input type="password" name="passphrase" placeholder="Enter passphrase" required>
+            <button type="submit">Access Dashboard</button>
+        </form>
+        </body></html>
+        ''', 401
+
     return send_from_directory('static', 'dashboard.html')
 
 
