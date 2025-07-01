@@ -10,6 +10,12 @@ import uuid
 import json
 from datetime import datetime
 from dotenv import load_dotenv
+from threading import Semaphore
+import psutil
+
+# Memory protection
+MAX_CONCURRENT_PROCESSING = 2
+processing_semaphore = Semaphore(MAX_CONCURRENT_PROCESSING)
 
 print("Starting voice donation API...")
 
@@ -20,6 +26,14 @@ app = Flask(__name__)
 CORS(app)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+def check_memory_usage():
+    """Check current memory usage"""
+    try:
+        process = psutil.Process(os.getpid())
+        memory_mb = process.memory_info().rss / 1024 / 1024
+        return memory_mb
+    except:
+        return 0
 
 # Test AWS connection function
 def test_aws_connection():
@@ -336,8 +350,15 @@ def start_multi_task_processing(donation_id):
 
 
 def process_multi_task_background(donation_id):
+    """Multi-task processing with memory management"""
+
+    # ACQUIRE SEMAPHORE FOR WHOLE DONATION
+    processing_semaphore.acquire()
+
     try:
         print(f"Background processing started: {donation_id}")
+        memory_start = check_memory_usage()
+        print(f"Memory at start: {memory_start:.1f} MB")
 
         if donation_id not in pending_submissions:
             print(f"ERROR: No submissions for {donation_id}")
@@ -345,6 +366,7 @@ def process_multi_task_background(donation_id):
 
         tasks = pending_submissions[donation_id]
 
+        # PROCESS TASKS SEQUENTIALLY - Not parallel
         for task_num in sorted(tasks.keys()):
             task_data = tasks[task_num]
             print(f"Processing task {task_num}")
@@ -359,30 +381,71 @@ def process_multi_task_background(donation_id):
                     request_info=task_data['request_info']
                 )
 
-                process_audio_background(
-                    task_data['recording_id'],
+                # PROCESS IMMEDIATELY WITHOUT NEW THREAD
+                from utils.feature_extraction import extract_all_features
+                features_result = extract_all_features(
                     task_data['audio_data'],
                     task_data['filename'],
-                    task_data['questionnaire_result'],
                     task_data['request_info']
                 )
 
+                if features_result.get('summary', {}).get('processing_successful', False):
+                    from utils.database import save_voice_donation_features
+                    save_voice_donation_features(
+                        recording_id=task_data['recording_id'],
+                        audio_features=features_result,
+                        questionnaire_data=task_data['questionnaire_result']['data'],
+                        metadata=features_result['metadata']
+                    )
+
                 print(f"Completed task {task_num}")
+
+                # CLEANUP BETWEEN TASKS
+                import gc
+                gc.collect()
+
             except Exception as e:
                 print(f"Task {task_num} error: {e}")
 
         del pending_submissions[donation_id]
         print(f"Completed all tasks for donation: {donation_id}")
+
     except Exception as e:
         print(f"Background processing error: {e}")
 
+    finally:
+        # ALWAYS RELEASE
+        processing_semaphore.release()
+
+        import gc
+        gc.collect()
+
+        memory_end = check_memory_usage()
+        print(f"Memory at end: {memory_end:.1f} MB")
+
 
 def process_audio_background(recording_id, audio_data, filename, questionnaire_result, request_info):
+    """Background audio processing with memory limits"""
+
+    # ACQUIRE SEMAPHORE - Wait if too many processing
+    processing_semaphore.acquire()
+
     try:
         print(f"Starting audio processing for {recording_id}")
+        memory_before = check_memory_usage()
+        print(f"Memory before processing: {memory_before:.1f} MB")
+
+        # MEMORY CHECK - Don't start if already high
+        if memory_before > 700:  # 700MB threshold
+            print(f"Memory too high ({memory_before:.1f}MB), delaying processing")
+            import time
+            time.sleep(5)  # Wait 5 seconds
 
         from utils.feature_extraction import extract_all_features
         features_result = extract_all_features(audio_data, filename, request_info)
+
+        memory_after = check_memory_usage()
+        print(f"Memory after processing: {memory_after:.1f} MB")
 
         if features_result.get('summary', {}).get('processing_successful', False):
             from utils.database import save_voice_donation_features
@@ -395,8 +458,27 @@ def process_audio_background(recording_id, audio_data, filename, questionnaire_r
             print(f"Processing completed for {recording_id}: {db_result['success']}")
         else:
             print(f"Feature extraction failed for {recording_id}")
+
     except Exception as e:
         print(f"Audio processing error for {recording_id}: {e}")
+
+        # UPDATE DATABASE WITH ERROR
+        try:
+            from utils.database import update_voice_donation_status
+            update_voice_donation_status(recording_id, 'failed', str(e))
+        except:
+            pass
+
+    finally:
+        # ALWAYS RELEASE SEMAPHORE
+        processing_semaphore.release()
+
+        # FORCE CLEANUP
+        import gc
+        gc.collect()
+
+        memory_final = check_memory_usage()
+        print(f"Final memory after cleanup: {memory_final:.1f} MB")
 
 
 print("All routes configured")

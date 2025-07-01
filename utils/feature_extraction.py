@@ -13,6 +13,7 @@ import io
 from datetime import datetime, timezone
 import uuid
 import hashlib
+import gc
 
 
 def convert_audio_to_wav(audio_data, filename):
@@ -193,28 +194,34 @@ def validate_audio_quality(y, sr):
 
 
 def extract_librosa_features(y, sr):
-    """Extract comprehensive spectral and rhythmic features using librosa"""
+    """Extract comprehensive spectral and rhythmic features using librosa with memory cleanup"""
+    import gc
     features = {}
 
     # MFCC features (13 coefficients)
     mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
     features['mfcc_mean'] = np.mean(mfcc, axis=1)
     features['mfcc_std'] = np.std(mfcc, axis=1)
+    del mfcc  # Clean up immediately
 
     # Chroma features (12 pitch classes)
     chroma = librosa.feature.chroma_stft(y=y, sr=sr)
     features['chroma_mean'] = np.mean(chroma, axis=1)
     features['chroma_std'] = np.std(chroma, axis=1)
+    del chroma
 
     # Spectral contrast (7 bands)
     contrast = librosa.feature.spectral_contrast(y=y, sr=sr)
     features['spectral_contrast_mean'] = np.mean(contrast, axis=1)
     features['spectral_contrast_std'] = np.std(contrast, axis=1)
+    del contrast
 
     # Tonnetz (6 dimensions)
-    tonnetz = librosa.feature.tonnetz(y=librosa.effects.harmonic(y), sr=sr)
+    y_harmonic = librosa.effects.harmonic(y)
+    tonnetz = librosa.feature.tonnetz(y=y_harmonic, sr=sr)
     features['tonnetz_mean'] = np.mean(tonnetz, axis=1)
     features['tonnetz_std'] = np.std(tonnetz, axis=1)
+    del y_harmonic, tonnetz
 
     # Additional spectral features
     features['spectral_centroid'] = np.mean(librosa.feature.spectral_centroid(y=y, sr=sr))
@@ -232,6 +239,10 @@ def extract_librosa_features(y, sr):
     # Mel-frequency spectral coefficients (additional)
     mel_spectrogram = librosa.feature.melspectrogram(y=y, sr=sr)
     features['mel_spectrogram_mean'] = np.mean(mel_spectrogram, axis=1)
+    del mel_spectrogram
+
+    # Force cleanup
+    gc.collect()
 
     return features
 
@@ -512,14 +523,16 @@ def extract_phonation_duration_analysis(wav_file_path):
             'error': str(e)
         }
 
+
 def extract_all_features(audio_data, filename, request_info=None):
-    """Extract comprehensive audio features from voice recording"""
+    """Extract comprehensive audio features from voice recording with memory management"""
     import os
     import traceback
 
     print(f"Processing {filename} ({len(audio_data) / 1024 / 1024:.1f} MB)")
 
     converted_wav_path = None
+    y = None
 
     try:
         # Convert audio to high-quality WAV for analysis
@@ -554,6 +567,10 @@ def extract_all_features(audio_data, filename, request_info=None):
             print("Adding speech activity analysis...")
             audio_features.update(extract_speech_activity_features(converted_wav_path))
 
+        # MEMORY CLEANUP - Clear large arrays immediately
+        del y
+        gc.collect()
+
         # Combine everything into structured output
         complete_data = {
             # Metadata section
@@ -573,7 +590,7 @@ def extract_all_features(audio_data, filename, request_info=None):
                 "recommended_for_analysis": quality_metrics["signal_quality"] in ["good", "excellent"],
                 "audio_format_converted": not filename.lower().endswith('.wav'),
                 "final_sample_rate": sr,
-                "final_duration": round(len(y) / sr, 2)
+                "final_duration": round(quality_metrics.get('total_samples', 0) / sr, 2) if sr > 0 else 0
             }
         }
 
@@ -600,12 +617,22 @@ def extract_all_features(audio_data, filename, request_info=None):
         }
 
     finally:
-        # Clean up converted WAV file if it was created
-        if converted_wav_path and os.path.exists(converted_wav_path):
-            try:
+        # CRITICAL CLEANUP - Always runs
+        try:
+            # Clean up audio arrays
+            if 'y' in locals() and y is not None:
+                del y
+
+            # Clean up converted WAV file
+            if converted_wav_path and os.path.exists(converted_wav_path):
                 os.remove(converted_wav_path)
-            except:
-                pass  # Ignore cleanup errors
+
+            # Force garbage collection
+            gc.collect()
+            print("Memory cleanup completed")
+
+        except Exception as cleanup_error:
+            print(f"Cleanup error: {cleanup_error}")
 
 
 def calculate_completeness(features_dict):
