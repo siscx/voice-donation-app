@@ -631,17 +631,43 @@ def get_dashboard_data():
 
 @app.route('/api/donation-data')
 def get_donation_data():
-    """API endpoint to get individual donation records with features"""
+    """Simple donation data endpoint without pandas dependency"""
     try:
-        from tools.validate_voice_data import VoiceDataValidatorV3
+        import boto3
+        from decimal import Decimal
 
-        validator = VoiceDataValidatorV3()
-        items = validator.fetch_all_data()
+        # Direct DynamoDB query
+        dynamodb = boto3.resource(
+            'dynamodb',
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            region_name=os.getenv('AWS_REGION')
+        )
+        table = dynamodb.Table('voice-donations')
+
+        # Get all items
+        response = table.scan()
+        items = response['Items']
+
+        while 'LastEvaluatedKey' in response:
+            response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+            items.extend(response['Items'])
+
+        # Convert Decimal to float
+        def convert_decimal(obj):
+            if isinstance(obj, dict):
+                return {k: convert_decimal(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_decimal(i) for i in obj]
+            elif isinstance(obj, Decimal):
+                return float(obj)
+            return obj
+
+        items = [convert_decimal(item) for item in items]
 
         # Process items into donation records
         donations = {}
         for item in items:
-            item = validator.convert_decimal_to_float(item)
             donation_id = item.get('donation_id', item['recording_id'])
 
             if donation_id not in donations:
@@ -657,30 +683,23 @@ def get_donation_data():
                     'tasks': {}
                 }
 
-            # Add task data with better feature extraction
+            # Add task data with features
             task_metadata = item.get('task_metadata', {})
-            task_number = int(float(task_metadata.get('task_number', 1)))
+            task_number = task_metadata.get('task_number', 1)
             task_type = task_metadata.get('task_type', 'unknown')
+
+            # Convert float task numbers to integers for consistency
+            if isinstance(task_number, float):
+                task_number = int(task_number)
 
             status = 'completed' if item.get('status') == 'completed' else 'missing'
             features = {}
 
-            # Better feature extraction - check multiple possible locations
             if status == 'completed' and 'audio_features' in item:
                 audio_features_data = item['audio_features']
-
-                # Try different possible locations for features
-                if isinstance(audio_features_data, dict):
-                    if 'audio_features' in audio_features_data:
-                        features = audio_features_data['audio_features']
-                    elif len(audio_features_data) > 0:
-                        # Sometimes features might be directly in audio_features
-                        features = audio_features_data
-
-                # Debug: log what we found
-                print(f"Task {task_number} for {donation_id}: found {len(features)} features")
-                if len(features) > 0:
-                    print(f"Sample features: {list(features.keys())[:5]}")
+                if isinstance(audio_features_data, dict) and 'audio_features' in audio_features_data:
+                    features = audio_features_data['audio_features']
+                    print(f"Task {task_number} for {donation_id}: found {len(features)} features")
 
             donations[donation_id]['tasks'][task_number] = {
                 'type': task_type,
@@ -688,7 +707,7 @@ def get_donation_data():
                 'features': features
             }
 
-        # Convert to list and add debug info
+        # Convert to list
         donation_list = list(donations.values())
         print(f"Returning {len(donation_list)} donations")
 
