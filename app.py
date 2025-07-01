@@ -690,8 +690,21 @@ def get_donation_data():
                 responses = questionnaire.get('responses', {})
                 flags = questionnaire.get('analysis_flags', {})
 
+                # Extract date from created_at
+                created_at = item.get('created_at', '')
+                donation_date = 'Unknown'
+                if created_at:
+                    try:
+                        from datetime import datetime
+                        date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                        donation_date = date_obj.strftime('%Y-%m-%d')
+                    except:
+                        donation_date = 'Unknown'
+
                 donations[donation_id] = {
                     'donation_id': donation_id,
+                    'date': donation_date,
+                    'created_at': created_at,  # Keep for sorting
                     'language': responses.get('donation_language', 'unknown'),
                     'age': responses.get('age_group', 'unknown'),
                     'health': 'Healthy' if not flags.get('has_any_condition', True) else 'Has Conditions',
@@ -722,8 +735,9 @@ def get_donation_data():
                 'features': features
             }
 
-        # Convert to list
+        # Convert to list and sort by date (newest first)
         donation_list = list(donations.values())
+        donation_list.sort(key=lambda x: x.get('created_at', ''), reverse=True)
         print(f"Returning {len(donation_list)} donations")
 
         return jsonify(donation_list)

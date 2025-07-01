@@ -556,6 +556,7 @@
                     <thead>
                         <tr>
                             <th>Donation ID</th>
+                            <th>Date</th>
                             <th>Language</th>
                             <th>Age</th>
                             <th>Health</th>
@@ -564,7 +565,7 @@
                     </thead>
                     <tbody id="dataTableBody">
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 20px; color: #718096;">
+                            <td colspan="6" style="text-align: center; padding: 20px; color: #718096;">
                                 Loading donation data...
                             </td>
                         </tr>
@@ -770,6 +771,7 @@
                     return `
                     <tr>
                         <td><strong>${donation.donation_id}</strong></td>
+                        <td>${donation.date}</td>
                         <td>${donation.language}</td>
                         <td>${donation.age}</td>
                         <td>${donation.health}</td>
