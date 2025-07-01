@@ -165,7 +165,7 @@ const translations = {
         successTitle: "Thank You!",
         successSubtitle: "Your voice recordings have been submitted successfully and are being processed to advance medical research.",
         successDescription: "You can safely close this page. Your anonymous donation contributes to developing AI that can detect health conditions years before symptoms appear, bringing proactive healthcare within reach for everyone.",
-        privacyNote: "Your data is stored securely and used anonymously for health research. To request removal of your donation, please email privacy@munsait.com and include your Donation ID above for faster processing.",
+        privacyNote: "Your data is stored securely and used anonymously for health research. To request removal of your donation, please email info@munsait.com and include your Donation ID above for faster processing.",
 
         // Tab Navigation
         tabHome: "Home",
@@ -365,7 +365,7 @@ const translations = {
         successTitle: "شكراً لك!",
         successSubtitle: "تم إرسال تسجيلاتك الصوتية بنجاح وجاري معالجتها لتطوير البحوث الطبية.",
         successDescription: "يمكنك إغلاق هذه الصفحة بأمان. يساهم تبرعك المجهول في تطوير ذكاء اصطناعي يمكنه اكتشاف الحالات الصحية قبل سنوات من ظهور الأعراض، مما يجعل الرعاية الصحية الاستباقية في متناول الجميع.",
-        privacyNote: "يتم تخزين بياناتك بأمان واستخدامها بشكل مجهول للبحوث الصحية. لطلب إزالة تبرعك، يرجى مراسلة privacy@munsait.com وتضمين معرف التبرع أعلاه لمعالجة أسرع.",
+        privacyNote: "يتم تخزين بياناتك بأمان واستخدامها بشكل مجهول للبحوث الصحية. لطلب إزالة تبرعك، يرجى مراسلة info@munsait.com وتضمين معرف التبرع أعلاه لمعالجة أسرع.",
 
         // Tab Navigation
         tabHome: "الرئيسية",
