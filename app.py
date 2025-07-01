@@ -501,14 +501,21 @@ def get_dashboard_data():
             return jsonify(data)
         else:
             # If no data file exists, run validation to generate it
+            print("No dashboard_data.json found, running validation...")
+
             from tools.validate_voice_data import VoiceDataValidatorV3
 
             validator = VoiceDataValidatorV3()
+            print("Validator created, running full validation...")
+
             results = validator.run_full_validation()
+            print(f"Validation completed: {results is not None}")
 
             if results and 'dashboard_data' in results:
+                print("Returning dashboard data from validation results")
                 return jsonify(results['dashboard_data'])
             else:
+                print("No dashboard data in validation results, returning empty structure")
                 # Return empty data structure if validation fails
                 return jsonify({
                     'overview': {
@@ -542,8 +549,20 @@ def get_dashboard_data():
                 })
 
     except Exception as e:
-        print(f"Dashboard data error: {e}")
-        return jsonify({'error': 'Failed to load dashboard data'}), 500
+        # ADD DETAILED ERROR LOGGING
+        print(f"=== DASHBOARD DATA ERROR ===")
+        print(f"Error: {e}")
+        print(f"Error type: {type(e).__name__}")
+
+        import traceback
+        print("Full traceback:")
+        traceback.print_exc()  # This will show the full error stack
+
+        return jsonify({
+            'error': f'Failed to load dashboard data: {str(e)}',
+            'error_type': type(e).__name__,
+            'details': 'Check server logs for full traceback'
+        }), 500
 
 
 @app.route('/api/donation-data')
@@ -616,6 +635,15 @@ def get_donation_data():
         import traceback
         traceback.print_exc()
         return jsonify({'error': f'Failed to load donation data: {str(e)}'}), 500
+
+@app.route('/api/test-validation')
+def test_validation():
+    try:
+        from tools.validate_voice_data import VoiceDataValidatorV3
+        validator = VoiceDataValidatorV3()
+        return jsonify({'success': True, 'message': 'Validation import works'})
+    except Exception as e:
+        return jsonify({'error': str(e), 'traceback': traceback.format_exc()}), 500
 
 print("All routes configured")
 
