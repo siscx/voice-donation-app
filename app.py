@@ -510,7 +510,7 @@ def get_dashboard_data():
         import boto3
         from decimal import Decimal
 
-        # Direct DynamoDB query without validation script
+        # Direct DynamoDB query
         dynamodb = boto3.resource(
             'dynamodb',
             aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
@@ -538,6 +538,31 @@ def get_dashboard_data():
             return obj
 
         items = [convert_decimal(item) for item in items]
+
+        # Filter out test donations (same logic as validate_voice_data.py)
+        filtered_items = []
+        for item in items:
+            questionnaire = item.get('questionnaire', {})
+            responses = questionnaire.get('responses', {})
+            condition_specs = responses.get('condition_specifications', {})
+
+            # Check for "test SC" in any specification field
+            is_test = False
+            for field_name, spec_value in condition_specs.items():
+                if isinstance(spec_value, str) and 'test sc' in spec_value.lower():
+                    is_test = True
+                    break
+
+            # Also check health_conditions array for other_general + the text field
+            health_conditions = responses.get('health_conditions', [])
+            if ('other_general' in health_conditions and
+                    condition_specs.get('otherGeneralCondition', '').lower().strip() in ['test sc', 'test']):
+                is_test = True
+
+            if not is_test:
+                filtered_items.append(item)
+
+        items = filtered_items  # Use filtered items for all calculations
 
         # Simple counting
         total_recordings = len(items)
@@ -679,6 +704,31 @@ def get_donation_data():
             return obj
 
         items = [convert_decimal(item) for item in items]
+
+        # Filter out test donations (same logic as validate_voice_data.py)
+        filtered_items = []
+        for item in items:
+            questionnaire = item.get('questionnaire', {})
+            responses = questionnaire.get('responses', {})
+            condition_specs = responses.get('condition_specifications', {})
+
+            # Check for "test SC" in any specification field
+            is_test = False
+            for field_name, spec_value in condition_specs.items():
+                if isinstance(spec_value, str) and 'test sc' in spec_value.lower():
+                    is_test = True
+                    break
+
+            # Also check health_conditions array for other_general + the text field
+            health_conditions = responses.get('health_conditions', [])
+            if ('other_general' in health_conditions and
+                    condition_specs.get('otherGeneralCondition', '').lower().strip() in ['test sc', 'test']):
+                is_test = True
+
+            if not is_test:
+                filtered_items.append(item)
+
+        items = filtered_items  # Use filtered items for all calculations
 
         # Process items into donation records
         donations = {}
