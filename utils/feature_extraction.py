@@ -525,7 +525,7 @@ def extract_phonation_duration_analysis(wav_file_path):
 
 
 def extract_all_features(audio_data, filename, request_info=None):
-    """Extract comprehensive audio features from voice recording with memory management"""
+    """Extract task-appropriate audio features from voice recording with memory management"""
     import os
     import traceback
 
@@ -549,23 +549,72 @@ def extract_all_features(audio_data, filename, request_info=None):
         metadata = generate_metadata(audio_data, filename, request_info)
         quality_metrics = validate_audio_quality(y, sr)
 
-        # Extract features from all modules
-        print("Extracting features...")
-        audio_features = {}
-        audio_features.update(extract_librosa_features(y, sr))
-        audio_features.update(extract_parselmouth_features(converted_wav_path))
-
-        # NEW: Check task type and add appropriate analysis
+        # Determine task type for appropriate feature extraction
         task_metadata = request_info.get('task_metadata', {}) if request_info else {}
         task_type = task_metadata.get('task_type', 'speech')
 
+        print(f"Task type detected: {task_type}")
+
+        # Extract features based on task type
+        audio_features = {}
+
         if task_type == 'maximum_phonation_time':
-            print("Adding phonation analysis for MPT task...")
+            print("Extracting MPT-specific features...")
+
+            # 1. Basic voice quality features from Parselmouth (essential for MPT)
+            parselmouth_features = extract_parselmouth_features(converted_wav_path)
+
+            # Filter to keep only relevant features for sustained phonation
+            mpt_relevant_features = {
+                # Pitch features (important for sustained vowel)
+                'mean_pitch': parselmouth_features.get('mean_pitch', 0),
+                'std_pitch': parselmouth_features.get('std_pitch', 0),
+                'min_pitch': parselmouth_features.get('min_pitch', 0),
+                'max_pitch': parselmouth_features.get('max_pitch', 0),
+                'pitch_range': parselmouth_features.get('pitch_range', 0),
+
+                # Intensity features
+                'mean_intensity': parselmouth_features.get('mean_intensity', 0),
+                'std_intensity': parselmouth_features.get('std_intensity', 0),
+
+                # Voice quality (crucial for MPT analysis)
+                'jitter_local': parselmouth_features.get('jitter_local', 0),
+                'jitter_rap': parselmouth_features.get('jitter_rap', 0),
+                'shimmer_local': parselmouth_features.get('shimmer_local', 0),
+                'shimmer_apq3': parselmouth_features.get('shimmer_apq3', 0),
+                'hnr': parselmouth_features.get('hnr', 0),
+
+                # Formants (vowel quality)
+                'f1_mean': parselmouth_features.get('f1_mean', 0),
+                'f2_mean': parselmouth_features.get('f2_mean', 0),
+                'f3_mean': parselmouth_features.get('f3_mean', 0),
+
+                # Basic energy
+                'rms_energy': np.sqrt(np.mean(y ** 2)) if len(y) > 0 else 0
+            }
+
+            audio_features.update(mpt_relevant_features)
+
+            # 2. MPT-specific phonation analysis
             phonation_analysis = extract_phonation_duration_analysis(converted_wav_path)
             audio_features.update(phonation_analysis)
+
+            print(f"MPT features extracted: {len(audio_features)} features")
+
         else:
-            print("Adding speech activity analysis...")
+            print("Extracting full speech analysis features...")
+
+            # For speech tasks: extract comprehensive feature set
+            # 1. Spectral and rhythmic features (librosa)
+            audio_features.update(extract_librosa_features(y, sr))
+
+            # 2. Voice quality features (Parselmouth)
+            audio_features.update(extract_parselmouth_features(converted_wav_path))
+
+            # 3. Speech activity analysis
             audio_features.update(extract_speech_activity_features(converted_wav_path))
+
+            print(f"Speech analysis features extracted: {len(audio_features)} features")
 
         # MEMORY CLEANUP - Clear large arrays immediately
         del y
@@ -579,13 +628,15 @@ def extract_all_features(audio_data, filename, request_info=None):
             # Quality assessment
             "quality_metrics": quality_metrics,
 
-            # Extracted audio features
+            # Extracted audio features (task-appropriate)
             "audio_features": audio_features,
 
             # Summary statistics
             "summary": {
                 "total_features_extracted": len(audio_features),
                 "processing_successful": True,
+                "task_type": task_type,
+                "feature_extraction_method": "mpt_specific" if task_type == 'maximum_phonation_time' else "full_speech",
                 "data_completeness": calculate_completeness(audio_features),
                 "recommended_for_analysis": quality_metrics["signal_quality"] in ["good", "excellent"],
                 "audio_format_converted": not filename.lower().endswith('.wav'),
@@ -596,7 +647,7 @@ def extract_all_features(audio_data, filename, request_info=None):
 
         # Convert numpy arrays to lists for JSON serialization
         complete_data = convert_numpy_to_json_serializable(complete_data)
-        print(f"Feature extraction successful: {len(audio_features)} features extracted")
+        print(f"Feature extraction successful: {len(audio_features)} features extracted for {task_type}")
 
         return complete_data
 

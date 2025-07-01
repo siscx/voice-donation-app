@@ -1,4 +1,4 @@
-# validate_voice_data.py
+# validate_voice_data_v3.py - Updated for Multi-Task Donation System
 
 import boto3
 import pandas as pd
@@ -10,16 +10,15 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 import warnings
+import json
 
 warnings.filterwarnings('ignore')
-
-# Load environment variables
 load_dotenv()
 
 
-class VoiceDataValidator:
+class VoiceDataValidatorV3:
     def __init__(self):
-        """Initialize the validator with DynamoDB connection"""
+        """Initialize validator for multi-task donation system"""
         self.dynamodb = boto3.resource(
             'dynamodb',
             aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
@@ -28,66 +27,22 @@ class VoiceDataValidator:
         )
         self.table = self.dynamodb.Table('voice-donations')
 
-        # Realistic ranges based on actual voice data analysis
-        self.expected_ranges = {
-            # Pitch features (Hz) - based on real speech data
-            "mean_pitch": (80, 400),  # Wide range for all voice types
-            "min_pitch": (50, 300),  # Lower bound for deep voices
-            "max_pitch": (150, 800),  # Upper bound for high pitches/peaks
-            "std_pitch": (10, 200),  # Pitch variation range
-            "pitch_range": (100, 700),  # Total pitch span
-
-            # Voice quality (realistic clinical ranges)
-            "jitter_local": (0, 0.08),  # Up to 8% jitter (clinical threshold)
-            "jitter_rap": (0, 0.08),
-            "jitter_ppq5": (0, 0.08),
-            "shimmer_local": (0, 0.4),  # Up to 40% shimmer (realistic for normal speech)
-            "shimmer_apq3": (0, 0.4),
-            "shimmer_apq5": (0, 0.4),
-
-            # Intensity (dB) - microphone and environment dependent
-            "mean_intensity": (30, 80),  # Realistic recording levels
-            "max_intensity": (40, 90),
-            "min_intensity": (20, 70),
-            "std_intensity": (1, 15),
-
-            # Harmonics-to-noise ratio (dB) - forgiving for home recordings
-            "hnr": (3, 25),  # 3dB+ is acceptable for non-studio recordings
-
-            # Speech activity - realistic for description tasks
-            "speech_ratio": (0.2, 0.9),  # 20-90% (description tasks have pauses)
-            "pause_ratio": (0.1, 0.8),  # Complementary to speech ratio
-            "speaking_rate": (0.5, 8),  # Wide range of speaking speeds
-            "num_speech_segments": (5, 200),  # Varies greatly by task
-
-            # Duration (seconds)
-            "quality_duration_seconds": (25, 45),  # Your target range
-
-            # Formants (Hz) - accommodate all demographics
-            "f1_mean": (200, 1000),  # First formant realistic range
-            "f2_mean": (800, 3500),  # Second formant realistic range
-            "f3_mean": (1500, 4500),  # Third formant realistic range
-
-            # Energy features - device dependent
-            "quality_rms_energy": (0.001, 0.1),  # Realistic energy levels
-            "rms_energy": (0.001, 0.1),  # Duplicate check
-
-            # Spectral features - based on speech analysis literature
-            "spectral_centroid": (400, 3000),  # Spectral center frequency
-            "spectral_bandwidth": (1000, 4000),  # Spectral spread
-            "spectral_rolloff": (800, 4000),  # High frequency rolloff
-            "zero_crossing_rate": (0.005, 0.1),  # Zero crossing frequency
-            "tempo": (60, 200),  # Speech tempo range
+        # Task-specific validation ranges
+        self.mpt_ranges = {
+            "actual_phonation_time": (1, 45),  # 1-45 seconds for MPT
+            "phonation_efficiency": (50, 100),  # 50-100% efficiency
+            "voice_breaks_percentage": (0, 30),  # 0-30% voice breaks
         }
 
-        # Critical features that should never be zero/missing
-        self.critical_features = [
-            "mean_pitch", "mean_intensity", "quality_duration_seconds",
-            "speech_ratio", "quality_rms_energy"
-        ]
+        self.speech_ranges = {
+            "mean_pitch": (80, 400),
+            "speech_ratio": (0.3, 0.9),
+            "quality_duration_seconds": (25, 65),  # 25-65s for speech tasks
+            "hnr": (5, 25),
+        }
 
     def convert_decimal_to_float(self, obj):
-        """Convert DynamoDB Decimal types to float for analysis"""
+        """Convert DynamoDB Decimal types to float"""
         if isinstance(obj, dict):
             return {key: self.convert_decimal_to_float(value) for key, value in obj.items()}
         elif isinstance(obj, list):
@@ -98,462 +53,508 @@ class VoiceDataValidator:
             return obj
 
     def fetch_all_data(self):
-        """Fetch all voice donation records from DynamoDB"""
-        print("📥 Fetching data from DynamoDB...")
+        """Fetch voice donation records from June 26th onwards, excluding test recordings"""
+        print("📥 Fetching data from DynamoDB (June 26th onwards)...")
 
         response = self.table.scan()
         items = response['Items']
 
-        # Handle pagination if there are many records
         while 'LastEvaluatedKey' in response:
             response = self.table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
             items.extend(response['Items'])
 
-        print(f"✅ Found {len(items)} voice donation records")
-        return items
+        # Filter for June 26th onwards (2024-06-26)
+        cutoff_date = datetime(2024, 6, 26)
+        filtered_items = []
+        test_recordings = 0
 
-    def extract_features_dataframe(self, items):
-        """Extract audio features into a pandas DataFrame for analysis"""
-        print("🔄 Processing audio features...")
-
-        records = []
         for item in items:
-            # Convert Decimals to floats
+            created_at = item.get('created_at', '')
+
+            # Check if it's a test recording
+            is_test = False
+            questionnaire = item.get('questionnaire', {})
+            responses = questionnaire.get('responses', {})
+            condition_specs = responses.get('condition_specifications', {})
+
+            # Check for "test SC" in any specification field, especially otherGeneralCondition
+            for field_name, spec_value in condition_specs.items():
+                if isinstance(spec_value, str) and 'test sc' in spec_value.lower():
+                    is_test = True
+                    test_recordings += 1
+                    break
+
+            # Also check health_conditions array for other_general + the text field
+            health_conditions = responses.get('health_conditions', [])
+            if ('other_general' in health_conditions and
+                    condition_specs.get('otherGeneralCondition', '').lower().strip() in ['test sc', 'test']):
+                is_test = True
+                test_recordings += 1
+
+            if is_test:
+                continue  # Skip test recordings
+
+            if created_at:
+                try:
+                    # Parse ISO datetime string
+                    item_date = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                    if item_date.replace(tzinfo=None) >= cutoff_date:
+                        filtered_items.append(item)
+                except ValueError:
+                    # If date parsing fails, include the item to be safe
+                    filtered_items.append(item)
+
+        print(f"✅ Found {len(filtered_items)} real voice donation records since June 26th")
+        print(f"   (Filtered out {len(items) - len(filtered_items) - test_recordings} older records)")
+        print(f"   (Excluded {test_recordings} test recordings with 'test SC')")
+        return filtered_items
+
+    def analyze_donation_completeness(self, items):
+        """Analyze donation completion rates and multi-task success"""
+        print("\n🎯 DONATION COMPLETENESS ANALYSIS")
+        print("=" * 50)
+
+        # Group by donation_id
+        donations = {}
+        for item in items:
             item = self.convert_decimal_to_float(item)
+            donation_id = item.get('donation_id', item['recording_id'])
 
-            # Extract basic info
-            record = {
-                'recording_id': item['recording_id'],
-                'created_at': item['created_at']
-            }
+            if donation_id not in donations:
+                donations[donation_id] = {
+                    'recordings': [],
+                    'expected_tasks': 1,
+                    'completed_tasks': 0,
+                    'failed_tasks': 0,
+                    'status': 'unknown'
+                }
 
-            # Extract audio features
-            if 'audio_features' in item and 'audio_features' in item['audio_features']:
-                features = item['audio_features']['audio_features']
-                record.update(features)
+            donations[donation_id]['recordings'].append(item)
 
-            # Extract quality metrics
-            if 'audio_features' in item and 'quality_metrics' in item['audio_features']:
-                quality = item['audio_features']['quality_metrics']
-                for key, value in quality.items():
-                    record[f"quality_{key}"] = value
+            # Get expected task count - check multiple fields
+            task_metadata = item.get('task_metadata', {})
+            if task_metadata:
+                # Try different field names for total tasks
+                expected = (task_metadata.get('total_tasks_in_donation') or
+                            task_metadata.get('total_tasks') or
+                            3)  # Default to 3 for multi-task system
+                donations[donation_id]['expected_tasks'] = expected
 
-            # Extract questionnaire data - UPDATED FOR NEW SCHEMA
-            if 'questionnaire' in item and 'responses' in item['questionnaire']:
-                responses = item['questionnaire']['responses']
-                for key, value in responses.items():
-                    # Handle arrays (like chronic_conditions) properly
-                    if isinstance(value, list):
-                        record[f"survey_{key}"] = ', '.join(value)  # Convert to string for analysis
-                        # Also create individual boolean columns for conditions
-                        if key == 'chronic_conditions':
-                            for condition in ['respiratory', 'neurological', 'cardiovascular', 'other', 'none']:
-                                record[f"survey_has_{condition}"] = condition in value
+            # Count completed/failed
+            if item.get('status') == 'completed':
+                donations[donation_id]['completed_tasks'] += 1
+            elif item.get('status') == 'failed':
+                donations[donation_id]['failed_tasks'] += 1
+
+        # Analyze donation success rates
+        total_donations = len(donations)
+        completed_donations = 0
+        partial_donations = 0
+        failed_donations = 0
+        multi_task_donations = 0
+
+        for donation_id, donation in donations.items():
+            expected = donation['expected_tasks']
+            completed = donation['completed_tasks']
+            failed = donation['failed_tasks']
+
+            if expected > 1:
+                multi_task_donations += 1
+
+            if completed == expected and failed == 0:
+                completed_donations += 1
+                donation['status'] = 'completed'
+            elif completed > 0:
+                partial_donations += 1
+                donation['status'] = 'partial'
+            else:
+                failed_donations += 1
+                donation['status'] = 'failed'
+
+        print(f"Total Donations: {total_donations}")
+        print(f"Multi-task Donations: {multi_task_donations} ({multi_task_donations / total_donations * 100:.1f}%)")
+        print(f"Fully Completed Donations: {completed_donations} ({completed_donations / total_donations * 100:.1f}%)")
+        print(f"Partial Donations: {partial_donations} ({partial_donations / total_donations * 100:.1f}%)")
+        print(f"Failed Donations: {failed_donations} ({failed_donations / total_donations * 100:.1f}%)")
+
+        # Show completed donations breakdown
+        if completed_donations > 0:
+            print(f"\n✅ COMPLETED DONATIONS BREAKDOWN:")
+            print(f"   Total completed recordings: {completed_donations * 3}")
+            print(f"   This represents {completed_donations} people who finished all 3 tasks")
+
+        return donations
+
+    def analyze_task_distribution(self, items):
+        """Analyze distribution of different task types (completed donations only)"""
+        print("\n📊 TASK TYPE DISTRIBUTION (COMPLETED ONLY)")
+        print("=" * 50)
+
+        # Only count completed recordings
+        completed_items = [item for item in items if item.get('status') == 'completed']
+
+        task_counts = {
+            'maximum_phonation_time': 0,
+            'picture_description': 0,
+            'weekend_question': 0,
+            'unknown': 0
+        }
+
+        # Count completed recordings by task type
+        for item in completed_items:
+            task_metadata = item.get('task_metadata', {})
+            task_type = task_metadata.get('task_type', 'unknown')
+            task_counts[task_type] = task_counts.get(task_type, 0) + 1
+
+        total_completed = sum(task_counts.values())
+
+        print(f"Total Completed Recordings: {total_completed}")
+        print(f"Completed Donations (assuming 3 tasks each): {total_completed // 3}")
+        print("")
+
+        for task_type, count in task_counts.items():
+            percentage = (count / total_completed * 100) if total_completed > 0 else 0
+            donations_count = count  # Each recording represents one task completion
+            print(f"{task_type}: {count} completed recordings ({percentage:.1f}%)")
+
+        # Additional insight: Check for incomplete donation sets
+        if total_completed % 3 != 0:
+            incomplete_recordings = total_completed % 3
+            print(f"\n⚠️  Note: {incomplete_recordings} recordings suggest incomplete donation sets")
+
+        return task_counts
+
+    def validate_task_specific_features(self, items):
+        """Validate features based on task type"""
+        print("\n🔍 TASK-SPECIFIC FEATURE VALIDATION")
+        print("=" * 50)
+
+        issues = []
+
+        for item in items:
+            item = self.convert_decimal_to_float(item)
+            recording_id = item['recording_id']
+            task_metadata = item.get('task_metadata', {})
+            task_type = task_metadata.get('task_type', 'unknown')
+
+            if 'audio_features' not in item:
+                continue
+
+            features = item['audio_features'].get('audio_features', {})
+
+            if task_type == 'maximum_phonation_time':
+                # Validate MPT-specific features
+                for feature, (min_val, max_val) in self.mpt_ranges.items():
+                    if feature in features:
+                        value = features[feature]
+                        # Safe numeric conversion
+                        try:
+                            value = float(value)
+                            if not (min_val <= value <= max_val):
+                                issues.append(
+                                    f"MPT {recording_id}: {feature} = {value:.2f} (expected: {min_val}-{max_val})")
+                        except (ValueError, TypeError):
+                            issues.append(f"MPT {recording_id}: {feature} = '{value}' (invalid numeric value)")
+
+            elif task_type in ['picture_description', 'weekend_question']:
+                # Validate speech task features
+                for feature, (min_val, max_val) in self.speech_ranges.items():
+                    if feature in features:
+                        value = features[feature]
+                        # Safe numeric conversion
+                        try:
+                            value = float(value)
+                            if not (min_val <= value <= max_val):
+                                issues.append(
+                                    f"Speech {recording_id}: {feature} = {value:.2f} (expected: {min_val}-{max_val})")
+                        except (ValueError, TypeError):
+                            issues.append(f"Speech {recording_id}: {feature} = '{value}' (invalid numeric value)")
+
+        print(f"Found {len(issues)} task-specific validation issues")
+        for issue in issues[:10]:  # Show first 10
+            print(f"  ⚠️  {issue}")
+
+        if len(issues) > 10:
+            print(f"  ... and {len(issues) - 10} more issues")
+
+        return issues
+
+    def analyze_questionnaire_v3(self, items):
+        """Analyze new enhanced questionnaire data"""
+        print("\n📋 ENHANCED QUESTIONNAIRE ANALYSIS")
+        print("=" * 50)
+
+        # Only analyze unique donations (not individual recordings)
+        seen_donations = set()
+        donation_data = []
+
+        for item in items:
+            donation_id = item.get('donation_id', item['recording_id'])
+            if donation_id in seen_donations:
+                continue
+            seen_donations.add(donation_id)
+
+            questionnaire = item.get('questionnaire', {})
+            responses = questionnaire.get('responses', {})
+            flags = questionnaire.get('analysis_flags', {})
+
+            donation_data.append({
+                'donation_id': donation_id,
+                'responses': responses,
+                'flags': flags
+            })
+
+        df = pd.DataFrame(donation_data)
+        total_donations = len(df)
+
+        print(f"Unique Donations Analyzed: {total_donations}")
+
+        # Language distribution
+        print(f"\n🌍 LANGUAGE DISTRIBUTION:")
+        languages = df.apply(lambda x: x['responses'].get('donation_language', 'unknown'), axis=1)
+        english_count = (languages == 'english').sum()
+        arabic_count = (languages == 'arabic').sum()
+        unknown_count = (languages == 'unknown').sum()
+
+        print(f"  English: {english_count} donations ({english_count / total_donations * 100:.1f}%)")
+        print(f"  Arabic: {arabic_count} donations ({arabic_count / total_donations * 100:.1f}%)")
+        if unknown_count > 0:
+            print(f"  Unknown: {unknown_count} donations ({unknown_count / total_donations * 100:.1f}%)")
+
+        # Health condition analysis
+        print(f"\n🏥 HEALTH CONDITION DISTRIBUTION:")
+        has_condition_count = 0
+        healthy_count = 0
+        unknown_health_count = 0
+
+        for _, row in df.iterrows():
+            flags = row['flags']
+            responses = row['responses']
+
+            # Check if person has any health condition
+            has_any_condition = flags.get('has_any_condition', None)
+
+            if has_any_condition is True:
+                has_condition_count += 1
+            elif has_any_condition is False:
+                healthy_count += 1
+            else:
+                # Fallback: check health_conditions in responses
+                health_conditions = responses.get('health_conditions', [])
+                if isinstance(health_conditions, list):
+                    if 'none' in health_conditions:
+                        healthy_count += 1
+                    elif len(health_conditions) > 0:
+                        has_condition_count += 1
                     else:
-                        record[f"survey_{key}"] = value
+                        unknown_health_count += 1
+                else:
+                    unknown_health_count += 1
 
-            # Extract analysis flags - NEW IN SCHEMA v2.1
-            if 'questionnaire' in item and 'analysis_flags' in item['questionnaire']:
-                flags = item['questionnaire']['analysis_flags']
-                for key, value in flags.items():
-                    record[f"flag_{key}"] = value
+        print(
+            f"  Has Health Condition(s): {has_condition_count} donations ({has_condition_count / total_donations * 100:.1f}%)")
+        print(f"  Healthy (No Conditions): {healthy_count} donations ({healthy_count / total_donations * 100:.1f}%)")
+        if unknown_health_count > 0:
+            print(
+                f"  Unknown Health Status: {unknown_health_count} donations ({unknown_health_count / total_donations * 100:.1f}%)")
 
-            records.append(record)
+        # Age distribution
+        print(f"\n👥 AGE DISTRIBUTION:")
+        ages = df.apply(lambda x: x['responses'].get('age_group', 'unknown'), axis=1)
+        for age, count in ages.value_counts().items():
+            print(f"  {age}: {count} donations ({count / total_donations * 100:.1f}%)")
 
-        df = pd.DataFrame(records)
-        print(f"✅ Processed {len(df)} records with {len(df.columns)} features")
+        # Detailed health condition breakdown (if people have conditions)
+        if has_condition_count > 0:
+            print(f"\n🔍 DETAILED CONDITION BREAKDOWN:")
+            condition_flags = [
+                ('has_neurological_condition', 'Neurological'),
+                ('has_respiratory_condition', 'Respiratory'),
+                ('has_mood_condition', 'Mood/Psychiatric'),
+                ('has_voice_condition', 'Voice Problems'),
+                ('has_metabolic_condition', 'Metabolic/Endocrine')
+            ]
+
+            for flag, label in condition_flags:
+                count = df.apply(lambda x: x['flags'].get(flag, False), axis=1).sum()
+                if count > 0:
+                    print(f"  {label}: {count} donations ({count / total_donations * 100:.1f}%)")
+
+        # Cross-analysis: Language vs Health
+        print(f"\n🔄 LANGUAGE vs HEALTH CROSS-ANALYSIS:")
+        english_healthy = 0
+        english_condition = 0
+        arabic_healthy = 0
+        arabic_condition = 0
+
+        for _, row in df.iterrows():
+            language = row['responses'].get('donation_language', 'unknown')
+            has_condition = row['flags'].get('has_any_condition', None)
+
+            if has_condition is None:
+                # Fallback check
+                health_conditions = row['responses'].get('health_conditions', [])
+                if isinstance(health_conditions, list) and 'none' in health_conditions:
+                    has_condition = False
+                elif isinstance(health_conditions, list) and len(health_conditions) > 0:
+                    has_condition = True
+
+            if language == 'english':
+                if has_condition:
+                    english_condition += 1
+                else:
+                    english_healthy += 1
+            elif language == 'arabic':
+                if has_condition:
+                    arabic_condition += 1
+                else:
+                    arabic_healthy += 1
+
+        print(f"  English - Healthy: {english_healthy}, With Conditions: {english_condition}")
+        print(f"  Arabic - Healthy: {arabic_healthy}, With Conditions: {arabic_condition}")
+
         return df
 
-    def validate_feature_ranges(self, df):
-        """Check if features fall within expected healthy ranges"""
-        print("\n🔍 FEATURE RANGE VALIDATION")
+    def generate_dashboard_data(self, items, donations):
+        """Generate key metrics for dashboard"""
+        print("\n📈 GENERATING DASHBOARD METRICS")
         print("=" * 50)
 
-        issues = []
-
-        for feature, (min_val, max_val) in self.expected_ranges.items():
-            if feature in df.columns:
-                values = df[feature].dropna()
-                if len(values) == 0:
-                    continue
-
-                outliers = values[(values < min_val) | (values > max_val)]
-                outlier_percentage = len(outliers) / len(values) * 100
-
-                print(f"{feature:25s}: {values.min():.4f} - {values.max():.4f} "
-                      f"(expected: {min_val:.4f} - {max_val:.4f}) "
-                      f"| {outlier_percentage:.1f}% outliers")
-
-                # Show actual values for debugging
-                if len(values) <= 5:  # If few samples, show all values
-                    actual_values = ", ".join([f"{v:.4f}" for v in values])
-                    print(f"{'':27s}  Actual values: [{actual_values}]")
-
-                if outlier_percentage > 50:  # Only flag if >50% are outliers (more lenient)
-                    issues.append(f"⚠️  {feature}: {outlier_percentage:.1f}% of values outside normal range")
-
-        return issues
-
-    def check_critical_features(self, df):
-        """Check for missing or zero critical features"""
-        print("\n🚨 CRITICAL FEATURE CHECK")
-        print("=" * 50)
-
-        issues = []
-
-        for feature in self.critical_features:
-            if feature in df.columns:
-                values = df[feature].dropna()
-                zero_count = len(values[values == 0])
-                missing_count = len(df) - len(values)
-
-                print(f"{feature:20s}: {missing_count} missing, {zero_count} zero values")
-
-                if zero_count > 0:
-                    issues.append(f"🚨 {feature}: {zero_count} records have zero values")
-                if missing_count > 0:
-                    issues.append(f"🚨 {feature}: {missing_count} records missing this feature")
-            else:
-                issues.append(f"🚨 {feature}: Feature completely missing from data")
-
-        return issues
-
-    def analyze_data_quality(self, df):
-        """Analyze overall data quality metrics"""
-        print("\n📊 DATA QUALITY ANALYSIS")
-        print("=" * 50)
-
-        total_records = len(df)
-        print(f"Total Records: {total_records}")
-
-        # Check duration distribution
-        if 'quality_duration_seconds' in df.columns:
-            durations = df['quality_duration_seconds'].dropna()
-            print(f"Duration Range: {durations.min():.1f}s - {durations.max():.1f}s")
-            print(f"Average Duration: {durations.mean():.1f}s")
-
-            target_duration = durations[(durations >= 25) & (durations <= 45)]
-            print(f"Within Target Duration (25-45s): {len(target_duration)}/{len(durations)} "
-                  f"({len(target_duration) / len(durations) * 100:.1f}%)")
-
-        # Check signal quality
-        if 'quality_signal_quality' in df.columns:
-            quality_counts = df['quality_signal_quality'].value_counts()
-            print(f"\nSignal Quality Distribution:")
-            for quality, count in quality_counts.items():
-                print(f"  {quality}: {count} ({count / total_records * 100:.1f}%)")
-
-        # Check language distribution - NEW
-        if 'survey_donation_language' in df.columns:
-            language_counts = df['survey_donation_language'].value_counts()
-            print(f"\nDonation Language Distribution:")
-            for language, count in language_counts.items():
-                print(f"  {language}: {count} ({count / total_records * 100:.1f}%)")
-
-        # Check for demographic distribution
-        if 'survey_age_group' in df.columns:
-            age_counts = df['survey_age_group'].value_counts()
-            print(f"\nAge Group Distribution:")
-            for age, count in age_counts.items():
-                print(f"  {age}: {count} ({count / total_records * 100:.1f}%)")
-
-        # Check chronic conditions distribution - NEW
-        if 'survey_chronic_conditions' in df.columns:
-            print(f"\nChronic Conditions Distribution:")
-            # Count each condition separately since it's now an array
-            for condition in ['none', 'respiratory', 'neurological', 'cardiovascular', 'other']:
-                col_name = f'survey_has_{condition}'
-                if col_name in df.columns:
-                    count = df[col_name].sum()
-                    print(f"  {condition}: {count} ({count / total_records * 100:.1f}%)")
-
-        # Analysis flags summary - NEW
-        flag_columns = [col for col in df.columns if col.startswith('flag_')]
-        if flag_columns:
-            print(f"\nAnalysis Flags Summary:")
-            for flag_col in flag_columns:
-                if df[flag_col].dtype == 'bool':
-                    true_count = df[flag_col].sum()
-                    print(f"  {flag_col.replace('flag_', '')}: {true_count} ({true_count / total_records * 100:.1f}%)")
-                elif df[flag_col].dtype in ['object', 'str']:
-                    value_counts = df[flag_col].value_counts()
-                    print(f"  {flag_col.replace('flag_', '')}:")
-                    for value, count in value_counts.items():
-                        print(f"    {value}: {count} ({count / total_records * 100:.1f}%)")
-
-    def check_questionnaire_data_quality(self, df, total_records=None):
-        """NEW: Check questionnaire data quality specifically"""
-        print("\n📋 QUESTIONNAIRE DATA QUALITY")
-        print("=" * 50)
-
-        total_records = len(df)
-
-        # Check for required fields completion
-        required_fields = [
-            'survey_donation_language',
-            'survey_age_group',
-            'survey_chronic_conditions',
-            'survey_voice_problems',
-            'survey_native_language',  # NEW
-            'survey_arabic_dialect'  # NEW
-        ]
-
-        for field in required_fields:
-            if field in df.columns:
-                missing_count = df[field].isna().sum()
-                completion_rate = ((len(df) - missing_count) / len(df)) * 100
-                print(f"{field.replace('survey_', ''):20s}: {completion_rate:.1f}% completion rate")
-            else:
-                print(f"{field.replace('survey_', ''):20s}: MISSING from data")
-
-        # Check conditional field logic
-        if 'survey_has_other' in df.columns and 'survey_other_condition' in df.columns:
-            other_selected = df['survey_has_other'].sum()
-            other_specified = df['survey_other_condition'].notna().sum()
-            print(f"\nConditional Field Check:")
-            print(f"  'Other' condition selected: {other_selected}")
-            print(f"  'Other' condition specified: {other_specified}")
-            if other_selected != other_specified:
-                print(f"  ⚠️  Mismatch: {abs(other_selected - other_specified)} records missing conditional data")
-
-        # Check voice problems conditional logic
-        if 'survey_voice_problems' in df.columns and 'survey_other_voice_problem' in df.columns:
-            other_voice_selected = (df['survey_voice_problems'] == 'other').sum()
-            other_voice_specified = df['survey_other_voice_problem'].notna().sum()
-            print(f"  'Other' voice problem selected: {other_voice_selected}")
-            print(f"  'Other' voice problem specified: {other_voice_specified}")
-            if other_voice_selected != other_voice_specified:
-                print(
-                    f"  ⚠️  Mismatch: {abs(other_voice_selected - other_voice_specified)} voice problem records missing conditional data")
-
-        # Language distribution analysis
-        if 'survey_native_language' in df.columns:
-            native_lang_counts = df['survey_native_language'].value_counts()
-            print(f"\nNative Language Distribution:")
-            for lang, count in native_lang_counts.items():
-                print(f"  {lang}: {count} ({count / total_records * 100:.1f}%)")
-
-        if 'survey_arabic_dialect' in df.columns:
-            dialect_counts = df['survey_arabic_dialect'].value_counts()
-            print(f"\nArabic Dialect Distribution:")
-            for dialect, count in dialect_counts.items():
-                print(f"  {dialect}: {count} ({count / total_records * 100:.1f}%)")
-
-        # Cross-language validation
-        if 'survey_donation_language' in df.columns:
-            print(f"\nLanguage Consistency Check:")
-            english_donations = (df['survey_donation_language'] == 'english').sum()
-            arabic_donations = (df['survey_donation_language'] == 'arabic').sum()
-
-            if 'survey_native_language' in df.columns:
-                native_lang_provided = df['survey_native_language'].notna().sum()
-                print(f"  English donations with native language data: {native_lang_provided}/{english_donations}")
-
-            if 'survey_arabic_dialect' in df.columns:
-                dialect_provided = df['survey_arabic_dialect'].notna().sum()
-                print(f"  Arabic donations with dialect data: {dialect_provided}/{arabic_donations}")
-
-    def suggest_optimal_ranges(self, df):
-        """Suggest optimal ranges based on actual data distribution"""
-        print("\n🎯 SUGGESTED OPTIMAL RANGES (Based on Your Data)")
-        print("=" * 60)
-
-        suggested_ranges = {}
-
-        for feature in df.columns:
-            if feature.startswith(
-                    ('mean_', 'std_', 'min_', 'max_', 'jitter_', 'shimmer_', 'hnr', 'speech_', 'pause_', 'f1_', 'f2_',
-                     'f3_', 'quality_')):
-                values = df[feature].dropna()
-                if len(values) == 0:
-                    continue
-
-                # Skip boolean and non-numeric columns
-                if values.dtype == 'bool' or values.dtype == 'object':
-                    continue
-
-                # Skip if all values are the same (no range to calculate)
-                if len(values.unique()) <= 1:
-                    continue
-
-                try:
-                    # Calculate percentile-based ranges (5th to 95th percentile)
-                    min_val = np.percentile(values, 5)
-                    max_val = np.percentile(values, 95)
-
-                    # Add some padding (±20% for robustness)
-                    padding = (max_val - min_val) * 0.2
-                    suggested_min = max(0, min_val - padding) if min_val >= 0 else min_val - padding
-                    suggested_max = max_val + padding
-
-                    suggested_ranges[feature] = (suggested_min, suggested_max)
-
-                    print(f"{feature:25s}: {suggested_min:.4f} - {suggested_max:.4f} "
-                          f"(current data: {values.min():.4f} - {values.max():.4f})")
-
-                except (TypeError, ValueError) as e:
-                    # Skip features that can't be processed
-                    print(f"{feature:25s}: Skipped (data type: {values.dtype})")
-                    continue
-
-        return suggested_ranges
-
-    def create_feature_plots(self, df):
-        """Create visualization plots for key features"""
-        print("\n📈 Creating feature distribution plots...")
-
-        # Select key features for plotting
-        plot_features = [
-            'mean_pitch', 'jitter_local', 'shimmer_local', 'hnr',
-            'speech_ratio', 'quality_duration_seconds'
-        ]
-
-        available_features = [f for f in plot_features if f in df.columns]
-
-        if len(available_features) == 0:
-            print("❌ No key features available for plotting")
-            return
-
-        # Create subplots
-        fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-        fig.suptitle('Voice Feature Distributions', fontsize=16)
-
-        for i, feature in enumerate(available_features[:6]):
-            row, col = i // 3, i % 3
-            ax = axes[row, col]
-
-            values = df[feature].dropna()
-
-            # Histogram
-            ax.hist(values, bins=20, alpha=0.7, edgecolor='black')
-            ax.set_title(f'{feature}\n(n={len(values)})')
-            ax.set_xlabel('Value')
-            ax.set_ylabel('Frequency')
-
-            # Add expected range if available
-            if feature in self.expected_ranges:
-                min_val, max_val = self.expected_ranges[feature]
-                ax.axvline(min_val, color='red', linestyle='--', alpha=0.7, label='Expected Min')
-                ax.axvline(max_val, color='red', linestyle='--', alpha=0.7, label='Expected Max')
-                ax.legend()
-
-        # Hide empty subplots
-        for i in range(len(available_features), 6):
-            row, col = i // 3, i % 3
-            axes[row, col].set_visible(False)
-
-        plt.tight_layout()
-        plt.savefig('voice_feature_distributions.png', dpi=300, bbox_inches='tight')
-        print("✅ Saved plot as 'voice_feature_distributions.png'")
-        plt.show()
-
-    def generate_summary_report(self, df, range_issues, critical_issues):
-        """Generate a comprehensive validation summary"""
-        print("\n" + "=" * 60)
-        print("🎯 VOICE DATA VALIDATION SUMMARY REPORT")
-        print("=" * 60)
-
-        total_records = len(df)
-
-        # Overall health score (more lenient scoring)
-        total_issues = len(range_issues) + len(critical_issues)
-        health_score = max(0, 100 - (total_issues * 5))  # Reduced penalty per issue
-
-        print(f"📊 OVERALL DATA HEALTH SCORE: {health_score}/100")
-
-        if health_score >= 90:
-            print("✅ EXCELLENT: Your voice data extraction is working perfectly!")
-        elif health_score >= 70:
-            print("✅ GOOD: Minor issues detected, but overall quality is very acceptable")
-        elif health_score >= 50:
-            print("⚠️  FAIR: Some issues detected, but pipeline is functional")
-        elif health_score >= 30:
-            print("🔶 NEEDS ATTENTION: Several issues detected, review recommended")
-        else:
-            print("🚨 POOR: Significant issues detected, pipeline needs attention")
-
-        print(f"\n📈 Data Summary:")
-        print(f"  • Total voice donations: {total_records}")
-        print(f"  • Range validation issues: {len(range_issues)}")
-        print(f"  • Critical feature issues: {len(critical_issues)}")
-
-        # NEW: Language distribution summary
-        if 'survey_donation_language' in df.columns:
-            lang_counts = df['survey_donation_language'].value_counts()
-            print(f"  • Languages: {dict(lang_counts)}")
-
-        if range_issues:
-            print(f"\n⚠️  Range Issues:")
-            for issue in range_issues:
-                print(f"    {issue}")
-
-        if critical_issues:
-            print(f"\n🚨 Critical Issues:")
-            for issue in critical_issues:
-                print(f"    {issue}")
-
-        if not range_issues and not critical_issues:
-            print("\n🎉 No major issues detected! Your voice extraction pipeline appears to be working correctly.")
-
-        print(f"\n💡 Recommendations:")
-        if len(range_issues) > 5:
-            print("  • The current validation ranges may be too restrictive for your data")
-            print("  • Consider using the suggested optimal ranges shown above")
-            print("  • This is normal for initial testing - ranges can be adjusted")
-
-        if health_score < 80:
-            print("  • Review audio quality of problematic recordings")
-            print("  • Check microphone settings and recording environment")
-            print("  • Verify feature extraction algorithms")
-
-        print("  • Continue testing with diverse voice samples")
-        print("  • Consider demographic balance in your test data")
-        print("  • Test both English and Arabic recordings for language-specific patterns")
-        print("  • Monitor data quality as you scale up")
+        # Convert to DataFrames for analysis
+        items_df = pd.DataFrame([self.convert_decimal_to_float(item) for item in items])
+
+        # Basic counts
+        total_recordings = len(items)
+        total_donations = len(donations)
+        completed_recordings = len(items_df[items_df['status'] == 'completed'])
+
+        # Success rates
+        donation_success_rate = sum(1 for d in donations.values() if d['status'] == 'completed') / total_donations * 100
+        recording_success_rate = completed_recordings / total_recordings * 100
+
+        # Quality metrics (for completed recordings only)
+        completed_items = items_df[items_df['status'] == 'completed']
+
+        avg_features_extracted = 0
+        avg_duration = 0
+        excellent_quality_count = 0
+
+        if len(completed_items) > 0:
+            # Extract feature counts
+            feature_counts = []
+            durations = []
+            quality_ratings = []
+
+            for _, item in completed_items.iterrows():
+                if 'audio_features' in item and pd.notna(item['audio_features']):
+                    audio_features = item['audio_features']
+                    if isinstance(audio_features, dict):
+                        features = audio_features.get('audio_features', {})
+                        summary = audio_features.get('summary', {})
+                        quality = audio_features.get('quality_metrics', {})
+
+                        if features:
+                            feature_counts.append(len(features))
+                        if 'final_duration' in summary:
+                            durations.append(summary['final_duration'])
+                        if quality.get('signal_quality') == 'excellent':
+                            excellent_quality_count += 1
+
+            if feature_counts:
+                avg_features_extracted = np.mean(feature_counts)
+            if durations:
+                avg_duration = np.mean(durations)
+
+        # Task distribution
+        task_counts = self.analyze_task_distribution(items)
+
+        dashboard_data = {
+            'overview': {
+                'total_recordings': total_recordings,
+                'total_donations': total_donations,
+                'completed_recordings': completed_recordings,
+                'donation_success_rate': round(donation_success_rate, 1),
+                'recording_success_rate': round(recording_success_rate, 1),
+            },
+            'quality': {
+                'avg_features_extracted': round(avg_features_extracted, 1),
+                'avg_duration_seconds': round(avg_duration, 1),
+                'excellent_quality_count': excellent_quality_count,
+                'excellent_quality_rate': round(excellent_quality_count / completed_recordings * 100,
+                                                1) if completed_recordings > 0 else 0
+            },
+            'tasks': task_counts,
+            'system_health_score': None,  # Will be set by the main validation function
+            'timestamp': datetime.now().isoformat()
+        }
+
+        # Save dashboard data
+        with open('dashboard_data.json', 'w') as f:
+            json.dump(dashboard_data, f, indent=2)
+
+        print("Dashboard data saved to 'dashboard_data.json'")
+        print("\nKey Metrics:")
+        print(f"  Total Donations: {total_donations}")
+        print(f"  Donation Success Rate: {donation_success_rate:.1f}%")
+        print(f"  Average Features per Recording: {avg_features_extracted:.1f}")
+        print(f"  Excellent Quality Rate: {dashboard_data['quality']['excellent_quality_rate']:.1f}%")
+
+        return dashboard_data
 
     def run_full_validation(self):
-        """Run complete validation pipeline"""
-        print("🔬 VOICE DATA VALIDATION STARTING...")
+        """Run complete validation for multi-task system"""
+        print("🔬 VOICE DATA VALIDATION V3.0 - MULTI-TASK SYSTEM")
         print("=" * 60)
 
-        # Fetch data
+        # Fetch and analyze data
         items = self.fetch_all_data()
         if not items:
-            print("❌ No data found in DynamoDB table")
-            return
+            print("❌ No data found")
+            return None
 
-        # Process into DataFrame
-        df = self.extract_features_dataframe(items)
+        # Multi-task specific analyses
+        donations = self.analyze_donation_completeness(items)
+        task_distribution = self.analyze_task_distribution(items)
+        task_validation_issues = self.validate_task_specific_features(items)
+        questionnaire_analysis = self.analyze_questionnaire_v3(items)
 
-        # Run validations
-        range_issues = self.validate_feature_ranges(df)
-        critical_issues = self.check_critical_features(df)
+        # Generate dashboard data
+        dashboard_data = self.generate_dashboard_data(items, donations)
 
-        # Quality analysis
-        self.analyze_data_quality(df)
+        # Overall health assessment
+        total_issues = len(task_validation_issues)
+        donation_success_rate = dashboard_data['overview']['donation_success_rate']
 
-        # NEW: Questionnaire quality check
-        self.check_questionnaire_data_quality(df)
+        health_score = max(0, 100 - total_issues - (100 - donation_success_rate))
 
-        # Suggest optimal ranges
-        suggested_ranges = self.suggest_optimal_ranges(df)
+        # Add health score to dashboard data
+        dashboard_data['system_health_score'] = round(health_score, 1)
 
-        # Create plots
-        self.create_feature_plots(df)
+        print(f"\n🎯 OVERALL SYSTEM HEALTH SCORE: {health_score:.1f}/100")
 
-        # Generate summary
-        self.generate_summary_report(df, range_issues, critical_issues)
+        if health_score >= 90:
+            print("✅ EXCELLENT: Multi-task donation system is working perfectly!")
+        elif health_score >= 70:
+            print("✅ GOOD: Minor issues detected, system is functional")
+        elif health_score >= 50:
+            print("⚠️  FAIR: Some issues detected, review recommended")
+        else:
+            print("🚨 NEEDS ATTENTION: Multiple issues detected")
 
-        return df
+        return {
+            'items': items,
+            'donations': donations,
+            'dashboard_data': dashboard_data,
+            'health_score': health_score
+        }
 
 
 def main():
-    """Main function to run validation"""
-    validator = VoiceDataValidator()
-    df = validator.run_full_validation()
-    return df
+    """Run the updated validation"""
+    validator = VoiceDataValidatorV3()
+    results = validator.run_full_validation()
+    return results
 
 
 if __name__ == "__main__":
-    # Required packages: pip install pandas matplotlib seaborn boto3
-    df = main()
+    results = main()

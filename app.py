@@ -481,6 +481,142 @@ def process_audio_background(recording_id, audio_data, filename, questionnaire_r
         print(f"Final memory after cleanup: {memory_final:.1f} MB")
 
 
+# Dashboard
+@app.route('/dashboard')
+def dashboard():
+    """Serve the dashboard HTML"""
+    return send_from_directory('static', 'dashboard.html')
+
+
+@app.route('/api/dashboard-data')
+def get_dashboard_data():
+    """API endpoint to serve dashboard data with real DynamoDB data"""
+    try:
+        # Try to read existing dashboard data
+        dashboard_file = 'dashboard_data.json'
+
+        if os.path.exists(dashboard_file):
+            with open(dashboard_file, 'r') as f:
+                data = json.load(f)
+            return jsonify(data)
+        else:
+            # If no data file exists, run validation to generate it
+            from tools.validate_voice_data import VoiceDataValidatorV3
+
+            validator = VoiceDataValidatorV3()
+            results = validator.run_full_validation()
+
+            if results and 'dashboard_data' in results:
+                return jsonify(results['dashboard_data'])
+            else:
+                # Return empty data structure if validation fails
+                return jsonify({
+                    'overview': {
+                        'total_recordings': 0,
+                        'total_donations': 0,
+                        'completed_recordings': 0,
+                        'donation_success_rate': 0,
+                        'recording_success_rate': 0,
+                    },
+                    'quality': {
+                        'avg_features_extracted': 0,
+                        'avg_duration_seconds': 0,
+                        'excellent_quality_count': 0,
+                        'excellent_quality_rate': 0
+                    },
+                    'tasks': {
+                        'maximum_phonation_time': 0,
+                        'picture_description': 0,
+                        'weekend_question': 0,
+                        'unknown': 0
+                    },
+                    'demographics': {
+                        'english_count': 0,
+                        'arabic_count': 0,
+                        'healthy_count': 0,
+                        'conditions_count': 0,
+                        'age_groups': {}
+                    },
+                    'system_health_score': 0,
+                    'timestamp': datetime.now().isoformat()
+                })
+
+    except Exception as e:
+        print(f"Dashboard data error: {e}")
+        return jsonify({'error': 'Failed to load dashboard data'}), 500
+
+
+@app.route('/api/donation-data')
+def get_donation_data():
+    """API endpoint to get individual donation records with features"""
+    try:
+        from tools.validate_voice_data import VoiceDataValidatorV3
+
+        validator = VoiceDataValidatorV3()
+        items = validator.fetch_all_data()
+
+        # Process items into donation records
+        donations = {}
+        for item in items:
+            item = validator.convert_decimal_to_float(item)
+            donation_id = item.get('donation_id', item['recording_id'])
+
+            if donation_id not in donations:
+                questionnaire = item.get('questionnaire', {})
+                responses = questionnaire.get('responses', {})
+                flags = questionnaire.get('analysis_flags', {})
+
+                donations[donation_id] = {
+                    'donation_id': donation_id,
+                    'language': responses.get('donation_language', 'unknown'),
+                    'age': responses.get('age_group', 'unknown'),
+                    'health': 'Healthy' if not flags.get('has_any_condition', True) else 'Has Conditions',
+                    'tasks': {}
+                }
+
+            # Add task data with better feature extraction
+            task_metadata = item.get('task_metadata', {})
+            task_number = int(float(task_metadata.get('task_number', 1)))
+            task_type = task_metadata.get('task_type', 'unknown')
+
+            status = 'completed' if item.get('status') == 'completed' else 'missing'
+            features = {}
+
+            # Better feature extraction - check multiple possible locations
+            if status == 'completed' and 'audio_features' in item:
+                audio_features_data = item['audio_features']
+
+                # Try different possible locations for features
+                if isinstance(audio_features_data, dict):
+                    if 'audio_features' in audio_features_data:
+                        features = audio_features_data['audio_features']
+                    elif len(audio_features_data) > 0:
+                        # Sometimes features might be directly in audio_features
+                        features = audio_features_data
+
+                # Debug: log what we found
+                print(f"Task {task_number} for {donation_id}: found {len(features)} features")
+                if len(features) > 0:
+                    print(f"Sample features: {list(features.keys())[:5]}")
+
+            donations[donation_id]['tasks'][task_number] = {
+                'type': task_type,
+                'status': status,
+                'features': features
+            }
+
+        # Convert to list and add debug info
+        donation_list = list(donations.values())
+        print(f"Returning {len(donation_list)} donations")
+
+        return jsonify(donation_list)
+
+    except Exception as e:
+        print(f"Donation data error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Failed to load donation data: {str(e)}'}), 500
+
 print("All routes configured")
 
 if __name__ == '__main__':
