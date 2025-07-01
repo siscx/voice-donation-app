@@ -366,6 +366,15 @@ document.addEventListener('click', function(event) {
 // Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded, initializing...');
+
+    // Auto-detect language from URL
+    const path = window.location.pathname;
+    if (path === '/ar') {
+        switchLanguage('ar');
+    } else if (path === '/en') {
+        switchLanguage('en');
+    }
+
     createParticles();
 
     // Load HTML components

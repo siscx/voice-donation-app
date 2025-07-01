@@ -85,6 +85,14 @@ pending_submissions = {}
 @app.route('/')
 def home():
     return send_from_directory('static', 'index.html')
+@app.route('/ar')
+def home_arabic():
+    return send_from_directory('static', 'index.html')
+
+@app.route('/en')
+def home_english():
+    return send_from_directory('static', 'index.html')
+
 
 
 @app.route('/static/<path:filename>')
