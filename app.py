@@ -490,79 +490,143 @@ def dashboard():
 
 @app.route('/api/dashboard-data')
 def get_dashboard_data():
-    """API endpoint to serve dashboard data with real DynamoDB data"""
+    """Simple dashboard data without pandas dependency"""
     try:
-        # Try to read existing dashboard data
-        dashboard_file = 'dashboard_data.json'
+        import boto3
+        from decimal import Decimal
 
-        if os.path.exists(dashboard_file):
-            with open(dashboard_file, 'r') as f:
-                data = json.load(f)
-            return jsonify(data)
-        else:
-            # If no data file exists, run validation to generate it
-            print("No dashboard_data.json found, running validation...")
+        # Direct DynamoDB query without validation script
+        dynamodb = boto3.resource(
+            'dynamodb',
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            region_name=os.getenv('AWS_REGION')
+        )
+        table = dynamodb.Table('voice-donations')
 
-            from tools.validate_voice_data import VoiceDataValidatorV3
+        # Get all items
+        response = table.scan()
+        items = response['Items']
 
-            validator = VoiceDataValidatorV3()
-            print("Validator created, running full validation...")
+        while 'LastEvaluatedKey' in response:
+            response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+            items.extend(response['Items'])
 
-            results = validator.run_full_validation()
-            print(f"Validation completed: {results is not None}")
+        # Convert Decimal to float
+        def convert_decimal(obj):
+            if isinstance(obj, dict):
+                return {k: convert_decimal(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_decimal(i) for i in obj]
+            elif isinstance(obj, Decimal):
+                return float(obj)
+            return obj
 
-            if results and 'dashboard_data' in results:
-                print("Returning dashboard data from validation results")
-                return jsonify(results['dashboard_data'])
+        items = [convert_decimal(item) for item in items]
+
+        # Simple counting
+        total_recordings = len(items)
+        completed_recordings = len([item for item in items if item.get('status') == 'completed'])
+
+        # Count unique donations
+        donations = {}
+        for item in items:
+            donation_id = item.get('donation_id', item['recording_id'])
+            if donation_id not in donations:
+                donations[donation_id] = {'recordings': [], 'completed': 0}
+            donations[donation_id]['recordings'].append(item)
+            if item.get('status') == 'completed':
+                donations[donation_id]['completed'] += 1
+
+        total_donations = len(donations)
+        completed_donations = len([d for d in donations.values() if d['completed'] >= 3])
+
+        # Calculate success rate
+        success_rate = (completed_donations / total_donations * 100) if total_donations > 0 else 0
+
+        # Count demographics from unique donations only
+        english_count = 0
+        arabic_count = 0
+        healthy_count = 0
+        conditions_count = 0
+        age_groups = {}
+
+        seen_donations = set()
+        for item in items:
+            donation_id = item.get('donation_id', item['recording_id'])
+            if donation_id in seen_donations:
+                continue
+            seen_donations.add(donation_id)
+
+            questionnaire = item.get('questionnaire', {})
+            responses = questionnaire.get('responses', {})
+            flags = questionnaire.get('analysis_flags', {})
+
+            # Language
+            lang = responses.get('donation_language', 'unknown')
+            if lang == 'english':
+                english_count += 1
+            elif lang == 'arabic':
+                arabic_count += 1
+
+            # Health
+            has_condition = flags.get('has_any_condition', False)
+            if has_condition:
+                conditions_count += 1
             else:
-                print("No dashboard data in validation results, returning empty structure")
-                # Return empty data structure if validation fails
-                return jsonify({
-                    'overview': {
-                        'total_recordings': 0,
-                        'total_donations': 0,
-                        'completed_recordings': 0,
-                        'donation_success_rate': 0,
-                        'recording_success_rate': 0,
-                    },
-                    'quality': {
-                        'avg_features_extracted': 0,
-                        'avg_duration_seconds': 0,
-                        'excellent_quality_count': 0,
-                        'excellent_quality_rate': 0
-                    },
-                    'tasks': {
-                        'maximum_phonation_time': 0,
-                        'picture_description': 0,
-                        'weekend_question': 0,
-                        'unknown': 0
-                    },
-                    'demographics': {
-                        'english_count': 0,
-                        'arabic_count': 0,
-                        'healthy_count': 0,
-                        'conditions_count': 0,
-                        'age_groups': {}
-                    },
-                    'system_health_score': 0,
-                    'timestamp': datetime.now().isoformat()
-                })
+                healthy_count += 1
 
-    except Exception as e:
-        # ADD DETAILED ERROR LOGGING
-        print(f"=== DASHBOARD DATA ERROR ===")
-        print(f"Error: {e}")
-        print(f"Error type: {type(e).__name__}")
+            # Age
+            age = responses.get('age_group', 'unknown')
+            age_groups[age] = age_groups.get(age, 0) + 1
 
-        import traceback
-        print("Full traceback:")
-        traceback.print_exc()  # This will show the full error stack
+        # Average features
+        feature_counts = []
+        for item in items:
+            if item.get('status') == 'completed' and 'audio_features' in item:
+                features = item['audio_features'].get('audio_features', {})
+                if features:
+                    feature_counts.append(len(features))
+
+        avg_features = sum(feature_counts) / len(feature_counts) if feature_counts else 0
 
         return jsonify({
-            'error': f'Failed to load dashboard data: {str(e)}',
-            'error_type': type(e).__name__,
-            'details': 'Check server logs for full traceback'
-        }), 500
+            'overview': {
+                'total_recordings': total_recordings,
+                'total_donations': total_donations,
+                'completed_recordings': completed_recordings,
+                'donation_success_rate': round(success_rate, 1),
+                'recording_success_rate': round(
+                    (completed_recordings / total_recordings * 100) if total_recordings > 0 else 0, 1),
+            },
+            'quality': {
+                'avg_features_extracted': round(avg_features, 1),
+                'avg_duration_seconds': 0,
+                'excellent_quality_count': 0,
+                'excellent_quality_rate': 0
+            },
+            'tasks': {
+                'maximum_phonation_time': 0,
+                'picture_description': 0,
+                'weekend_question': 0,
+                'unknown': 0
+            },
+            'demographics': {
+                'english_count': english_count,
+                'arabic_count': arabic_count,
+                'healthy_count': healthy_count,
+                'conditions_count': conditions_count,
+                'age_groups': age_groups
+            },
+            'system_health_score': round(success_rate, 1),
+            'timestamp': datetime.now().isoformat()
+        })
+
+    except Exception as e:
+        print(f"Dashboard data error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Failed to load dashboard data: {str(e)}'}), 500
 
 
 @app.route('/api/donation-data')
