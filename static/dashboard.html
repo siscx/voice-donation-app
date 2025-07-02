@@ -1071,20 +1071,13 @@
             featuresGrid.innerHTML = html;
         }
 
+
         function updateLastUpdated(timestamp) {
-            const date = new Date(timestamp);
-            // Convert to Dubai timezone
-            const dubaiTime = date.toLocaleString('en-US', {
-                timeZone: 'Asia/Dubai',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
+            const now = new Date();
+            const utcTime = now.toISOString().replace('T', ' ').replace('Z', '');
+
             document.getElementById('lastUpdated').textContent =
-                `Last updated: ${dubaiTime} (Dubai time)`;
+                `Last updated: ${utcTime} UTC`;
         }
 
         // Load data on page load
