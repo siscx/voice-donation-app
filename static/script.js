@@ -21,6 +21,9 @@ function createParticles() {
 function nextStep() {
     console.log('nextStep called, currentStep:', currentStep);
 
+    // Preserve current language
+    const currentLang = document.documentElement.lang || 'en';
+
     // Validate questionnaire on step 2
     if (currentStep === 2 && !validateQuestionnaire()) {
         return;
@@ -48,6 +51,11 @@ function nextStep() {
     }
 
     document.getElementById(`step${currentStep}`).classList.add('active');
+
+    // CRITICAL: Restore language state after step transition
+    if (currentLang === 'ar') {
+        switchLanguage('ar');
+    }
 
     // Scroll to top when moving to next step
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -367,13 +375,26 @@ document.addEventListener('click', function(event) {
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded, initializing...');
 
-    // Auto-detect language from URL
+    // Auto-detect and LOCK language from URL
     const path = window.location.pathname;
+    let detectedLang = 'en'; // default
+
     if (path === '/ar') {
-        switchLanguage('ar');
+        detectedLang = 'ar';
+        // Store in sessionStorage to persist through step changes
+        sessionStorage.setItem('appLanguage', 'ar');
     } else if (path === '/en') {
-        switchLanguage('en');
+        detectedLang = 'en';
+        sessionStorage.setItem('appLanguage', 'en');
+    } else {
+        // Check if we have a stored language preference
+        const storedLang = sessionStorage.getItem('appLanguage');
+        if (storedLang) {
+            detectedLang = storedLang;
+        }
     }
+
+    switchLanguage(detectedLang);
 
     createParticles();
 
@@ -383,7 +404,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Start testimonials rotation on step 1
     startTestimonialRotation();
 
-    console.log('Initialization complete');
+    console.log('Initialization complete with language:', detectedLang);
 });
 
 // Simple HTML include function
