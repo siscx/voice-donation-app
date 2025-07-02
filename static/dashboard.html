@@ -784,6 +784,8 @@
                     `;
                 }).join('');
 
+                setupSearch();
+
             } catch (error) {
                 console.error('Error loading data browser:', error);
                 document.getElementById('dataTableBody').innerHTML = `
@@ -1078,6 +1080,22 @@
 
             document.getElementById('lastUpdated').textContent =
                 `Last updated: ${utcTime} UTC`;
+        }
+
+        // Simple Donation ID search
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                const tableRows = document.querySelectorAll('#dataTableBody tr');
+
+                tableRows.forEach(row => {
+                    const donationId = row.cells[0]?.textContent.toLowerCase() || '';
+                    row.style.display = donationId.includes(searchTerm) ? '' : 'none';
+                });
+            });
         }
 
         // Load data on page load
