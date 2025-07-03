@@ -198,7 +198,14 @@ const translations = {
         testimonial3: '"Your voice holds more health information than you imagine. With just a brief audio sample, we can begin to detect patterns linked to chronic diseases. But for our research to be accurate and inclusive, we need thousands of voices—different ages, accents, and health backgrounds."',
         testimonial3Author: "- Dr Leila, Neurologist",
         testimonial4: '"Most of the medical AI tools today are trained on data from outside our region. But voice, like language and accent, varies across populations. By donating your voice, you\'re helping us build healthcare solutions that truly reflect and serve our communities."',
-        testimonial4Author: "- Dr Ahmed, Pulmonologist"
+        testimonial4Author: "- Dr Ahmed, Pulmonologist",
+
+        // Research tab
+        tabResearch: "Key Studies",
+        researchTitle: "Key Studies on Voice Biomarkers",
+        researchIntroTitle: "Scientific Foundation",
+        researchIntroText: "Voice biomarker research is rapidly advancing, with studies from leading institutions demonstrating the potential of vocal analysis for health monitoring. Here are key publications that form the scientific foundation of our work.",
+        viewPaper: "View Paper"
     },
 
     ar: {
@@ -398,7 +405,14 @@ const translations = {
         testimonial3: '"صوتك يحمل معلومات صحية أكثر مما تتخيل. مع عينة صوتية قصيرة فقط، يمكننا البدء في اكتشاف الأنماط المرتبطة بالأمراض المزمنة. لكن لكي يكون بحثنا دقيقاً وشاملاً، نحتاج إلى آلاف الأصوات—أعمار ولهجات وخلفيات صحية مختلفة."',
         testimonial3Author: "- د. ليلى، طبيبة أعصاب",
         testimonial4: '"معظم أدوات الذكاء الاصطناعي الطبية اليوم مدربة على بيانات من خارج منطقتنا. لكن الصوت، مثل اللغة واللهجة، يختلف عبر السكان. من خلال التبرع بصوتك، أنت تساعدنا في بناء حلول رعاية صحية تعكس وتخدم مجتمعاتنا حقاً."',
-        testimonial4Author: "- د. أحمد، طبيب رئة"
+        testimonial4Author: "- د. أحمد، طبيب رئة",
+
+        // Research tab
+        tabResearch: "الدراسات الرئيسية",
+        researchTitle: "الدراسات الرئيسية حول المؤشرات الحيوية الصوتية",
+        researchIntroTitle: "الأساس العلمي",
+        researchIntroText: "تتقدم أبحاث المؤشرات الحيوية الصوتية بسرعة، مع دراسات من مؤسسات رائدة تُظهر إمكانات التحليل الصوتي لمراقبة الصحة. هذه هي المنشورات الرئيسية التي تشكل الأساس العلمي لعملنا.",
+        viewPaper: "عرض البحث"
     }
 };
 
